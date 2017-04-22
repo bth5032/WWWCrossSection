@@ -1,0 +1,9 @@
+DEFAULT::signal_region=baseline
+
+#================================
+# Baseline Region
+#================================
+DEFAULT::Mjj_Z_veto=true
+DEFAULT::dilmass_Z_veto=true
+DEFAULT::tau_veto=true
+DEFAULT::NBjets_max=0

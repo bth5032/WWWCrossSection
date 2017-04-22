@@ -1,0 +1,7 @@
+DEFAULT::signal_region=2j
+
+#================================
+# Baseline Region
+#================================
+DEFAULT::Njets_min=2
+DEFAULT::MT2_min=80
