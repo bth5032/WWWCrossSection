@@ -144,6 +144,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   //going to be the data events in our signal region. The rest of the hists, starting
   //from 1, are added to a THStack which is normalized to hist_0 in the bin 0-50. 
   //num_hists should be the number of the number of histograms in the plot.
+
   TString errors="";
   TGraphAsymmErrors *prediction_errors;
 
@@ -172,8 +173,6 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   cout << "Found files "<<endl;
 
   TString plot_name = conf->get("plot_name");
-  double xmax = stod(conf->get("xmax"));
-  double xmin = stod(conf->get("xmin"));
   double bin_size;
   if (conf->get("bin_size") != ""){
     bin_size = stod(conf->get("bin_size"));
@@ -192,6 +191,10 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     }
   }
 
+  cout<<"/////////////////////////////////////////////////"<<endl;
+  cout << "Making Plots for: "<<plot_name<<endl;
+  cout<<"/////////////////////////////////////////////////"<<endl;
+
   //Get labels for TLegend
   vector<TString> hist_labels (num_hists);
   for (int i = 0; i<num_hists; i++){
@@ -205,9 +208,6 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   TString save_dir=(conf->get("save_dir") != "") ? conf->get("save_dir") : getOutputDir(conf, "plot");
   TString plot_title=parseLatex(conf->get("title"));
 
-
-  cout << "Making Plots for: "<<plot_name<<endl;
-
   vector<TH1D*> hists (num_hists);
   for (int i = 0; i<num_hists; i++){
     hists[i] = (TH1D*) ((TH1D*) hist_files[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name);
@@ -217,6 +217,12 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   cout << "Histograms pulled from files, adding draw options"<<endl;
   
   //cout<<__LINE__<<endl;
+  if (conf->get("relabel_x_axis") == "true"){
+    hists[0]->LabelsDeflate();
+  }
+
+  double xmax = (conf->get("xmax") != "" ) ? stod(conf->get("xmax")) : hists[0]->GetNbinsX();
+  double xmin = (conf->get("xmin") != "" ) ? stod(conf->get("xmin")) : 0;
 
 
   //============================================
@@ -258,7 +264,6 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     }
   }
   else if (conf->get("binning") != ""){
-    cout<<"here"<<endl;
     vector<double> binning = parseVector(conf->get("binning"));
     for (int i = 0; i<num_hists; i++){
       hists[i] = (TH1D*) hists[i]->Rebin(binning.size()-1, TString(hist_names[i]+"_rebin"), &binning[0]);
@@ -465,7 +470,16 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   
   TH2F* h_axes = new TH2F(Form("%s_axes",plot_name.Data()),plot_title,hists[0]->GetNbinsX(),xmin,xmax,1000,ymin,ymax);
   
-  
+  if (conf->get("relabel_x_axis") == "true"){
+    TString bin_label;
+    for (int i = (int) xmin; i <= (int) xmax; i++)
+    {
+      bin_label=hists[0]->GetXaxis()->GetBinLabel(hists[0]->FindBin(i));
+      h_axes->GetXaxis()->SetBinLabel(h_axes->FindBin(i), bin_label);
+    }  
+    //h_axes->GetXaxis()->LabelsOption("v");
+    h_axes->GetXaxis()->SetLabelSize(.015);
+  }
   //-----------------------
   // AXES FIX
   //-----------------------
@@ -888,8 +902,6 @@ TString drawArbitraryNumber(ConfigParser *conf){
   cout << "Found files "<<endl;
 
   TString plot_name = conf->get("plot_name");
-  double xmax = stod(conf->get("xmax"));
-  double xmin = stod(conf->get("xmin"));
   double bin_size;
   if (conf->get("bin_size") != ""){
     bin_size = stod(conf->get("bin_size"));
@@ -934,6 +946,13 @@ TString drawArbitraryNumber(ConfigParser *conf){
   cout << "Histograms pulled from files, adding draw options"<<endl;
   
   //cout<<__LINE__<<endl;
+
+  if (conf->get("relabel_x_axis") == "true"){
+    hists[0]->LabelsDeflate();
+  }
+
+  double xmax = (conf->get("xmax") != "" ) ? stod(conf->get("xmax")) : hists[0]->GetNbinsX();
+  double xmin = (conf->get("xmin") != "" ) ? stod(conf->get("xmin")) : 0;
 
 
   //============================================
@@ -1056,7 +1075,16 @@ TString drawArbitraryNumber(ConfigParser *conf){
   
   TH2F* h_axes = new TH2F(Form("%s_axes",plot_name.Data()),plot_title,hists[0]->GetNbinsX(),xmin,xmax,1000,ymin,ymax);
   
-  
+  if (conf->get("relabel_x_axis") == "true"){
+    TString bin_label;
+    for (int i = (int) xmin; i <= (int) xmax; i++)
+    {
+      bin_label=hists[0]->GetXaxis()->GetBinLabel(hists[0]->FindBin(i));
+      h_axes->GetXaxis()->SetBinLabel(h_axes->FindBin(i), bin_label);
+    }  
+    //h_axes->GetXaxis()->LabelsOption("v");
+    h_axes->GetXaxis()->SetLabelSize(.015);
+  }
   //-----------------------
   // AXES FIX
   //-----------------------
@@ -1302,8 +1330,6 @@ TString drawSingleTH1(ConfigParser *conf){
 
   TString plot_name = conf->get("plot_name");
   TString plot_title = parseLatex(conf->get("title"));
-  double xmax = stod(conf->get("xmax"));
-  double xmin = stod(conf->get("xmin"));
   TString hist_name=conf->get("hist_name");
   TString xlabel=parseLatex(conf->get("xlabel"));
   TString ylabel=parseLatex(conf->get("ylabel"));
@@ -1324,6 +1350,13 @@ TString drawSingleTH1(ConfigParser *conf){
 
   cout << "Histograms pulled from files, adding draw options"<<endl;
   
+  if (conf->get("relabel_x_axis") == "true"){
+    p_hist->LabelsDeflate();
+  }
+
+  double xmax = (conf->get("xmax") != "" ) ? stod(conf->get("xmax")) : p_hist->GetNbinsX();
+  double xmin = (conf->get("xmin") != "" ) ? stod(conf->get("xmin")) : 0;
+
   //============================================
   // Draw Data-MC Plots
   //============================================
@@ -1399,7 +1432,16 @@ TString drawSingleTH1(ConfigParser *conf){
   
   TH2F* h_axes = new TH2F(Form("%s_axes",plot_name.Data()),plot_title,p_hist->GetNbinsX(),xmin,xmax,1000,ymin,ymax);
   
-  
+  if (conf->get("relabel_x_axis") == "true"){
+    TString bin_label;
+    for (int i = (int) xmin; i <= (int) xmax; i++)
+    {
+      bin_label=p_hist->GetXaxis()->GetBinLabel(p_hist->FindBin(i));
+      h_axes->GetXaxis()->SetBinLabel(h_axes->FindBin(i), bin_label);
+    }  
+    //h_axes->GetXaxis()->LabelsOption("v");
+    h_axes->GetXaxis()->SetLabelSize(.015);
+  }
   //-----------------------
   // AXES FIX
   //-----------------------

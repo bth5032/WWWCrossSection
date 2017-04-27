@@ -76,6 +76,22 @@ double getMbb(){
   return (g_jets_p4.at(b_index.first)+g_jets_p4.at(b_index.second)).M();
 }
 
+double getMT2_JL(){
+  /*Builds MT2 (jet lepton sum) from two most W-like jets*/
+
+  pair<int, int> indicies = getMostWlikePair(g_jets_p4);
+
+  double mt2_1=MT2(g_met, g_met_phi, g_jets_p4.at(indicies.first)+phys.lep_p4().at(0), g_jets_p4.at(indicies.second)+phys.lep_p4().at(1), 0, 0);
+  double mt2_2=MT2(g_met, g_met_phi, g_jets_p4.at(indicies.first)+phys.lep_p4().at(1), g_jets_p4.at(indicies.second)+phys.lep_p4().at(0), 0, 0);
+
+  if (mt2_1 > mt2_2){
+    return mt2_2;
+  }
+  else{
+    return mt2_1;
+  }
+}
+
 double getMT2ForBjets(bool select_highest_csv/*=false*/){
   /*This function gets the MT2 built out of the two Bjets in an event, no guarentee is made about selecting the highest csv jets*/
   double mt2;
@@ -146,23 +162,28 @@ double getdRGammaLep(short id/*=0*/){
   return sqrt(pow(dPhi, 2) + pow(dEta, 2));
 }
 
-pair<int,int> getMostZlikePair(const vector<LorentzVector> &vecs){
-  /*Finds the pair with 2 vector mass closest to the mass of the Z for the vector of LorentzVector objects given*/
+pair<int, int> getPairWithMass(const vector<LorentzVector> &vecs, double target_mass, bool close){
+  /*Searches the vector of lorentz vectors for the pair with mass nearest (furthest) from the target mass if 'close' is true (false)*/
+  
+  short mult = (close) ? 1 : -1;
   if (vecs.size() < 2){
-    return make_pair(-1,-1);
+    cout<<"Throwing error, vector does not have at least 2 elements in getPairWithMass()"<<endl;
+    std::stringstream message;
+    message<<"Can not find pair for mass "<<target_mass<<" in evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<". The vector given has "<<vecs.size()<<" entries, must have at least 2.";
+    throw std::underflow_error(message.str());
   }
 
   int first_index = 0;
   int second_index = 1;
 
-  double best_mass = abs(91 - (vecs.at(first_index)+vecs.at(second_index)).M());
+  double best_mass = mult*abs(target_mass - (vecs.at(first_index)+vecs.at(second_index)).M());
 
   for (int i = 0; i < (int) vecs.size(); i++){
     for (int j = i+1; j < (int) vecs.size(); j++){
-      if (abs(91 - (vecs.at(i)+vecs.at(j)).M()) < best_mass){
+      if (mult*abs(target_mass - (vecs.at(i)+vecs.at(j)).M()) < best_mass){
         first_index=i;
         second_index=j;
-        best_mass = abs(91 - (vecs.at(first_index)+vecs.at(second_index)).M());
+        best_mass = mult*abs(target_mass - (vecs.at(first_index)+vecs.at(second_index)).M());
       }
     }
   }
@@ -170,28 +191,19 @@ pair<int,int> getMostZlikePair(const vector<LorentzVector> &vecs){
   return make_pair(first_index, second_index);
 }
 
+pair<int,int> getMostZlikePair(const vector<LorentzVector> &vecs){
+  /*Finds the pair with 2 vector mass closest to the mass of the Z (91 GeV) for the vector of LorentzVector objects given*/
+  return getPairWithMass(vecs, 91, true);
+}
+
 pair<int,int> getLeastZlikePair(const vector<LorentzVector> &vecs){
-  /*Finds the pair with 2 vector mass furthest from the mass of the Z for the vector of LorentzVector objects given*/
-  if (vecs.size() < 2){
-    return make_pair(-1,-1);
-  }
+  /*Finds the pair with 2 vector mass furthest from the mass of the Z (91 GeV) for the vector of LorentzVector objects given*/
+  return getPairWithMass(vecs, 91, false);
+}
 
-  int first_index = 0;
-  int second_index = 1;
-
-  double best_mass = abs(91 - (vecs.at(first_index)+vecs.at(second_index)).M());
-
-  for (int i = 0; i < (int) vecs.size(); i++){
-    for (int j = i+1; j < (int) vecs.size(); j++){
-      if (abs(91 - (vecs.at(i)+vecs.at(j)).M()) > best_mass){
-        first_index=i;
-        second_index=j;
-        best_mass = abs(91 - (vecs.at(first_index)+vecs.at(second_index)).M());
-      }
-    }
-  }
-
-  return make_pair(first_index, second_index);
+pair<int,int> getMostWlikePair(const vector<LorentzVector> &vecs){
+  /*Finds the pair with 2 vector mass closest to the mass of the W (80 GeV) for the vector of LorentzVector objects given*/
+  return getPairWithMass(vecs, 80, true);
 }
 
 int getNumOSSFPairs(){
@@ -203,6 +215,37 @@ int getNumOSSFPairs(){
     }
   }
   return num_OSSF;
+}
+
+TString getLepFlavorString(){
+  /*Returns a string which gives the exact flavor composition of the leptons in the event*/
+  int num_e=0;
+  int num_ebar=0;
+  int num_m=0;
+  int num_mbar=0;
+
+  for (int i = 0; i<(int) phys.nlep(); i++){
+    if (phys.lep_pdgId().at(i) == 11) num_e++;
+    else if (phys.lep_pdgId().at(i) == -11) num_ebar++;
+    else if (phys.lep_pdgId().at(i) == 13) num_m++;
+    else if (phys.lep_pdgId().at(i) == -13) num_mbar++;
+  }
+
+  TString flavor = "";
+  for (int j = 0; j<num_e; j++){
+    flavor += "E";
+  }
+  for (int j = 0; j<num_ebar; j++){
+    flavor += "Ebar";
+  }
+  for (int j = 0; j<num_m; j++){
+    flavor += "Mu";
+  }
+  for (int j = 0; j<num_mbar; j++){
+    flavor += "Mubar";
+  }
+
+  return flavor;
 }
 //=============================
 // Triggers
@@ -324,24 +367,24 @@ bool hasGood3l(){
   
   //cout<<__LINE__<<endl;
 
-  if( phys.lep_pt().at(0) < 25        ) {
+  if( phys.lep_pt().at(0) < 10        ) {
     numEvents->Fill(11); 
-    if (printFail) cout<<phys.evt()<<" :Failed lep1 pt < 25 Z cut"<<endl;
+    if (printFail) cout<<phys.evt()<<" :Failed lep1 pt < 10 Z cut"<<endl;
     return false; // leading lep pT > 25 GeV
   }
   //if (printStats) { cout<<"lep1 pt: "<<phys.lep_pt().at(0)<<" "; }
 
   //cout<<__LINE__<<endl;
 
-  if( phys.lep_pt().at(1) < 20        ) {
+  if( phys.lep_pt().at(1) < 10        ) {
     numEvents->Fill(12); 
-    if (printFail) cout<<phys.evt()<<" :Failed lep2 pt < 20 Z cut"<<endl;
+    if (printFail) cout<<phys.evt()<<" :Failed lep2 pt < 10 Z cut"<<endl;
     return false; // tailing lep pT > 20 GeV      
   }
 
-  if( phys.lep_pt().at(2) < 20        ) {
+  if( phys.lep_pt().at(2) < 10        ) {
     numEvents->Fill(12); 
-    if (printFail) cout<<phys.evt()<<" :Failed lep3 pt < 20 Z cut"<<endl;
+    if (printFail) cout<<phys.evt()<<" :Failed lep3 pt < 10 Z cut"<<endl;
     return false; // tailing lep pT > 20 GeV      
   }
   //if (printStats) { cout<<"lep2 pt: "<<phys.lep_pt().at(1)<<" "; }
@@ -372,26 +415,6 @@ bool hasGood3l(){
 
   //cout<<__LINE__<<endl;
 
-  if (conf->get("dil_flavor") == "emu"){ //only true for ttbar estimate
-    if (! (phys.hyp_type() == 2) ){ //require explicit emu event
-      numEvents->Fill(15); 
-      if (printFail) cout<<phys.evt()<<" :Failed not explicit e/mu Z cut, for ttbar only"<<endl;
-      return false; // require explicit opposite flavor event
-    }
-    //if (printStats) { cout<<"hyp_type: "<<phys.hyp_type()<<" "; }
-  }
-  else{
-    //require explicit hypothesis type
-    if( !( phys.hyp_type() == 0 || phys.hyp_type() == 1 ) ) {
-        numEvents->Fill(15); 
-        if (printFail) cout<<phys.evt()<<" :Failed explicit mu/mu or e/e Z cut"<<endl;
-        return false; // require explicit same flavor event
-    }
-    //if (printStats) { cout<<"hyp_type: "<<phys.hyp_type()<<" "; } 
-  }
-
-  //cout<<__LINE__<<endl;
-
   //This is the original cut selection
   if( abs(phys.lep_p4().at(0).eta()) > 1.4 && abs(phys.lep_p4().at(0).eta()) < 1.6 ){
     numEvents->Fill(17);
@@ -417,44 +440,32 @@ bool hasGood3l(){
 
   if (! passLeptonHLTs()){
     numEvents->Fill(20);
-    if (printFail) cout<<phys.evt()<<" :Failed HLT Z cut"<<endl;
+    if (printFail) cout<<phys.evt()<<" :Failed HLT cut"<<endl;
     return false;
   }
 
   //cout<<__LINE__<<endl;
 
-  /*if( !(phys.evt_type() == 0 ) ) {
-    numEvents->Fill(21); 
-    if (printFail) cout<<phys.evt()<<" :Failed evt_type=0 Z cut"<<endl;
-    return false; // require opposite sign
+  if( conf->get("num_OSSF_pairs") != "" ) {
+    if ( stoi(conf->get("num_OSSF_pairs")) != getNumOSSFPairs()){
+      numEvents->Fill(21); 
+      if (printFail) cout<<phys.evt()<<" :Failed Num SFOS pairs cut"<<endl;
+      return false; // require correct number of SFOS pairs
+    }
   }
   //if (printStats) { cout<<"evt_type: "<<phys.evt_type()<<" "; }*/
 
-  double Z_VETO_WINDOW = 10;
-  if (conf->get("z_veto_window") != ""){
-    Z_VETO_WINDOW = stod(conf->get("z_veto_window"));
-  }
-
-  pair<int,int> lepind = getMostZlikePair(phys.lep_p4());
-  if( abs((phys.lep_p4().at(lepind.first) + phys.lep_p4().at(lepind.second)).M() - Z_MASS) < Z_VETO_WINDOW ) {
-    numEvents->Fill(22); 
-    if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut"<<endl;
-    return false; // require opposite sign
-  }
-
-  //cout<<__LINE__<<endl;
-
-  if (phys.njets() >= 2){
-    pair<int,int> jetind = getMostZlikePair(phys.jets_p4());
-    if( abs((phys.jets_p4().at(jetind.first) + phys.jets_p4().at(jetind.second)).M() - Z_MASS) < Z_VETO_WINDOW ) {
-      numEvents->Fill(9); 
+  if( conf->get("dilmass_Z_veto") == "true" ) {
+    pair<int,int> lepind = getMostZlikePair(phys.lep_p4());
+    if( abs((phys.lep_p4().at(lepind.first) + phys.lep_p4().at(lepind.second)).M() - Z_MASS) < Z_VETO_WINDOW ) {
+      numEvents->Fill(22); 
       if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut"<<endl;
       return false; // require opposite sign
     }
   }
 
   //cout<<__LINE__<<endl;
-  
+
   //if (printPass) cout<<phys.evt()<<": Passes good Z Cuts"<<endl;
   return true;
 }
@@ -469,19 +480,19 @@ bool hasGood2l(){
   
   //cout<<__LINE__<<endl;
 
-  if( phys.lep_pt().at(0) < 25        ) {
+  if( phys.lep_pt().at(0) < 10        ) {
     numEvents->Fill(11); 
-    if (printFail) cout<<phys.evt()<<" :Failed lep1 pt < 25 Z cut"<<endl;
-    return false; // leading lep pT > 25 GeV
+    if (printFail) cout<<phys.evt()<<" :Failed lep1 pt < 10 Z cut"<<endl;
+    return false; // leading lep pT > 10 GeV
   }
   //if (printStats) { cout<<"lep1 pt: "<<phys.lep_pt().at(0)<<" "; }
 
   //cout<<__LINE__<<endl;
 
-  if( phys.lep_pt().at(1) < 20        ) {
+  if( phys.lep_pt().at(1) < 10        ) {
     numEvents->Fill(12); 
-    if (printFail) cout<<phys.evt()<<" :Failed lep2 pt < 20 Z cut"<<endl;
-    return false; // tailing lep pT > 20 GeV      
+    if (printFail) cout<<phys.evt()<<" :Failed lep2 pt < 10 Z cut"<<endl;
+    return false; // tailing lep pT > 10 GeV      
   }
   
   //cout<<__LINE__<<endl;
@@ -538,36 +549,65 @@ bool hasGood2l(){
   else if (conf->get("dil_sign") == "opposite"){
     if( !(phys.evt_type() == 0 ) ) {
       numEvents->Fill(21); 
-      if (printFail) cout<<phys.evt()<<" :Failed same sign cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed opposite sign cut"<<endl;
       return false; // require opposite sign
     }
   }
 
-  double Z_VETO_WINDOW = 10;
-  if (conf->get("z_veto_window") != ""){
-    Z_VETO_WINDOW = stod(conf->get("z_veto_window"));
+  if (conf->get("dil_flavor") == "emu"){ 
+    if (! (phys.hyp_type() == 2) ){ //require explicit emu event
+      numEvents->Fill(15); 
+      if (printFail) cout<<phys.evt()<<" :Failed not explicit e/mu event"<<endl;
+      return false; // require explicit opposite flavor event
+    }
   }
+  else if (conf->get("dil_flavor") == "same"){
+    if( !( phys.hyp_type() == 0 || phys.hyp_type() == 1 ) ) {
+        numEvents->Fill(15); 
+        if (printFail) cout<<phys.evt()<<" :Failed explicit mu/mu or e/e cut"<<endl;
+        return false; // require explicit same flavor event
+    }
+  }
+  else if (conf->get("dil_flavor") == "ee"){
+    if( !( phys.hyp_type() == 0 ) ) {
+        numEvents->Fill(15); 
+        if (printFail) cout<<phys.evt()<<" :Failed explicit e/e cut"<<endl;
+        return false; // require explicit same flavor event
+    }
+  }
+  else if (conf->get("dil_flavor") == "mumu"){
+    if( !( phys.hyp_type() == 1 ) ) {
+        numEvents->Fill(15); 
+        if (printFail) cout<<phys.evt()<<" :Failed explicit mu/mu cut"<<endl;
+        return false; // require explicit same flavor event
+    }
+  }
+  //cout<<"pdgIDs: "<<phys.lep_pdgId().at(0)<<" "<<phys.lep_pdgId().at(1)<<endl;
 
-  if( abs((phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() - Z_MASS) < Z_VETO_WINDOW ) {
-    numEvents->Fill(22); 
-    if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut"<<endl;
-    return false; // require opposite sign
+  //cout<<__LINE__<<endl;
+
+  if ((conf->get("dilmass_Z_veto") == "true") && (phys.hyp_type() == 0 || phys.hyp_type() == 1) ){
+    if( abs((phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() - Z_MASS) < Z_VETO_WINDOW ) {
+      numEvents->Fill(22); 
+      if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut"<<endl;
+      return false; // require opposite sign
+    }
   }
 
   //cout<<__LINE__<<endl;
 
   if (phys.njets() >= 2){
-    pair<int,int> jetind = getMostZlikePair(phys.jets_p4());
-    if( abs((phys.jets_p4().at(jetind.first) + phys.jets_p4().at(jetind.second)).M() - Z_MASS) < Z_VETO_WINDOW ) {
+    pair<int,int> jetind = getMostWlikePair(g_jets_p4);
+    if( abs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - W_MASS) > W_JET_WINDOW ) {
       numEvents->Fill(9); 
-      if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut"<<endl;
-      return false; // require at least 2 jets
+      if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut"<<endl;
+      return false; // require at at least 2 Jets within the W mass window.
     }
   }
   else{
     numEvents->Fill(34); 
-      if (printFail) cout<<phys.evt()<<" :Not enough jets"<<endl;
-      return false; // require opposite sign
+      if (printFail) cout<<phys.evt()<<" :Failed Not enough jets"<<endl;
+      return false; // require at least 2 jets
   }
 
   //cout<<__LINE__<<endl;
@@ -1116,6 +1156,18 @@ bool passSignalRegionCuts(){
     }
   }
 
+  if (conf->get("Mjj_Z_veto") == "true"){
+    pair<int,int> jetind = getMostZlikePair(g_jets_p4);
+    if( abs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - Z_MASS) < Z_VETO_WINDOW ) {
+      numEvents->Fill(9); 
+      if (printFail) cout<<phys.evt()<<" :Failed jet pair on Z mass cut"<<endl;
+      return false; // Mjj Z Veto
+    }
+  }
+
+  //cout<<__LINE__<<endl;
+  
+
   //cout<<__LINE__<<endl;
 
   if (conf->get("flavor") == "dimuon"){
@@ -1466,6 +1518,9 @@ bool passFileSelections(){
 //=============================
 
 void setupGlobals(){
+  Z_VETO_WINDOW = (conf->get("z_veto_window") == "") ? 5 : stod(conf->get("z_veto_window"));
+  W_JET_WINDOW = (conf->get("w_jet_window") == "") ? 30 : stod(conf->get("w_jet_window"));
+
   if ( conf->get("uncertainty_mode") == "JES_up" ){
     g_dphi_metj1 = phys.dphi_metj1_up();
     g_dphi_metj2 = phys.dphi_metj2_up();
@@ -1715,9 +1770,65 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   dEta_jj_zlike->SetDirectory(rootdir);
   dEta_jj_zlike->Sumw2();
 
+  TH1D* mjj_wlike = new TH1D("mjj_wlike", "M_{jj} for jets closest to W Mass in "+g_sample_name, 6000,0,6000);
+  mjj_wlike->SetDirectory(rootdir);
+  mjj_wlike->Sumw2();
+
+  TH1D* dEta_jj_wlike = new TH1D("dEta_jj_wlike", "#Delta#Eta_{jj} for jets closest to W Mass in "+g_sample_name, 700,0,7);
+  dEta_jj_wlike->SetDirectory(rootdir);
+  dEta_jj_wlike->Sumw2();
+
   TH1D* dPhi_3l_MET = new TH1D("dPhi_3l_MET", "#Delta#Phi between 3 lepton system and MET"+g_sample_name, 100,0,3.15);
   dPhi_3l_MET->SetDirectory(rootdir);
   dPhi_3l_MET->Sumw2();
+
+  TH1D *lep1_pt = new TH1D("lep1_pt", "p_{T} for leading lepton "+g_sample_name, 500,0,500);
+  lep1_pt->SetDirectory(rootdir);
+  lep1_pt->Sumw2();
+
+  TH1D *lep2_pt = new TH1D("lep2_pt", "p_{T} for subleading lepton "+g_sample_name, 500,0,500);
+  lep2_pt->SetDirectory(rootdir);
+  lep2_pt->Sumw2();
+
+  TH1D *lep3_pt = new TH1D("lep3_pt", "p_{T} for trailing lepton "+g_sample_name, 500,0,500);
+  lep3_pt->SetDirectory(rootdir);
+  lep3_pt->Sumw2();
+
+  TH1D *lep1_eta = new TH1D("lep1_eta", "#eta for leading lepton "+g_sample_name, 100,0,3);
+  lep1_eta->SetDirectory(rootdir);
+  lep1_eta->Sumw2();
+
+  TH1D *lep2_eta = new TH1D("lep2_eta", "#eta for subleading lepton "+g_sample_name, 100,0,3);
+  lep2_eta->SetDirectory(rootdir);
+  lep2_eta->Sumw2();
+
+  TH1D *lep3_eta = new TH1D("lep3_eta", "#eta for trailing lepton "+g_sample_name, 100,0,3);
+  lep3_eta->SetDirectory(rootdir);
+  lep3_eta->Sumw2();
+
+  TH1D *jet1_pt = new TH1D("jet1_pt", "p_{T} for leading jet "+g_sample_name, 500,0,500);
+  jet1_pt->SetDirectory(rootdir);
+  jet1_pt->Sumw2();
+
+  TH1D *jet2_pt = new TH1D("jet2_pt", "p_{T} for subleading jet "+g_sample_name, 500,0,500);
+  jet2_pt->SetDirectory(rootdir);
+  jet2_pt->Sumw2();
+
+  TH1D *jet3_pt = new TH1D("jet3_pt", "p_{T} for trailing jet "+g_sample_name, 500,0,500);
+  jet3_pt->SetDirectory(rootdir);
+  jet3_pt->Sumw2();
+
+  TH1D *mt2_jl = new TH1D("mt2_jl", "MT2 (Jet+lepton sum) for "+g_sample_name, 6000,0,6000);
+  mt2_jl->SetDirectory(rootdir);
+  mt2_jl->Sumw2();
+
+  TH1D *lep_signs = new TH1D("lep_signs", "Product of lepton signs"+g_sample_name, 2,-1.01,1.01);
+  lep_signs->SetDirectory(rootdir);
+  lep_signs->Sumw2();
+
+  TH1D *lep_flavor = new TH1D("lep_flavor", "dil_flavor"+g_sample_name, 0,0,0);
+  lep_flavor->SetDirectory(rootdir);
+  lep_flavor->Sumw2();
 
 
   cout<<"Histograms initialized"<<endl;
@@ -2067,14 +2178,60 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
 
         double trilep_phi = (phys.lep_p4().at(0) + phys.lep_p4().at(1) + phys.lep_p4().at(2)).phi();
         dPhi_3l_MET->Fill(acos(cos(g_met_phi - trilep_phi)), weight);
+
+        lep1_pt->Fill(phys.lep_pt().at(0), weight);
+        lep2_pt->Fill(phys.lep_pt().at(1), weight);
+        lep3_pt->Fill(phys.lep_pt().at(2), weight);
+
+        lep1_eta->Fill(phys.lep_eta().at(0), weight);
+        lep2_eta->Fill(phys.lep_eta().at(1), weight);
+        lep3_eta->Fill(phys.lep_eta().at(2), weight);
+
+        int signs=(phys.lep_pdgId().at(0)/abs(phys.lep_pdgId().at(0)));
+        signs *= (phys.lep_pdgId().at(1)/abs(phys.lep_pdgId().at(1)));
+        signs *= (phys.lep_pdgId().at(2)/abs(phys.lep_pdgId().at(2)));
+        lep_signs->Fill(signs, weight);
+      }
+      else{
+        lep1_pt->Fill(phys.lep_pt().at(0), weight);
+        lep2_pt->Fill(phys.lep_pt().at(1), weight);
+
+        lep1_eta->Fill(phys.lep_eta().at(0), weight);
+        lep2_eta->Fill(phys.lep_eta().at(1), weight);
+
+        dilmass_zlike->Fill((phys.lep_p4().at(0) + phys.lep_p4().at(1)).M(), weight);
+        dilmass_zless->Fill((phys.lep_p4().at(0) + phys.lep_p4().at(1)).M(), weight);
+        dilmass_sum->Fill(phys.lep_p4().at(0).M() + phys.lep_p4().at(1).M(), weight);
+
+        int signs=(phys.lep_pdgId().at(0)/abs(phys.lep_pdgId().at(0)));
+        signs *= (phys.lep_pdgId().at(1)/abs(phys.lep_pdgId().at(1)));
+        lep_signs->Fill(signs, weight);
       }
 
+      lep_flavor->Fill(getLepFlavorString().Data(), weight);
       mjj_min_dphi->Fill(g_mjj_mindphi, weight);
 
+
       if (phys.njets() >= 2){
-        pair<int, int> indicies = getMostZlikePair(phys.jets_p4());
-        mjj_zlike->Fill((phys.jets_p4().at(indicies.first) + phys.jets_p4().at(indicies.second)).M(), weight);
-        dEta_jj_zlike->Fill(abs(phys.jets_p4().at(indicies.first).eta() - phys.jets_p4().at(indicies.second).eta()), weight);
+        pair<int, int> indicies = getMostZlikePair(g_jets_p4);
+        mjj_zlike->Fill((g_jets_p4.at(indicies.first) + g_jets_p4.at(indicies.second)).M(), weight);
+        dEta_jj_zlike->Fill(abs(g_jets_p4.at(indicies.first).eta() - g_jets_p4.at(indicies.second).eta()), weight);
+
+        indicies = getMostWlikePair(g_jets_p4);
+        mjj_wlike->Fill((g_jets_p4.at(indicies.first) + g_jets_p4.at(indicies.second)).M(), weight);
+        dEta_jj_wlike->Fill(abs(g_jets_p4.at(indicies.first).eta() - g_jets_p4.at(indicies.second).eta()), weight);
+
+        mt2_jl->Fill(getMT2_JL(), weight);
+      }
+
+      if (phys.njets() >= 1){
+        jet1_pt->Fill(g_jets_p4.at(0).pt(), weight);
+      }
+      if (phys.njets() >= 2){
+        jet2_pt->Fill(g_jets_p4.at(1).pt(), weight);
+      }
+      if (phys.njets() >= 3){
+        jet3_pt->Fill(g_jets_p4.at(2).pt(), weight);
       }
 
 //===========================================
@@ -2196,7 +2353,34 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   //cout<<__LINE__<<endl;
   mjj_zlike->Write();
   //cout<<__LINE__<<endl;
-
+  dEta_jj_wlike->Write();
+  //cout<<__LINE__<<endl;
+  mjj_wlike->Write();
+  //cout<<__LINE__<<endl;
+  lep1_pt->Write();
+  //cout<<__LINE__<<endl;
+  lep2_pt->Write();
+  //cout<<__LINE__<<endl;
+  lep3_pt->Write();
+  //cout<<__LINE__<<endl;
+  lep1_eta->Write();
+  //cout<<__LINE__<<endl;
+  lep2_eta->Write();
+  //cout<<__LINE__<<endl;
+  lep3_eta->Write();
+  //cout<<__LINE__<<endl;
+  jet1_pt->Write();
+  //cout<<__LINE__<<endl;
+  jet2_pt->Write();
+  //cout<<__LINE__<<endl;
+  jet3_pt->Write();
+  //cout<<__LINE__<<endl;
+  mt2_jl->Write();
+  //cout<<__LINE__<<endl;
+  lep_signs->Write();
+  //cout<<__LINE__<<endl;
+  lep_flavor->Write();
+  //cout<<__LINE__<<endl;
 
   //close output file
   output->Write();

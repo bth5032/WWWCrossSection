@@ -183,3 +183,37 @@ function AddOptToDir {
     echo "Aborting, nothing added to files..."
   fi
 }
+
+function mirrorPlots {
+  if [[ $# < 2 ]]
+  then
+    echo "mirrorPlots <Plots From Directory> <Top Level Directory>"
+    return 1
+  fi
+
+  mirrorPlots_fromdir=$1
+  mirrorPlots_todirs=$2
+
+  echo "Do you want to copy: "
+  ls ${mirrorPlots_fromdir}/*plots.conf 
+  echo
+  echo "to: "
+  echo
+  find ${mirrorPlots_todirs}/* -type d
+  echo -n "(yes/no): "
+  read input_from_user
+
+  if [[ $input_from_user == "yes" ]]
+  then
+    for i in `ls ${mirrorPlots_fromdir}/*plots.conf`
+    do
+      for j in `find ${mirrorPlots_todirs}/* -type d`
+      do
+        cp ${i} $j
+      done
+    done
+    echo "File Succesfully Altered"
+  else
+    echo "Aborting, nothing added to files..."
+  fi
+}

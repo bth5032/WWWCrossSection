@@ -142,6 +142,8 @@ vector<LorentzVector> g_jets_medb_p4;
 
 
 const int Z_MASS = 91;
+const int W_MASS = 80;
+double W_JET_WINDOW, Z_VETO_WINDOW;
 
 /* returns two most B-like jet indicies */
 pair<int, int> getMostBlike();
@@ -154,6 +156,9 @@ double getMT2B();
 
 /*Builds Mbb from two highest CSV jets*/
 double getMbb();
+
+/*Builds MT2 (jet lepton sum) from two most W-like jets*/
+double getMT2_JL();
 
 /*This function gets the MT2 built out of the two Bjets in an event, no guarentee 
 is made about selecting the highest csv jets*/
@@ -172,14 +177,19 @@ double getMTLepMET(short id=0);
 /* Builds the delta R (sqrt(dPhi^2 + dEta^2)) between the lepton at index id and the leading photon*/
 double getdRGammaLep(short id=0);
 
-/*Finds the pair with 2 vector mass closest to the mass of the Z for the vector of LorentzVector objects given*/
-pair<int,int> getMostZlikePair(const vector<LorentzVector> &vecs);
+/*Searches the vector of lorentz vectors for the pair with mass nearest (furthest) from the target mass if 'close' is true (false)*/
+pair<int, int> getPairWithMass(const vector<LorentzVector> &vecs, double target_mass, bool close);
 
-/*Finds the pair with 2 vector mass furthest from the mass of the Z for the vector of LorentzVector objects given*/
+/*These get the 4 vectors for objects with mass closest or furthest from the mass of the W or Z using getPairWithMass()*/
+pair<int,int> getMostZlikePair(const vector<LorentzVector> &vecs);
 pair<int,int> getLeastZlikePair(const vector<LorentzVector> &vecs);
+pair<int,int> getMostWlikePair(const vector<LorentzVector> &vecs);
 
 /*Loops through pairs of entries in the lep_pdgId vector and counts how many have opposite value*/
 int getNumOSSFPairs();
+
+/*Returns a string which gives the exact flavor composition of the leptons in the event*/
+TString getLepFlavorString();
 //=============================
 // Triggers
 //=============================
