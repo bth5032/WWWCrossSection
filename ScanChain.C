@@ -225,6 +225,7 @@ TString getLepFlavorString(){
   int num_mbar=0;
 
   for (int i = 0; i<(int) phys.nlep(); i++){
+    //cout<<"lep"<<i<<": "<<phys.lep_pdgId().at(i)<<endl;
     if (phys.lep_pdgId().at(i) == 11) num_e++;
     else if (phys.lep_pdgId().at(i) == -11) num_ebar++;
     else if (phys.lep_pdgId().at(i) == 13) num_m++;
@@ -244,6 +245,7 @@ TString getLepFlavorString(){
   for (int j = 0; j<num_mbar; j++){
     flavor += "Mubar";
   }
+  //cout<<flavor<<endl;
 
   return flavor;
 }
@@ -347,8 +349,15 @@ bool passLeptonHLTs(){
     else if ( phys.hyp_type() == 0 ){ //Electron Event
       return passElectronTriggers();
     }
-    else{ //Emu event, should never happen since this is only called from hasGoodZ()
-      return false; 
+    else if (phys.hyp_type() == 2) { //Emu event
+      return passEMuTriggers(); 
+    }
+    else{
+      cout<<"Throwing error, got hyp_type that's not 0-2"<<endl;
+      std::stringstream message;
+      message<<"hyp_type for event: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" is not 0 through 2... Inside passLeptonHLTs()";
+      throw std::underflow_error(message.str());
+      return false;
     }
   }
 }

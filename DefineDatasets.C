@@ -9,13 +9,13 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
 
   TString base_path;
   if (hadoop){
-    base_path="/hadoop/cms/store/user/olivito/AutoTwopler_babies/merged/ZMET/";
+    base_path="/hadoop/cms/store/user/bhashemi/AutoTwopler_babies/merged/ZMET/";
   }
   else {
     base_path="/nfs-7/userdata/ZMEToutput/output/ZMETbabies/";
   }
 
-  TString version="V08-22-16";
+  TString version="WWW_v0.1";
 
   TString dir;
   if (skimmed){
@@ -124,8 +124,8 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     //ch->Add(dir+"ttz_2l2n_amcnlo*");
     ch->Add(dir+"ttz_incl_mgmlm*");
   }
-  else if (set == "TTW"){
-    cout<<"Adding TTW"<<endl; 
+  else if (set == "TTW-inclusive"){
+    cout<<"Adding TTW inclusive MC"<<endl; 
     
     ch->Add(dir+"ttw_incl_mgmlm*");
   } 
