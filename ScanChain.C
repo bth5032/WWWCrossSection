@@ -249,6 +249,12 @@ TString getLepFlavorString(){
 
   return flavor;
 }
+
+double DeltaR(const LorentzVector p1, const LorentzVector p2){
+  /*Returns the DeltaR between objects p1 and p2.*/
+  //cout<<__LINE__<<endl;
+  return sqrt( (p1.eta() - p2.eta())*(p1.eta() - p2.eta())+(p1.phi() - p2.phi())*(p1.phi() - p2.phi()) );
+}
 //=============================
 // Triggers
 //=============================
@@ -605,12 +611,14 @@ bool hasGood2l(){
 
   //cout<<__LINE__<<endl;
 
-  if (phys.njets() >= 2){
-    pair<int,int> jetind = getMostWlikePair(g_jets_p4);
-    if( abs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - W_MASS) > W_JET_WINDOW ) {
-      numEvents->Fill(9); 
-      if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut"<<endl;
-      return false; // require at at least 2 Jets within the W mass window.
+  if (g_njets >= 2){
+    if (W_JET_WINDOW > 0){
+      pair<int,int> jetind = getMostWlikePair(g_jets_p4);
+      if( abs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - W_MASS) > W_JET_WINDOW ) {
+        numEvents->Fill(61); 
+        if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut"<<endl;
+        return false; // require at at least 2 Jets within the W mass window.
+      }
     }
   }
   else{
@@ -1526,14 +1534,65 @@ bool passFileSelections(){
 // Setup
 //=============================
 
+bool isOverlapJet(const LorentzVector &jet_p4){
+  /*Takes in a p4 for a jet and determines whether that jet is less than MAX_DR_JET_LEP_OVERLAP for all leptons*/ 
+  //cout<<__LINE__<<endl;
+  for (int i = 0; i< (int)phys.lep_p4().size(); i++){
+    if (DeltaR(jet_p4, phys.lep_p4().at(i)) < MAX_DR_JET_LEP_OVERLAP){
+      //cout<<"Failed JET at (eta, phi, pt) = ("<<jet_p4.eta()<<", "<<jet_p4.phi()<<", "<<jet_p4.pt()<<") lep at ("<<phys.lep_p4().at(i).eta()<<", "<<phys.lep_p4().at(i).phi()<<", "<<phys.lep_p4().at(i).pt()<<") DR="<<DeltaR(jet_p4, phys.lep_p4().at(i))<<endl;
+      return false;
+    }
+  }
+  //cout<<__LINE__<<endl;
+
+  return true;
+}
+
+void writeCleanedJets(const vector<LorentzVector> &vecs){
+  /*This function writes only elements of the given vector to g_jets_p4 variable, it can be passed the up and down variations as well.*/
+  int n_pass = 0;
+  //cout<<__LINE__<<endl;
+  for (int i = 0; i < (int) vecs.size(); i++){
+    if ( !isOverlapJet(vecs.at(i)) ) { 
+      g_jets_p4.push_back(vecs.at(i)); 
+      n_pass++;
+    }
+  }
+  //cout<<__LINE__<<endl;
+
+  g_njets = n_pass;
+  //cout<<"g_njets: "<<g_njets<<endl;
+}
+
+void writeCleanedBJets(const vector<LorentzVector> &vecs, const vector<float> &csvs){
+  /*This function writes only elements of the given vector to g_jets_medb_p4 variable, it can be passed the up and down variations as well. Distingushed from the regular jet function because we need to keep track of the CSV values as well.*/
+  int n_pass = 0;
+  //cout<<__LINE__<<endl;
+  for (int i = 0; i < (int) vecs.size(); i++){
+    if ( !isOverlapJet(vecs.at(i)) ) { 
+      g_jets_medb_p4.push_back(vecs.at(i)); 
+      g_jets_csv.push_back(csvs.at(i)); 
+      n_pass++;
+    }
+  }
+  //cout<<__LINE__<<endl;
+  g_nBJetMedium = n_pass;
+  //cout<<"g_nBJetMedium: "<<g_nBJetMedium<<endl;
+  //cout<<"g_jets_csv_size: "<<g_jets_csv.size()<<endl;
+}
+
 void setupGlobals(){
   Z_VETO_WINDOW = (conf->get("z_veto_window") == "") ? 5 : stod(conf->get("z_veto_window"));
   W_JET_WINDOW = (conf->get("w_jet_window") == "") ? 30 : stod(conf->get("w_jet_window"));
+  MAX_DR_JET_LEP_OVERLAP = (conf->get("max_dr_jet_lep") == "") ? 0.4 : stod(conf->get("max_dr_jet_lep"));
+
+  g_jets_p4.clear();
+  g_jets_medb_p4.clear();
+  g_jets_csv.clear();
 
   if ( conf->get("uncertainty_mode") == "JES_up" ){
     g_dphi_metj1 = phys.dphi_metj1_up();
     g_dphi_metj2 = phys.dphi_metj2_up();
-    g_njets = phys.njets_up();
     g_mbb = phys.mbb_csv_up();
     g_mjj_mindphi = phys.mjj_mindphi_up();
     g_nBJetMedium = phys.nBJetMedium_up();
@@ -1543,9 +1602,8 @@ void setupGlobals(){
     g_mt2b = phys.mt2b_up();
     g_ht = phys.ht_up();
 
-    g_jets_p4 = phys.jets_up_p4();
-    g_jets_medb_p4 = phys.jets_medb_up_p4();
-    g_jets_csv = phys.jets_up_csv();
+    writeCleanedJets(phys.jets_up_p4()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_up_p4(), phys.jets_up_csv());
   }
   else if (conf->get("uncertainty_mode") == "JES_dn"){
     g_dphi_metj1 = phys.dphi_metj1_dn();
@@ -1560,9 +1618,8 @@ void setupGlobals(){
     g_mt2b = phys.mt2b_dn();
     g_ht = phys.ht_dn();
 
-    g_jets_p4 = phys.jets_dn_p4();
-    g_jets_medb_p4 = phys.jets_medb_dn_p4();
-    g_jets_csv = phys.jets_dn_csv();
+    writeCleanedJets(phys.jets_dn_p4()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_dn_p4(), phys.jets_dn_csv());
   }
   else if (conf->get("uncertainty_mode") == "GenMet"){
     g_dphi_metj1 = phys.dphi_genmetj1();
@@ -1577,9 +1634,9 @@ void setupGlobals(){
     g_nBJetMedium = phys.nBJetMedium();
     g_njets = phys.njets();
     g_ht = phys.ht();
-    g_jets_p4 = phys.jets_p4();
-    g_jets_medb_p4 = phys.jets_medb_p4();
-    g_jets_csv = phys.jets_csv();
+
+    writeCleanedJets(phys.jets_p4()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_p4(), phys.jets_csv());
   }
   else{
     g_dphi_metj1 = phys.dphi_metj1();
@@ -1593,9 +1650,9 @@ void setupGlobals(){
     g_mt2 = phys.mt2();
     g_mt2b = phys.mt2b();
     g_ht = phys.ht();
-    g_jets_p4 = phys.jets_p4();
-    g_jets_medb_p4 = phys.jets_medb_p4();
-    g_jets_csv = phys.jets_csv();
+    
+    writeCleanedJets(phys.jets_p4()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_p4(), phys.jets_csv()); //g_jets_medb_p4, g_jets_csv, g_nBJetMedium
   }
 }
 
@@ -2221,7 +2278,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       mjj_min_dphi->Fill(g_mjj_mindphi, weight);
 
 
-      if (phys.njets() >= 2){
+      if (g_njets >= 2){
         pair<int, int> indicies = getMostZlikePair(g_jets_p4);
         mjj_zlike->Fill((g_jets_p4.at(indicies.first) + g_jets_p4.at(indicies.second)).M(), weight);
         dEta_jj_zlike->Fill(abs(g_jets_p4.at(indicies.first).eta() - g_jets_p4.at(indicies.second).eta()), weight);
@@ -2233,13 +2290,13 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         mt2_jl->Fill(getMT2_JL(), weight);
       }
 
-      if (phys.njets() >= 1){
+      if (g_njets >= 1){
         jet1_pt->Fill(g_jets_p4.at(0).pt(), weight);
       }
-      if (phys.njets() >= 2){
+      if (g_njets >= 2){
         jet2_pt->Fill(g_jets_p4.at(1).pt(), weight);
       }
-      if (phys.njets() >= 3){
+      if (g_njets >= 3){
         jet3_pt->Fill(g_jets_p4.at(2).pt(), weight);
       }
 

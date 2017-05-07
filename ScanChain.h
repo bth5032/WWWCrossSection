@@ -143,6 +143,8 @@ vector<LorentzVector> g_jets_medb_p4;
 
 const int Z_MASS = 91;
 const int W_MASS = 80;
+
+double MAX_DR_JET_LEP_OVERLAP;
 double W_JET_WINDOW, Z_VETO_WINDOW;
 
 /* returns two most B-like jet indicies */
@@ -190,6 +192,9 @@ int getNumOSSFPairs();
 
 /*Returns a string which gives the exact flavor composition of the leptons in the event*/
 TString getLepFlavorString();
+
+/*Returns the DeltaR between objects p1 and p2.*/
+double DeltaR(const LorentzVector p1, const LorentzVector p2);
 //=============================
 // Triggers
 //=============================
@@ -288,6 +293,15 @@ bool passFileSelections();
 //=============================
 // Setup
 //=============================
+/*Takes in a p4 for a jet and determines whether that jet is less than MAX_DR_JET_LEP_OVERLAP for all leptons*/
+bool isOverlapJet(const LorentzVector &jet_p4);
+
+/*This function writes only elements of the given vector to g_jets_p4 variable, it can be passed the up and down variations as well.*/
+void writeCleanedJets(const vector<LorentzVector> &vecs);
+
+/*This function writes only elements of the given vector to g_jets_medb_p4 variable, it can be passed the up and down variations as well. Distingushed from the regular jet function because we need to keep track of the CSV values as well.*/
+void writeCleanedBJets(const vector<LorentzVector> &vecs, const vector<float> &csvs);
+
 /*Sets up global variables for the event which are the quantities that might be fluctuated in the process of computing uncertainty limits*/
 void setupGlobals();
 
