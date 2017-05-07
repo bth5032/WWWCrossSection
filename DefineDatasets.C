@@ -33,7 +33,7 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     ch->Add(dir+"dy_m50_mgmlm_ext1*");
     ch->Add(dir+"dy_m50_mgmlm_ht100_ext1*");
     ch->Add(dir+"dy_m50_mgmlm_ht200_ext1*");
-    ch->Add("/nfs-7/userdata/ZMEToutput/output/ZMETbabies/V08-22-17/skims/dy_m50_mgmlm_ht400_ext1*"); 
+    ch->Add(dir+"dy_m50_mgmlm_ht400_ext1*"); 
     ch->Add(dir+"dy_m50_mgmlm_ht600_nonext*");
     ch->Add(dir+"dy_m50_mgmlm_ht800_nonext*");
     ch->Add(dir+"dy_m50_mgmlm_ht1200_nonext*");
