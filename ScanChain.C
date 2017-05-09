@@ -1399,7 +1399,7 @@ bool passFileSelections(){
 
 
   //Zjets Monte Carlo samples
-  if ( (! phys.isData()) && TString(conf->get("data_set")).Contains("ZMC")){
+  if ( (! phys.isData()) && TString(conf->get("data_set")).Contains("DY")){
     //cout<<"Zjets MC event"<<endl;
     if( TString(currentFile->GetTitle()).Contains("dy_m50_mgmlm") && (! TString(currentFile->GetTitle()).Contains("_ht")) ){
       //cout<<"File: "<<currentFile->GetTitle()<<" with gen_ht: "<<phys.gen_ht()<<endl;
@@ -1424,10 +1424,6 @@ bool passFileSelections(){
         numEvents->Fill(69);
         return false;
       }
-      /*if (conf->get("signal_region") == "TChiHZ" && phys.evt() == 24645544 && TString(conf->get("conf_path")).Contains("TemplatesClosure") ){
-        cout<<"Hand removed the one TChiHZ event"<<endl;
-        return false;
-      }*/
     }
   }
 
@@ -1538,7 +1534,7 @@ bool isOverlapJet(const LorentzVector &jet_p4){
   /*Takes in a p4 for a jet and determines whether that jet is less than MAX_DR_JET_LEP_OVERLAP for all leptons*/ 
   //cout<<__LINE__<<endl;
   for (int i = 0; i< (int)phys.lep_p4().size(); i++){
-    if (DeltaR(jet_p4, phys.lep_p4().at(i)) < MAX_DR_JET_LEP_OVERLAP){
+    if (DeltaR(jet_p4, phys.lep_p4().at(i)) > MAX_DR_JET_LEP_OVERLAP){
       //cout<<"Failed JET at (eta, phi, pt) = ("<<jet_p4.eta()<<", "<<jet_p4.phi()<<", "<<jet_p4.pt()<<") lep at ("<<phys.lep_p4().at(i).eta()<<", "<<phys.lep_p4().at(i).phi()<<", "<<phys.lep_p4().at(i).pt()<<") DR="<<DeltaR(jet_p4, phys.lep_p4().at(i))<<endl;
       return false;
     }
