@@ -15,7 +15,7 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     base_path="/nfs-7/userdata/ZMEToutput/output/ZMETbabies/";
   }
 
-  TString version="WWW_v0.1";
+  TString version="WWW_v0.1.2";
 
   TString dir;
   if (skimmed){

@@ -884,9 +884,9 @@ double getWeight(){
 
   //cout<<__LINE__<<endl;
 
-  /*if (weight < 0){
-    cout<<"Negative Weight: "<<weight<<" "<<phys.evt()<<endl;
-  }*/
+  if (weight < 0 || weight > 0.3){
+    cout<<"Odd Weight: "<<weight<<" "<<phys.evt()<<endl;
+  }
 
   //weight *= scale1fbFix();
 
