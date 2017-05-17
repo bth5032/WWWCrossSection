@@ -12,14 +12,14 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     base_path="/hadoop/cms/store/user/bhashemi/AutoTwopler_babies/merged/ZMET/";
   }
   else {
-    base_path="/nfs-7/userdata/ZMEToutput/output/ZMETbabies/";
+    base_path="/nfs-7/userdata/bhashemi/WWW_babies/";
   }
 
-  TString version="WWW_v0.1.2";
+  TString version="WWW_v0.1.3";
 
   TString dir;
   if (skimmed){
-    dir=base_path+version+"/skims/";
+    dir=base_path+version+"/skim/";
   }
   else{
     dir=base_path+version+"/output/";
@@ -67,6 +67,18 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     cout<<"Adding WW"<<endl; 
     
     ch->Add(dir+"ww_2l2nu_powheg*.root");
+  }
+  else if (set == "WJets"){
+    cout<<"Adding WJets"<<endl; 
+    
+    ch->Add(dir+"wjets_incl_mgmlm_*.root");
+    ch->Add(dir+"wjets_ht100_mgmlm_ext1_*.root");
+    ch->Add(dir+"wjets_ht200_mgmlm_ext1_*.root");
+    ch->Add(dir+"wjets_ht400_mgmlm_ext1_*.root");
+    ch->Add(dir+"wjets_ht600_mgmlm_ext1_*.root");
+    ch->Add(dir+"wjets_ht800_mgmlm_ext1_*.root");
+    ch->Add(dir+"wjets_ht1200_mgmlm_nonext_*.root");
+    ch->Add(dir+"wjets_ht2500_mgmlm_ext1_*.root");
   }
   else if (set == "TTW"){
     cout<<"Adding TTW MC"<<endl; 

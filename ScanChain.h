@@ -27,7 +27,7 @@
 #include "TH3.h"
 
 // Analysis Specific
-#include "ZMET2016.cc"
+#include "WWW.cc"
 
 // CORE
 //You can not include headers!!! This is not compiled code.
@@ -144,7 +144,7 @@ vector<LorentzVector> g_jets_medb_p4;
 const int Z_MASS = 91;
 const int W_MASS = 80;
 
-double MAX_DR_JET_LEP_OVERLAP;
+double MAX_DR_JET_LEP_OVERLAP, JET_PT_MIN;
 double W_JET_WINDOW, Z_VETO_WINDOW;
 
 /* returns two most B-like jet indicies */

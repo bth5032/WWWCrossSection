@@ -471,11 +471,13 @@ bool hasGood3l(){
   //if (printStats) { cout<<"evt_type: "<<phys.evt_type()<<" "; }*/
 
   if( conf->get("dilmass_Z_veto") == "true" ) {
-    pair<int,int> lepind = getMostZlikePair(phys.lep_p4());
-    if( abs((phys.lep_p4().at(lepind.first) + phys.lep_p4().at(lepind.second)).M() - Z_MASS) < Z_VETO_WINDOW ) {
-      numEvents->Fill(22); 
-      if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut"<<endl;
-      return false; // require opposite sign
+    if (getNumOSSFPairs() != 0){
+      pair<int,int> lepind = getMostZlikePair(phys.lep_p4());
+      if( abs((phys.lep_p4().at(lepind.first) + phys.lep_p4().at(lepind.second)).M() - Z_MASS) < Z_VETO_WINDOW ) {
+        numEvents->Fill(22); 
+        if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut"<<endl;
+        return false; // require opposite sign
+      }
     }
   }
 
@@ -613,8 +615,9 @@ bool hasGood2l(){
 
   if (g_njets >= 2){
     if (W_JET_WINDOW > 0){
-      pair<int,int> jetind = getMostWlikePair(g_jets_p4);
-      if( abs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - W_MASS) > W_JET_WINDOW ) {
+      /*pair<int,int> jetind = getMostWlikePair(g_jets_p4);
+      if( abs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - W_MASS) > W_JET_WINDOW ) {*/
+      if( abs((g_jets_p4.at(0) + g_jets_p4.at(1)).M() - W_MASS) > W_JET_WINDOW ) {
         numEvents->Fill(61); 
         if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut"<<endl;
         return false; // require at at least 2 Jets within the W mass window.
@@ -873,14 +876,6 @@ double getWeight(){
     weight *= getPrescaleWeight();
   }
 
-  if (conf->get("tchihz_tchizz_weightfix") == "true"){
-    if (TString(currentFile->GetTitle()).Contains("tchihz_80x_v2")){
-      weight *= 0.5;
-    }
-    else if (TString(currentFile->GetTitle()).Contains("tchizz_80x_v2")){
-      weight *= 0.25;
-    }
-  }
 
   //cout<<__LINE__<<endl;
 
@@ -889,6 +884,7 @@ double getWeight(){
   }*/
 
   //weight *= scale1fbFix();
+  //cout<<"weight: "<<weight<<" evt: "<<phys.evt()<<endl;
 
   return weight;
 }
@@ -1109,6 +1105,14 @@ bool passSignalRegionCuts(){
     if ( phys.lep_pt().at(1) < stod( conf->get("lep2_pt_min") )){
       numEvents->Fill(46);
       if (printFail) cout<<phys.evt()<<" :Failed lep2 min pt cut"<<endl;
+      return false;
+    }
+  }
+
+  if (conf->get("lep3_pt_min") != "" && conf->get("event_type") != "photon" ){
+    if ( phys.lep_pt().at(2) < stod( conf->get("lep3_pt_min") )){
+      numEvents->Fill(46);
+      if (printFail) cout<<phys.evt()<<" :Failed lep3 min pt cut"<<endl;
       return false;
     }
   }
@@ -1427,6 +1431,19 @@ bool passFileSelections(){
     }
   }
 
+  //Wjets Monte Carlo samples
+  if ( (! phys.isData()) && TString(conf->get("data_set")).Contains("WJets")){
+    //cout<<"Wjets MC event"<<endl;
+    if( TString(currentFile->GetTitle()).Contains("wjets_incl_mgmlm_") && (! TString(currentFile->GetTitle()).Contains("_ht")) ){
+      //cout<<"File: "<<currentFile->GetTitle()<<" with gen_ht: "<<phys.gen_ht()<<endl;
+      if( phys.gen_ht() > 100 ) {
+        //cout<<"skipped"<<endl;
+        numEvents->Fill(44);
+        return false;
+      }
+    }
+  }
+
   //Photon MC samples
   if ( (! phys.isData()) && TString(conf->get("data_set")).Contains("GammaMC")){
     //cout<<"Photon MC event"<<endl;
@@ -1549,6 +1566,7 @@ void writeCleanedJets(const vector<LorentzVector> &vecs){
   int n_pass = 0;
   //cout<<__LINE__<<endl;
   for (int i = 0; i < (int) vecs.size(); i++){
+    if (vecs.at(i).pt() < JET_PT_MIN) continue;
     if ( !isOverlapJet(vecs.at(i)) ) { 
       g_jets_p4.push_back(vecs.at(i)); 
       n_pass++;
@@ -1556,7 +1574,7 @@ void writeCleanedJets(const vector<LorentzVector> &vecs){
   }
   //cout<<__LINE__<<endl;
 
-  g_njets = n_pass;
+  g_njets = (int) g_jets_p4.size();
   //cout<<"g_njets: "<<g_njets<<endl;
 }
 
@@ -1565,6 +1583,7 @@ void writeCleanedBJets(const vector<LorentzVector> &vecs, const vector<float> &c
   int n_pass = 0;
   //cout<<__LINE__<<endl;
   for (int i = 0; i < (int) vecs.size(); i++){
+    if (vecs.at(i).pt() < JET_PT_MIN) continue;
     if ( !isOverlapJet(vecs.at(i)) ) { 
       g_jets_medb_p4.push_back(vecs.at(i)); 
       g_jets_csv.push_back(csvs.at(i)); 
@@ -1572,7 +1591,7 @@ void writeCleanedBJets(const vector<LorentzVector> &vecs, const vector<float> &c
     }
   }
   //cout<<__LINE__<<endl;
-  g_nBJetMedium = n_pass;
+  g_nBJetMedium = (int) g_jets_medb_p4.size();
   //cout<<"g_nBJetMedium: "<<g_nBJetMedium<<endl;
   //cout<<"g_jets_csv_size: "<<g_jets_csv.size()<<endl;
 }
@@ -1581,7 +1600,8 @@ void setupGlobals(){
   Z_VETO_WINDOW = (conf->get("z_veto_window") == "") ? 5 : stod(conf->get("z_veto_window"));
   W_JET_WINDOW = (conf->get("w_jet_window") == "") ? 30 : stod(conf->get("w_jet_window"));
   MAX_DR_JET_LEP_OVERLAP = (conf->get("max_dr_jet_lep") == "") ? 0.4 : stod(conf->get("max_dr_jet_lep"));
-
+  JET_PT_MIN = (conf->get("jet_pt_min") == "") ? 30 : stod(conf->get("jet_pt_min"));
+  
   g_jets_p4.clear();
   g_jets_medb_p4.clear();
   g_jets_csv.clear();
@@ -1598,13 +1618,18 @@ void setupGlobals(){
     g_mt2b = phys.mt2b_up();
     g_ht = phys.ht_up();
 
-    writeCleanedJets(phys.jets_up_p4()); //g_jets_p4, g_njets
-    writeCleanedBJets(phys.jets_medb_up_p4(), phys.jets_up_csv());
+    g_jets_p4 = phys.jets_up_p4();
+    g_njets = phys.njets_up();
+    g_nBJetMedium = phys.nBJetMedium_up();
+    g_jets_medb_p4 = phys.jets_medb_up_p4();
+    g_jets_csv = phys.jets_up_csv();
+
+    /*writeCleanedJets(phys.jets_up_p4()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_up_p4(), phys.jets_up_csv());*/
   }
   else if (conf->get("uncertainty_mode") == "JES_dn"){
     g_dphi_metj1 = phys.dphi_metj1_dn();
     g_dphi_metj2 = phys.dphi_metj2_dn();
-    g_njets = phys.njets_dn();
     g_mbb = phys.mbb_csv_dn();
     g_mjj_mindphi = phys.mjj_mindphi_dn();
     g_nBJetMedium = phys.nBJetMedium_dn();
@@ -1614,8 +1639,14 @@ void setupGlobals(){
     g_mt2b = phys.mt2b_dn();
     g_ht = phys.ht_dn();
 
-    writeCleanedJets(phys.jets_dn_p4()); //g_jets_p4, g_njets
-    writeCleanedBJets(phys.jets_medb_dn_p4(), phys.jets_dn_csv());
+    g_jets_p4 = phys.jets_dn_p4();
+    g_njets = phys.njets_dn();
+    g_nBJetMedium = phys.nBJetMedium_dn();
+    g_jets_medb_p4 = phys.jets_medb_dn_p4();
+    g_jets_csv = phys.jets_dn_csv();
+
+    /*writeCleanedJets(phys.jets_dn_p4()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_dn_p4(), phys.jets_dn_csv());*/
   }
   else if (conf->get("uncertainty_mode") == "GenMet"){
     g_dphi_metj1 = phys.dphi_genmetj1();
@@ -1624,31 +1655,38 @@ void setupGlobals(){
     g_met_phi = phys.met_genPhi();
     g_mt2 = phys.mt2_genmet();
     g_mt2b = phys.mt2b_genmet();
-    
     g_mjj_mindphi = phys.mjj_mindphi();
     g_mbb = phys.mbb_csv();
-    g_nBJetMedium = phys.nBJetMedium();
-    g_njets = phys.njets();
     g_ht = phys.ht();
 
-    writeCleanedJets(phys.jets_p4()); //g_jets_p4, g_njets
-    writeCleanedBJets(phys.jets_medb_p4(), phys.jets_csv());
+    g_jets_p4 = phys.jets_p4();
+    g_njets = phys.njets();
+    g_nBJetMedium = phys.nBJetMedium();
+    g_jets_medb_p4 = phys.jets_medb_p4();
+    g_jets_csv = phys.jets_csv();
+
+    /*writeCleanedJets(phys.jets_p4()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_p4(), phys.jets_csv());*/
   }
   else{
     g_dphi_metj1 = phys.dphi_metj1();
     g_dphi_metj2 = phys.dphi_metj2();
-    g_njets = phys.njets();
     g_mbb = phys.mbb_csv();
     g_mjj_mindphi = phys.mjj_mindphi();
-    g_nBJetMedium = phys.nBJetMedium();
     g_met = phys.met_T1CHS_miniAOD_CORE_pt();
     g_met_phi = phys.met_T1CHS_miniAOD_CORE_phi();
     g_mt2 = phys.mt2();
     g_mt2b = phys.mt2b();
     g_ht = phys.ht();
     
-    writeCleanedJets(phys.jets_p4()); //g_jets_p4, g_njets
-    writeCleanedBJets(phys.jets_medb_p4(), phys.jets_csv()); //g_jets_medb_p4, g_jets_csv, g_nBJetMedium
+    g_jets_p4 = phys.jets_p4();
+    g_njets = phys.njets();
+    g_nBJetMedium = phys.nBJetMedium();
+    g_jets_medb_p4 = phys.jets_medb_p4();
+    g_jets_csv = phys.jets_csv();
+
+    /*writeCleanedJets(phys.jets_p4()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_p4(), phys.jets_csv()); //g_jets_medb_p4, g_jets_csv, g_nBJetMedium*/
   }
 }
 
@@ -1892,6 +1930,42 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   lep_flavor->SetDirectory(rootdir);
   lep_flavor->Sumw2();
 
+  TH1D *lep1_ip3d = new TH1D("lep1_ip3d", "Leading lepton ip3d for "+g_sample_name, 6000,0,6);
+  lep1_ip3d->SetDirectory(rootdir);
+  lep1_ip3d->Sumw2();
+
+  TH1D *lep1_ip3derr = new TH1D("lep1_ip3derr", "Leading lepton ip3d error for "+g_sample_name, 6000,0,6);
+  lep1_ip3derr->SetDirectory(rootdir);
+  lep1_ip3derr->Sumw2();
+
+  TH1D *lep1_sip3d = new TH1D("lep1_sip3d", "Leading lepton sip3d for "+g_sample_name, 6000,0,6);
+  lep1_sip3d->SetDirectory(rootdir);
+  lep1_sip3d->Sumw2();
+
+  TH1D *lep2_ip3d = new TH1D("lep2_ip3d", "Subleading lepton ip3d for "+g_sample_name, 6000,0,6);
+  lep2_ip3d->SetDirectory(rootdir);
+  lep2_ip3d->Sumw2();
+
+  TH1D *lep2_ip3derr = new TH1D("lep2_ip3derr", "Subleading lepton ip3d error for "+g_sample_name, 6000,0,6);
+  lep2_ip3derr->SetDirectory(rootdir);
+  lep2_ip3derr->Sumw2();
+
+  TH1D *lep2_sip3d = new TH1D("lep2_sip3d", "Subleading lepton sip3d for "+g_sample_name, 6000,0,6);
+  lep2_sip3d->SetDirectory(rootdir);
+  lep2_sip3d->Sumw2();
+
+  TH1D *lep3_ip3d = new TH1D("lep3_ip3d", "Trailing lepton ip3d for "+g_sample_name, 6000,0,6);
+  lep1_ip3d->SetDirectory(rootdir);
+  lep1_ip3d->Sumw2();
+
+  TH1D *lep3_ip3derr = new TH1D("lep3_ip3derr", "Trailing lepton ip3d error for "+g_sample_name, 6000,0,6);
+  lep3_ip3derr->SetDirectory(rootdir);
+  lep3_ip3derr->Sumw2();
+
+  TH1D *lep3_sip3d = new TH1D("lep3_sip3d", "Trailing lepton sip3d for "+g_sample_name, 6000,0,6);
+  lep3_sip3d->SetDirectory(rootdir);
+  lep3_sip3d->Sumw2();
+
 
   cout<<"Histograms initialized"<<endl;
   //cout<<__LINE__<<endl;
@@ -2093,7 +2167,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       ++nEventsTotal;
       //cout<<__LINE__<<endl;    
       // Progress
-      ZMET2016::progress( nEventsTotal, nEventsChain );
+      WWW::progress( nEventsTotal, nEventsChain );
       setupGlobals();
       //eventsInFile++;
       //if (eventsInFile > 100) continue;
@@ -2296,6 +2370,19 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         jet3_pt->Fill(g_jets_p4.at(2).pt(), weight);
       }
 
+      lep1_ip3d->Fill(phys.lep_ip3d().at(0), weight);
+      lep1_ip3derr->Fill(phys.lep_ip3derr().at(0), weight);
+      lep1_sip3d->Fill(phys.lep_ip3d().at(0)/phys.lep_ip3derr().at(0), weight);
+      lep2_ip3d->Fill(phys.lep_ip3d().at(1), weight);
+      lep2_ip3derr->Fill(phys.lep_ip3derr().at(1), weight);
+      lep2_sip3d->Fill(phys.lep_ip3d().at(1)/phys.lep_ip3derr().at(1), weight);
+
+      if (phys.nlep() > 2){
+        lep3_ip3d->Fill(phys.lep_ip3d().at(2), weight);
+        lep3_ip3derr->Fill(phys.lep_ip3derr().at(2), weight);
+        lep3_sip3d->Fill(phys.lep_ip3d().at(2)/phys.lep_ip3derr().at(2), weight);
+      }
+
 //===========================================
 // Signal Region Specific Histos
 //===========================================
@@ -2442,6 +2529,25 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   lep_signs->Write();
   //cout<<__LINE__<<endl;
   lep_flavor->Write();
+  //cout<<__LINE__<<endl;
+
+  lep1_ip3d->Write();
+  //cout<<__LINE__<<endl;
+  lep1_ip3derr->Write();
+  //cout<<__LINE__<<endl;
+  lep1_sip3d->Write();
+  //cout<<__LINE__<<endl;
+  lep2_ip3d->Write();
+  //cout<<__LINE__<<endl;
+  lep2_ip3derr->Write();
+  //cout<<__LINE__<<endl;
+  lep2_sip3d->Write();
+  //cout<<__LINE__<<endl;
+  lep3_ip3d->Write();
+  //cout<<__LINE__<<endl;
+  lep3_ip3derr->Write();
+  //cout<<__LINE__<<endl;
+  lep3_sip3d->Write();
   //cout<<__LINE__<<endl;
 
   //close output file

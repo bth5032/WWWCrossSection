@@ -8,3 +8,5 @@ DEFAULT::tau_veto=true
 DEFAULT::NBjets_max=0
 DEFAULT::z_veto_window=5
 DEFAULT::w_jet_window=30
+DEFAULT::no_btag_sf=true
+DEFAULT::jet_pt_min=30

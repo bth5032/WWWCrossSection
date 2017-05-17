@@ -525,7 +525,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
       for(int i = 0 ; i < (int)hists.size(); i++){
         for(int st_bin=0; st_bin < (int) stats_bins.size(); st_bin++){
           //cout<<__LINE__<<endl;
-          count = hists[i]->IntegralAndError(hists[i]->FindBin(stats_bins[st_bin].first), hists[i]->FindBin(stats_bins[st_bin].second - 0.01), error);
+          count = hists[i]->IntegralAndError(hists[i]->FindBin(stats_bins[st_bin].first), hists[i]->FindBin(stats_bins[st_bin].second - 0.000001), error);
           stat_row.push_back(make_pair(count,error));
         }
         stats.push_back(stat_row);
@@ -536,7 +536,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
         //Tack on Ratio row
         double zjets_count, zjets_err;
         for(int st_bin=0; st_bin < (int) stats_bins.size(); st_bin++){
-          count = bg_sum->IntegralAndError(bg_sum->FindBin(stats_bins[st_bin].first), bg_sum->FindBin(stats_bins[st_bin].second - 0.01), error);
+          count = bg_sum->IntegralAndError(bg_sum->FindBin(stats_bins[st_bin].first), bg_sum->FindBin(stats_bins[st_bin].second - 0.000001), error);
           zjets_count = stats[0][st_bin].first;
           zjets_err = stats[0][st_bin].second;
           cout<<"zjets_count: "<<zjets_count<<" zjets_err: "<<zjets_err<<endl;
@@ -550,7 +550,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
       else {
         //Tack on BG sum row
         for(int st_bin=0; st_bin < (int) stats_bins.size(); st_bin++){
-          count = bg_sum->IntegralAndError(bg_sum->FindBin(stats_bins[st_bin].first), bg_sum->FindBin(stats_bins[st_bin].second - 0.01), error);
+          count = bg_sum->IntegralAndError(bg_sum->FindBin(stats_bins[st_bin].first), bg_sum->FindBin(stats_bins[st_bin].second - 0.000001  ), error);
           stat_row.push_back(make_pair(count,error)); 
         } 
         stats.push_back(stat_row);
