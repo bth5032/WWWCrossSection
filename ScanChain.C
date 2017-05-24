@@ -255,6 +255,30 @@ double DeltaR(const LorentzVector p1, const LorentzVector p2){
   //cout<<__LINE__<<endl;
   return sqrt( (p1.eta() - p2.eta())*(p1.eta() - p2.eta())+(p1.phi() - p2.phi())*(p1.phi() - p2.phi()) );
 }
+
+bool isCleanLepFromW(int index){
+  /* checks the gen record for a lepton with the index specified */
+  LorentzVector lp4 = phys.lep_p4().at(index);
+  int lpdgId = phys.lep_pdgId().at(index);
+
+  for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
+    if (phys.genPart_pdgId().at(i) == lpdgId){
+      if (DeltaR(phys.genPart_p4().at(i), lp4) < 0.2){
+        if (abs(phys.genPart_p4().at(i).pt() - lp4.pt()) < 5){
+          if (abs(phys.genPart_motherId().at(i)) == 24){
+            //Found Lepton with:
+            // DR within 0.2
+            // Pt within 5 GeV
+            // W mother
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+}
 //=============================
 // Triggers
 //=============================
@@ -603,7 +627,7 @@ bool hasGood2l(){
 
   //cout<<__LINE__<<endl;
 
-  if ((conf->get("dilmass_Z_veto") == "true") && (phys.hyp_type() == 0 || phys.hyp_type() == 1) ){
+  if ((conf->get("dilmass_Z_veto") == "true") && (phys.hyp_type() == 0) ){ //only apply for EE events
     if( abs((phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() - Z_MASS) < Z_VETO_WINDOW ) {
       numEvents->Fill(22); 
       if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut"<<endl;
@@ -1236,6 +1260,28 @@ bool passSignalRegionCuts(){
       numEvents->Fill(67);
       if (printFail) cout<<phys.evt()<<" :Failed truth level bjet cut"<<endl;
       return false;
+    }
+  }
+
+  //cout<<__LINE__<<endl;
+
+  if (conf->get("3chargeagree") == "true"){
+    for (int i = 0; i < stoi(conf->get("num_leptons")); i++){
+      if ( ! phys.lep_3ch_agree().at(i) ){
+        numEvents->Fill(65);
+        if (printFail) cout<<phys.evt()<<" :Failed Three Charge Agree cut at lepton "<<i<<endl;
+        return false;
+      }
+    }
+  }
+
+  if (conf->get("reliso04_max") != ""){
+    for (int i = 0; i < stoi(conf->get("num_leptons")); i++){
+      if ( phys.lep_relIso04EA().at(i) > stod(conf->get("reliso04_max")) ){
+        numEvents->Fill(66);
+        if (printFail) cout<<phys.evt()<<" :Failed reliso04 max: "<<stod(conf->get("reliso04_max"))<<" at lepton "<<i<<endl;
+        return false;
+      }
     }
   }
 
@@ -1966,6 +2012,49 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   lep3_sip3d->SetDirectory(rootdir);
   lep3_sip3d->Sumw2();
 
+  //-------------------------------------------
+  //Truth level tagging W leps ip distributions
+
+  TH1D *Wleps_ip3d = new TH1D("Wleps_ip3d", "Ip3d for leptons tagged as from a W"+g_sample_name, 6000,0,6);
+  Wleps_ip3d->SetDirectory(rootdir);
+  Wleps_ip3d->Sumw2();
+
+  TH1D *otherleps_ip3d = new TH1D("otherleps_ip3d", "Ip3d for leptons not tagged as from a W"+g_sample_name, 6000,0,6);
+  otherleps_ip3d->SetDirectory(rootdir);
+  otherleps_ip3d->Sumw2();
+
+  TH1D *Wleps_ip3derr = new TH1D("Wleps_ip3derr", "Ip3derr for leptons tagged as from a W"+g_sample_name, 6000,0,6);
+  Wleps_ip3derr->SetDirectory(rootdir);
+  Wleps_ip3derr->Sumw2();
+
+  TH1D *Wleps_reliso04 = new TH1D("Wleps_reliso04", "RelIso04 for leptons tagged as from a W"+g_sample_name, 6000,0,6);
+  Wleps_reliso04->SetDirectory(rootdir);
+  Wleps_reliso04->Sumw2();
+
+  TH1D *Wleps_ptRatio = new TH1D("Wleps_ptRatio", "Pt Ratio for leptons tagged as from a W"+g_sample_name, 6000,0,6);
+  Wleps_ptRatio->SetDirectory(rootdir);
+  Wleps_ptRatio->Sumw2();
+
+  TH1D *otherleps_ip3derr = new TH1D("otherleps_ip3derr", "Ip3derr for leptons not tagged as from a W"+g_sample_name, 6000,0,6);
+  otherleps_ip3derr->SetDirectory(rootdir);
+  otherleps_ip3derr->Sumw2();
+
+  TH1D *Wleps_sip3d = new TH1D("Wleps_sip3d", "Sip3d for leptons tagged as from a W"+g_sample_name, 6000,0,6);
+  Wleps_sip3d->SetDirectory(rootdir);
+  Wleps_sip3d->Sumw2();
+
+  TH1D *otherleps_sip3d = new TH1D("otherleps_sip3d", "Sip3d for leptons not tagged as from a W"+g_sample_name, 6000,0,6);
+  otherleps_sip3d->SetDirectory(rootdir);
+  otherleps_sip3d->Sumw2();
+
+  TH1D *otherleps_reliso04 = new TH1D("otherleps_reliso04", "RelIso04 for leptons not tagged as from a W"+g_sample_name, 6000,0,6);
+  otherleps_reliso04->SetDirectory(rootdir);
+  otherleps_reliso04->Sumw2();
+
+  TH1D *otherleps_ptRatio = new TH1D("otherleps_ptRatio", "Pt Ratio for leptons not tagged as from a W"+g_sample_name, 6000,0,6);
+  otherleps_ptRatio->SetDirectory(rootdir);
+  otherleps_ptRatio->Sumw2();
+
 
   cout<<"Histograms initialized"<<endl;
   //cout<<__LINE__<<endl;
@@ -2370,17 +2459,34 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         jet3_pt->Fill(g_jets_p4.at(2).pt(), weight);
       }
 
-      lep1_ip3d->Fill(phys.lep_ip3d().at(0), weight);
-      lep1_ip3derr->Fill(phys.lep_ip3derr().at(0), weight);
-      lep1_sip3d->Fill(phys.lep_ip3d().at(0)/phys.lep_ip3derr().at(0), weight);
-      lep2_ip3d->Fill(phys.lep_ip3d().at(1), weight);
-      lep2_ip3derr->Fill(phys.lep_ip3derr().at(1), weight);
-      lep2_sip3d->Fill(phys.lep_ip3d().at(1)/phys.lep_ip3derr().at(1), weight);
+      lep1_ip3d->Fill(abs(phys.lep_ip3d().at(0)), weight);
+      lep1_ip3derr->Fill(abs(phys.lep_ip3derr().at(0)), weight);
+      lep1_sip3d->Fill(abs(phys.lep_ip3d().at(0))/abs(phys.lep_ip3derr().at(0)), weight);
+      lep2_ip3d->Fill(abs(phys.lep_ip3d().at(1)), weight);
+      lep2_ip3derr->Fill(abs(phys.lep_ip3derr().at(1)), weight);
+      lep2_sip3d->Fill(abs(phys.lep_ip3d().at(1))/abs(phys.lep_ip3derr().at(1)), weight);
 
       if (phys.nlep() > 2){
-        lep3_ip3d->Fill(phys.lep_ip3d().at(2), weight);
-        lep3_ip3derr->Fill(phys.lep_ip3derr().at(2), weight);
-        lep3_sip3d->Fill(phys.lep_ip3d().at(2)/phys.lep_ip3derr().at(2), weight);
+        lep3_ip3d->Fill(abs(phys.lep_ip3d().at(2)), weight);
+        lep3_ip3derr->Fill(abs(phys.lep_ip3derr().at(2)), weight);
+        lep3_sip3d->Fill(abs(phys.lep_ip3d().at(2))/abs(phys.lep_ip3derr().at(2)), weight);
+      }
+
+      for (int c = 0; c < (int) phys.lep_p4().size(); c++){
+        if (isCleanLepFromW(c)){
+          Wleps_ip3d->Fill(abs(phys.lep_ip3d().at(c)), weight);
+          Wleps_sip3d->Fill(abs(phys.lep_ip3d().at(c))/abs(phys.lep_ip3derr().at(c)), weight);
+          Wleps_ip3derr->Fill(abs(phys.lep_ip3derr().at(c)), weight);  
+          Wleps_reliso04->Fill(abs(phys.lep_relIso04EA().at(c)), weight);
+          Wleps_ptRatio->Fill(abs(phys.lep_ptRatio().at(c)), weight);
+        }
+        else{
+          otherleps_ip3d->Fill(abs(phys.lep_ip3d().at(c)), weight);
+          otherleps_sip3d->Fill(abs(phys.lep_ip3d().at(c))/abs(phys.lep_ip3derr().at(c)), weight);
+          otherleps_ip3derr->Fill(abs(phys.lep_ip3derr().at(c)), weight);
+          otherleps_reliso04->Fill(abs(phys.lep_relIso04EA().at(c)), weight);
+          otherleps_ptRatio->Fill(abs(phys.lep_ptRatio().at(c)), weight);
+        }
       }
 
 //===========================================
@@ -2549,6 +2655,25 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   //cout<<__LINE__<<endl;
   lep3_sip3d->Write();
   //cout<<__LINE__<<endl;
+  Wleps_ip3d->Write();
+  //cout<<__LINE__<<endl;
+  Wleps_sip3d->Write();
+  //cout<<__LINE__<<endl;
+  Wleps_ip3derr->Write();
+  //cout<<__LINE__<<endl;
+  Wleps_reliso04->Write();
+  //cout<<__LINE__<<endl;
+  Wleps_ptRatio->Write();
+  //cout<<__LINE__<<endl;
+  otherleps_ip3d->Write();
+  //cout<<__LINE__<<endl;
+  otherleps_ip3derr->Write();
+  //cout<<__LINE__<<endl;
+  otherleps_sip3d->Write();
+  //cout<<__LINE__<<endl;
+  otherleps_reliso04->Write();
+  //cout<<__LINE__<<endl;
+  otherleps_ptRatio->Write();
 
   //close output file
   output->Write();

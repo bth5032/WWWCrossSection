@@ -15,7 +15,7 @@ else
   git pull 
   git checkout root6
   cd makeCMS3ClassFiles
-  root -l -b -q "makeCMS3ClassFiles.C(\"$updateClassFiles_BabyPath\", \"t\", \"ZMET2016\", \"zmet\", \"phys\")"
-  mv ZMET2016.* /home/users/bhashemi/Projects/GIT/ZMETBabyLooper2017/
+  root -l -b -q "makeCMS3ClassFiles.C(\"$updateClassFiles_BabyPath\", \"t\", \"WWW\", \"WWW_babies\", \"phys\")"
+  mv WWW.* /home/users/bhashemi/Projects/GIT/WWWCrossSection/
   popd
 fi

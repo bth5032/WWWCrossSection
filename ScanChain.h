@@ -195,6 +195,9 @@ TString getLepFlavorString();
 
 /*Returns the DeltaR between objects p1 and p2.*/
 double DeltaR(const LorentzVector p1, const LorentzVector p2);
+
+/* checks the gen record for a lepton with the index specified */
+bool isCleanLepFromW(int index);
 //=============================
 // Triggers
 //=============================

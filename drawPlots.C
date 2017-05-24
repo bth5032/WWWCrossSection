@@ -566,7 +566,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
       table.useTitle();
       for (int st_bin=0; st_bin < (int) stats_bins.size(); st_bin++){
         //cout<<__LINE__<<endl;
-        table.setColLabel(Form("%.2f-%.2f",stats_bins[st_bin].first, stats_bins[st_bin].second), st_bin);
+        table.setColLabel(Form("%.3f-%.3f",stats_bins[st_bin].first, stats_bins[st_bin].second), st_bin);
       }
       //cout<<__LINE__<<endl;
 

@@ -14,7 +14,7 @@
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
 // Generated with the command
-// makeCMS3ClassFiles("chain files", "t", "WWW", "zmet", "phys")
+// makeCMS3ClassFiles("chain files", "t", "WWW", "WWW_babies", "phys")
 
 using namespace std; 
 class WWW {
@@ -399,6 +399,48 @@ protected:
 	vector<int> *lep_charge_;
 	TBranch *lep_charge_branch;
 	bool lep_charge_isLoaded;
+	vector<bool> *lep_3ch_agree_;
+	TBranch *lep_3ch_agree_branch;
+	bool lep_3ch_agree_isLoaded;
+	vector<int> *lep_isFromW_;
+	TBranch *lep_isFromW_branch;
+	bool lep_isFromW_isLoaded;
+	vector<double> *lep_ptRatio_;
+	TBranch *lep_ptRatio_branch;
+	bool lep_ptRatio_isLoaded;
+	vector<double> *lep_ptRel_;
+	TBranch *lep_ptRel_branch;
+	bool lep_ptRel_isLoaded;
+	vector<double> *lep_relIso03_;
+	TBranch *lep_relIso03_branch;
+	bool lep_relIso03_isLoaded;
+	vector<double> *lep_relIso03DB_;
+	TBranch *lep_relIso03DB_branch;
+	bool lep_relIso03DB_isLoaded;
+	vector<double> *lep_relIso03EA_;
+	TBranch *lep_relIso03EA_branch;
+	bool lep_relIso03EA_isLoaded;
+	vector<double> *lep_relIso03EAv2_;
+	TBranch *lep_relIso03EAv2_branch;
+	bool lep_relIso03EAv2_isLoaded;
+	vector<double> *lep_relIso04DB_;
+	TBranch *lep_relIso04DB_branch;
+	bool lep_relIso04DB_isLoaded;
+	vector<double> *lep_relIso04EA_;
+	TBranch *lep_relIso04EA_branch;
+	bool lep_relIso04EA_isLoaded;
+	vector<double> *lep_relIso04EAv2_;
+	TBranch *lep_relIso04EAv2_branch;
+	bool lep_relIso04EAv2_isLoaded;
+	vector<double> *lep_miniRelIsoCMS3_EA_;
+	TBranch *lep_miniRelIsoCMS3_EA_branch;
+	bool lep_miniRelIsoCMS3_EA_isLoaded;
+	vector<double> *lep_miniRelIsoCMS3_EAv2_;
+	TBranch *lep_miniRelIsoCMS3_EAv2_branch;
+	bool lep_miniRelIsoCMS3_EAv2_isLoaded;
+	vector<double> *lep_miniRelIsoCMS3_DB_;
+	TBranch *lep_miniRelIsoCMS3_DB_branch;
+	bool lep_miniRelIsoCMS3_DB_isLoaded;
 	vector<int> *lep_pdgId_;
 	TBranch *lep_pdgId_branch;
 	bool lep_pdgId_isLoaded;
@@ -420,21 +462,6 @@ protected:
 	vector<int> *lep_tightId_;
 	TBranch *lep_tightId_branch;
 	bool lep_tightId_isLoaded;
-	vector<float> *lep_relIso03_;
-	TBranch *lep_relIso03_branch;
-	bool lep_relIso03_isLoaded;
-	vector<float> *lep_relIso03MREA_;
-	TBranch *lep_relIso03MREA_branch;
-	bool lep_relIso03MREA_isLoaded;
-	vector<float> *lep_relIso03MRDB_;
-	TBranch *lep_relIso03MRDB_branch;
-	bool lep_relIso03MRDB_isLoaded;
-	vector<float> *lep_relIso03MRNC_;
-	TBranch *lep_relIso03MRNC_branch;
-	bool lep_relIso03MRNC_isLoaded;
-	vector<float> *lep_relIso04_;
-	TBranch *lep_relIso04_branch;
-	bool lep_relIso04_isLoaded;
 	vector<int> *lep_mcMatchId_;
 	TBranch *lep_mcMatchId_branch;
 	bool lep_mcMatchId_isLoaded;
@@ -1258,6 +1285,20 @@ void LoadAllBranches();
 	const vector<float> &lep_phi();
 	const vector<float> &lep_mass();
 	const vector<int> &lep_charge();
+	const vector<bool> &lep_3ch_agree();
+	const vector<int> &lep_isFromW();
+	const vector<double> &lep_ptRatio();
+	const vector<double> &lep_ptRel();
+	const vector<double> &lep_relIso03();
+	const vector<double> &lep_relIso03DB();
+	const vector<double> &lep_relIso03EA();
+	const vector<double> &lep_relIso03EAv2();
+	const vector<double> &lep_relIso04DB();
+	const vector<double> &lep_relIso04EA();
+	const vector<double> &lep_relIso04EAv2();
+	const vector<double> &lep_miniRelIsoCMS3_EA();
+	const vector<double> &lep_miniRelIsoCMS3_EAv2();
+	const vector<double> &lep_miniRelIsoCMS3_DB();
 	const vector<int> &lep_pdgId();
 	const vector<float> &lep_dxy();
 	const vector<float> &lep_ip3d();
@@ -1265,11 +1306,6 @@ void LoadAllBranches();
 	const vector<float> &lep_etaSC();
 	const vector<float> &lep_dz();
 	const vector<int> &lep_tightId();
-	const vector<float> &lep_relIso03();
-	const vector<float> &lep_relIso03MREA();
-	const vector<float> &lep_relIso03MRDB();
-	const vector<float> &lep_relIso03MRNC();
-	const vector<float> &lep_relIso04();
 	const vector<int> &lep_mcMatchId();
 	const vector<int> &lep_lostHits();
 	const vector<int> &lep_convVeto();
@@ -1509,7 +1545,7 @@ void LoadAllBranches();
 extern WWW phys;
 #endif
 
-namespace zmet {
+namespace WWW_babies {
 	const int &run();
 	const int &lumi();
 	const unsigned long long &evt();
@@ -1636,6 +1672,20 @@ namespace zmet {
 	const vector<float> &lep_phi();
 	const vector<float> &lep_mass();
 	const vector<int> &lep_charge();
+	const vector<bool> &lep_3ch_agree();
+	const vector<int> &lep_isFromW();
+	const vector<double> &lep_ptRatio();
+	const vector<double> &lep_ptRel();
+	const vector<double> &lep_relIso03();
+	const vector<double> &lep_relIso03DB();
+	const vector<double> &lep_relIso03EA();
+	const vector<double> &lep_relIso03EAv2();
+	const vector<double> &lep_relIso04DB();
+	const vector<double> &lep_relIso04EA();
+	const vector<double> &lep_relIso04EAv2();
+	const vector<double> &lep_miniRelIsoCMS3_EA();
+	const vector<double> &lep_miniRelIsoCMS3_EAv2();
+	const vector<double> &lep_miniRelIsoCMS3_DB();
 	const vector<int> &lep_pdgId();
 	const vector<float> &lep_dxy();
 	const vector<float> &lep_ip3d();
@@ -1643,11 +1693,6 @@ namespace zmet {
 	const vector<float> &lep_etaSC();
 	const vector<float> &lep_dz();
 	const vector<int> &lep_tightId();
-	const vector<float> &lep_relIso03();
-	const vector<float> &lep_relIso03MREA();
-	const vector<float> &lep_relIso03MRDB();
-	const vector<float> &lep_relIso03MRNC();
-	const vector<float> &lep_relIso04();
 	const vector<int> &lep_mcMatchId();
 	const vector<int> &lep_lostHits();
 	const vector<int> &lep_convVeto();
