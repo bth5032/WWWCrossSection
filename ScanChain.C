@@ -263,9 +263,11 @@ bool isCleanLepFromW(int index){
 
   for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
     if (phys.genPart_pdgId().at(i) == lpdgId){
+      //cout<<"Found lepton "<<index<<" in evt: "<<phys.evt()<<" Gen Record with (pt, eta, phi) = ("<<phys.genPart_p4().at(i).pt()<<", "<<phys.genPart_p4().at(i).eta()<<", "<<phys.genPart_p4().at(i).phi()<<"). Lep has ("<<phys.lep_p4().at(index).pt()<<", "<<phys.lep_p4().at(index).eta()<<", "<<phys.lep_p4().at(index).phi()<<")."<<endl;
       if (DeltaR(phys.genPart_p4().at(i), lp4) < 0.2){
         if (abs(phys.genPart_p4().at(i).pt() - lp4.pt()) < 5){
           if (abs(phys.genPart_motherId().at(i)) == 24){
+            //cout<<"Was a match!"<<endl;
             //Found Lepton with:
             // DR within 0.2
             // Pt within 5 GeV
@@ -276,6 +278,8 @@ bool isCleanLepFromW(int index){
       }
     }
   }
+
+  //cout<<"No Match Found for evt: "<<phys.evt()<<endl;
 
   return false;
 }
@@ -1275,6 +1279,22 @@ bool passSignalRegionCuts(){
     }
   }
 
+  if (conf->get("dEta_jj_max") != ""){
+      if ( abs(g_jets_p4.at(0).eta() - g_jets_p4.at(1).eta()) >  stod(conf->get("dEta_jj_max"))){
+        numEvents->Fill(74);
+        if (printFail) cout<<phys.evt()<<" :Failed Delta Eta JJ Max cut at "<<stod(conf->get("dEta_jj_max"))<<endl;
+        return false;
+      }
+  }
+
+  if (conf->get("Mll_min") != ""){
+      if ( (phys.lep_p4().at(0)+phys.lep_p4().at(1)).M() <  stod(conf->get("Mll_min"))){
+        numEvents->Fill(48);
+        if (printFail) cout<<phys.evt()<<" :Failed Mll min cut at "<<stod(conf->get("Mll_min"))<<endl;
+        return false;
+      }
+  }
+
   if (conf->get("reliso04_max") != ""){
     for (int i = 0; i < stoi(conf->get("num_leptons")); i++){
       if ( phys.lep_relIso04EA().at(i) > stod(conf->get("reliso04_max")) ){
@@ -1282,6 +1302,44 @@ bool passSignalRegionCuts(){
         if (printFail) cout<<phys.evt()<<" :Failed reliso04 max: "<<stod(conf->get("reliso04_max"))<<" at lepton "<<i<<endl;
         return false;
       }
+    }
+  }
+
+  if (conf->get("reliso03_max") != ""){
+    for (int i = 0; i < stoi(conf->get("num_leptons")); i++){
+      if ( phys.lep_relIso03EA().at(i) > stod(conf->get("reliso03_max")) ){
+        numEvents->Fill(66);
+        if (printFail) cout<<phys.evt()<<" :Failed reliso03 max: "<<stod(conf->get("reliso03_max"))<<" at lepton "<<i<<endl;
+        return false;
+      }
+    }
+  }
+
+  if (conf->get("ip3d_max") != ""){
+    for (int i = 0; i < stoi(conf->get("num_leptons")); i++){
+      if ( phys.lep_ip3d().at(i) > stod(conf->get("ip3d_max")) ){
+        numEvents->Fill(66);
+        if (printFail) cout<<phys.evt()<<" :Failed ip3d_max max: "<<stod(conf->get("ip3d_max"))<<" at lepton "<<i<<endl;
+        return false;
+      }
+    }
+  }
+
+  //cout<<__LINE__<<endl;
+
+  if (conf->get("jet1_pt_min") != "" ){
+    if ( g_jets_p4.at(0).pt() < stod( conf->get("jet1_pt_min") )){
+      numEvents->Fill(49);
+      if (printFail) cout<<phys.evt()<<" :Failed jet1 min pt"<<endl;
+      return false;
+    }
+  }
+
+  if (conf->get("isotrack_veto") == "true" ){
+    if ( phys.nisoTrack_mt2() != 0){
+      numEvents->Fill(62);
+      if (printFail) cout<<phys.evt()<<" :Failed isotrack veto"<<endl;
+      return false;
     }
   }
 
