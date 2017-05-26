@@ -525,23 +525,6 @@ bool hasGood2l(){
   
   //cout<<__LINE__<<endl;
 
-  if( phys.lep_pt().at(0) < 10        ) {
-    numEvents->Fill(11); 
-    if (printFail) cout<<phys.evt()<<" :Failed lep1 pt < 10 Z cut"<<endl;
-    return false; // leading lep pT > 10 GeV
-  }
-  //if (printStats) { cout<<"lep1 pt: "<<phys.lep_pt().at(0)<<" "; }
-
-  //cout<<__LINE__<<endl;
-
-  if( phys.lep_pt().at(1) < 10        ) {
-    numEvents->Fill(12); 
-    if (printFail) cout<<phys.evt()<<" :Failed lep2 pt < 10 Z cut"<<endl;
-    return false; // tailing lep pT > 10 GeV      
-  }
-  
-  //cout<<__LINE__<<endl;
-
   if( abs(phys.lep_p4().at(0).eta())     > 2.4       ) {
     numEvents->Fill(13); 
     if (printFail) cout<<phys.evt()<<" :Failed lep1 eta > 2.4 Z cut"<<endl;
@@ -560,7 +543,7 @@ bool hasGood2l(){
   //cout<<__LINE__<<endl;
 
   //This is the original cut selection
-  if( abs(phys.lep_p4().at(0).eta()) > 1.4 && abs(phys.lep_p4().at(0).eta()) < 1.6 ){
+  /*if( abs(phys.lep_p4().at(0).eta()) > 1.4 && abs(phys.lep_p4().at(0).eta()) < 1.6 ){
     numEvents->Fill(17);
     if (printFail) cout<<phys.evt()<<" :Failed lep1 in xition region Z cut"<<endl;
     return false;
@@ -572,15 +555,15 @@ bool hasGood2l(){
     numEvents->Fill(18); 
     if (printFail) cout<<phys.evt()<<" :Failed lep2 in xition region Z cut"<<endl;
     return false; // veto xition region
-  }
+  }*/
 
   //cout<<__LINE__<<endl;
 
-  if (! passLeptonHLTs()){
+  /*if (! passLeptonHLTs()){
     numEvents->Fill(20);
     if (printFail) cout<<phys.evt()<<" :Failed HLT Z cut"<<endl;
     return false;
-  }
+  }*/
 
   //cout<<__LINE__<<endl;
 
@@ -641,10 +624,10 @@ bool hasGood2l(){
 
   //cout<<__LINE__<<endl;
 
-  if (g_njets >= 2){
+  /*if (g_njets >= 2){
     if (W_JET_WINDOW > 0){
-      /*pair<int,int> jetind = getMostWlikePair(g_jets_p4);
-      if( abs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - W_MASS) > W_JET_WINDOW ) {*/
+      pair<int,int> jetind = getMostWlikePair(g_jets_p4);
+      if( abs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - W_MASS) > W_JET_WINDOW ) {
       if( abs((g_jets_p4.at(0) + g_jets_p4.at(1)).M() - W_MASS) > W_JET_WINDOW ) {
         numEvents->Fill(61); 
         if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut"<<endl;
@@ -656,6 +639,19 @@ bool hasGood2l(){
     numEvents->Fill(34); 
       if (printFail) cout<<phys.evt()<<" :Failed Not enough jets"<<endl;
       return false; // require at least 2 jets
+  }*/
+
+  if (g_njets >= 2){
+    if( ((g_jets_p4.at(0) + g_jets_p4.at(1)).M() < 65) || ((g_jets_p4.at(0) + g_jets_p4.at(1)).M() > 105) ) {
+      numEvents->Fill(61); 
+      if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut"<<endl;
+      return false; // require at at least 2 Jets within the W mass window.
+    }
+  }
+  else{
+    numEvents->Fill(34); 
+    if (printFail) cout<<phys.evt()<<" :Failed Not enough jets"<<endl;
+    return false; // require at least 2 jets
   }
 
   //cout<<__LINE__<<endl;
@@ -1347,52 +1343,6 @@ bool passSignalRegionCuts(){
   //if (printPass) cout<<phys.evt()<<": Passes Signal Region Cuts"<<endl;
   return true;
 }
-
-bool passRareCuts(){
-  
-  bool hasrealmet = true;
-  bool realzpair  = true;
-
-  if( TString(conf->get("data_set")).Contains("RareMC-vvv") || TString(conf->get("data_set")).Contains("RareMC-ttz")){
-    //cout<<"Checking for rare cuts"<<endl;
-    hasrealmet = false;
-    realzpair  = false;
-    
-    for( size_t genind = 0; genind < phys.genPart_motherId().size(); genind++ ){
-      if( (abs(phys.genPart_motherId().at(genind)) == 24 || phys.genPart_motherId().at(genind) == 23) &&
-        (phys.genPart_status().at(genind) == 23 || phys.genPart_status().at(genind) == 1 ) &&
-        (abs(phys.genPart_pdgId().at(genind))==12 ||
-         abs(phys.genPart_pdgId().at(genind))==14 ||
-         abs(phys.genPart_pdgId().at(genind))==16) ){
-        // cout<<"mom "<<phys.genPart_motherId().at(genind) << " | stat "<< phys.genPart_status().at(genind) <<  " | id "<< phys.genPart_pdgId().at(genind) << endl;
-        hasrealmet = true;
-      }
-      
-      if( (phys.genPart_motherId().at(genind) == 23 || phys.genPart_grandmaId().at(genind) == 23) &&
-        (phys.genPart_status().at(genind) == 23 || phys.genPart_status().at(genind) == 1) &&
-        (abs(phys.genPart_pdgId().at(genind))==11 ||
-         abs(phys.genPart_pdgId().at(genind))==13) ){
-        realzpair = true;
-      }
-    }
-  }
-  //if (printStats) { cout<<"HasGenZ: "<<realzpair<<" "; }
-  //if (printStats) { cout<<"HasGenMET: "<<hasrealmet<<" "; }
-  if ( ! hasrealmet ){
-    numEvents->Fill(47);
-    if (printFail) cout<<phys.evt()<<" :Failed Has Real MET Rare Cut"<<endl;    
-    return false;
-  }
-  else if ( ! realzpair ){
-    numEvents->Fill(48);
-    if (printFail) cout<<phys.evt()<<" :Failed Has Real Z Rare Cut"<<endl;    
-    return false;
-  }
-  
-  //if (printPass) cout<<phys.evt()<<": Passes Has Real MET Rare Cut"<<endl;
-  //if (printPass) cout<<phys.evt()<<": Passes Has Real Z Pair Rare Cut"<<endl;
-  return true;
-} 
 
 bool isDuplicate(){
   //cout<<__LINE__<<endl;
@@ -2379,11 +2329,11 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       }
       //cout<<__LINE__<<endl;
       
-      if (conf->get("do_met_filters") != "false")
+      /*if (conf->get("do_met_filters") != "false")
       {
         //cout<<"checking MET filters"<<endl;
         if (! passMETFilters()) continue; ///met filters
-      }
+      }*/
       
       //double weight=1;
       double weight = getWeight();
@@ -2399,7 +2349,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
         }*/
         //When Debug mode is off, you can turn this on:
-        cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
+        //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
       }
 //===========================================
 // Analysis Code

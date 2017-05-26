@@ -44,6 +44,8 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     cout<<"Adding TTBar (smaller stats sample)"<<endl; 
     
     ch->Add(dir+"ttbar_dilep_mgmlm_ext1_*");
+    ch->Add(dir+"ttbar_1ltop_mgmlm_ext1_*");
+    ch->Add(dir+"ttbar_1ltbr_mgmlm_ext1_*");
   }
   else if (set == "TTBar-highstats"){
     cout<<"Adding TTBar (large stats sample)"<<endl; 
