@@ -38,11 +38,11 @@ pair<int,int> getClosestBPairToHiggsMass(){
     throw std::underflow_error(message.str());
   }
 
-  double dist = abs((g_jets_p4.at(0)+g_jets_p4.at(1)).M() - 125.0);
+  double dist = fabs((g_jets_p4.at(0)+g_jets_p4.at(1)).M() - 125.0);
 
   for (int i = 0; i < (int) g_jets_p4.size(); i++) {
     for (int j = i+1; j < (int) g_jets_p4.size(); j++) {
-      if (abs((g_jets_p4.at(i)+g_jets_p4.at(j)).M() - 125 ) < dist){
+      if (fabs((g_jets_p4.at(i)+g_jets_p4.at(j)).M() - 125 ) < dist){
         first = i;
         second = j;
       }
@@ -176,14 +176,14 @@ pair<int, int> getPairWithMass(const vector<LorentzVector> &vecs, double target_
   int first_index = 0;
   int second_index = 1;
 
-  double best_mass = mult*abs(target_mass - (vecs.at(first_index)+vecs.at(second_index)).M());
+  double best_mass = mult*fabs(target_mass - (vecs.at(first_index)+vecs.at(second_index)).M());
 
   for (int i = 0; i < (int) vecs.size(); i++){
     for (int j = i+1; j < (int) vecs.size(); j++){
-      if (mult*abs(target_mass - (vecs.at(i)+vecs.at(j)).M()) < best_mass){
+      if (mult*fabs(target_mass - (vecs.at(i)+vecs.at(j)).M()) < best_mass){
         first_index=i;
         second_index=j;
-        best_mass = mult*abs(target_mass - (vecs.at(first_index)+vecs.at(second_index)).M());
+        best_mass = mult*fabs(target_mass - (vecs.at(first_index)+vecs.at(second_index)).M());
       }
     }
   }
@@ -265,8 +265,8 @@ bool isCleanLepFromW(int index){
     if (phys.genPart_pdgId().at(i) == lpdgId){
       //cout<<"Found lepton "<<index<<" in evt: "<<phys.evt()<<" Gen Record with (pt, eta, phi) = ("<<phys.genPart_p4().at(i).pt()<<", "<<phys.genPart_p4().at(i).eta()<<", "<<phys.genPart_p4().at(i).phi()<<"). Lep has ("<<phys.lep_p4().at(index).pt()<<", "<<phys.lep_p4().at(index).eta()<<", "<<phys.lep_p4().at(index).phi()<<")."<<endl;
       if (DeltaR(phys.genPart_p4().at(i), lp4) < 0.2){
-        if (abs(phys.genPart_p4().at(i).pt() - lp4.pt()) < 5){
-          if (abs(phys.genPart_motherId().at(i)) == 24){
+        if (fabs(phys.genPart_p4().at(i).pt() - lp4.pt()) < 5){
+          if (fabs(phys.genPart_motherId().at(i)) == 24){
             //cout<<"Was a match!"<<endl;
             //Found Lepton with:
             // DR within 0.2
@@ -291,10 +291,10 @@ bool passPhotonEmulatedTrigger() {
   if( phys.gamma_r9()            .at(0) < 0.92 ) return false;
   if( phys.gamma_hOverE()        .at(0) > 0.2  ) return false;
   if( phys.gamma_hollowtkiso03() .at(0) > 5    ) return false;
-  if( abs(phys.gamma_eta().at(0)) < 1.4 && phys.gamma_ecpfclusiso().at(0) > 4 + phys.gamma_pt().at(0) * 0.0053  ) return false;
-  if( abs(phys.gamma_eta().at(0)) < 1.4 && phys.gamma_hcpfclusiso().at(0) > 8 + phys.gamma_pt().at(0) * 0.014   ) return false;
-  if( abs(phys.gamma_eta().at(0)) > 1.6 && phys.gamma_ecpfclusiso().at(0) > 4 + phys.gamma_pt().at(0) * 0.0034  ) return false;
-  if( abs(phys.gamma_eta().at(0)) > 1.6 && phys.gamma_hcpfclusiso().at(0) > 8 + phys.gamma_pt().at(0) * 0.0139  ) return false;
+  if( fabs(phys.gamma_eta().at(0)) < 1.4 && phys.gamma_ecpfclusiso().at(0) > 4 + phys.gamma_pt().at(0) * 0.0053  ) return false;
+  if( fabs(phys.gamma_eta().at(0)) < 1.4 && phys.gamma_hcpfclusiso().at(0) > 8 + phys.gamma_pt().at(0) * 0.014   ) return false;
+  if( fabs(phys.gamma_eta().at(0)) > 1.6 && phys.gamma_ecpfclusiso().at(0) > 4 + phys.gamma_pt().at(0) * 0.0034  ) return false;
+  if( fabs(phys.gamma_eta().at(0)) > 1.6 && phys.gamma_hcpfclusiso().at(0) > 8 + phys.gamma_pt().at(0) * 0.0139  ) return false;
 
   return true;
 }
@@ -434,7 +434,7 @@ bool hasGood3l(){
   
   //cout<<__LINE__<<endl;
 
-  if( abs(phys.lep_p4().at(0).eta())     > 2.4       ) {
+  if( fabs(phys.lep_p4().at(0).eta())     > 2.4       ) {
     numEvents->Fill(13); 
     if (printFail) cout<<phys.evt()<<" :Failed lep1 eta > 2.4 Z cut"<<endl;
     return false; // eta < 2.4
@@ -443,13 +443,13 @@ bool hasGood3l(){
 
   //cout<<__LINE__<<endl;
   
-  if( abs(phys.lep_p4().at(1).eta())     > 2.4       ) {
+  if( fabs(phys.lep_p4().at(1).eta())     > 2.4       ) {
     numEvents->Fill(14); 
     if (printFail) cout<<phys.evt()<<" :Failed lep2 eta > 2.4 Z cut"<<endl;
     return false; // eta < 2.4
   }
 
-  if( abs(phys.lep_p4().at(2).eta())     > 2.4       ) {
+  if( fabs(phys.lep_p4().at(2).eta())     > 2.4       ) {
     numEvents->Fill(14); 
     if (printFail) cout<<phys.evt()<<" :Failed lep3 eta > 2.4 Z cut"<<endl;
     return false; // eta < 2.4
@@ -459,7 +459,7 @@ bool hasGood3l(){
   //cout<<__LINE__<<endl;
 
   //This is the original cut selection
-  if( abs(phys.lep_p4().at(0).eta()) > 1.4 && abs(phys.lep_p4().at(0).eta()) < 1.6 ){
+  /*if( fabs(phys.lep_p4().at(0).eta()) > 1.4 && fabs(phys.lep_p4().at(0).eta()) < 1.6 ){
     numEvents->Fill(17);
     if (printFail) cout<<phys.evt()<<" :Failed lep1 in xition region Z cut"<<endl;
     return false;
@@ -467,27 +467,35 @@ bool hasGood3l(){
 
   //cout<<__LINE__<<endl;
 
-  if( abs(phys.lep_p4().at(1).eta()) > 1.4 && abs(phys.lep_p4().at(1).eta()) < 1.6 ) {
+  if( fabs(phys.lep_p4().at(1).eta()) > 1.4 && fabs(phys.lep_p4().at(1).eta()) < 1.6 ) {
     numEvents->Fill(18); 
     if (printFail) cout<<phys.evt()<<" :Failed lep2 in xition region Z cut"<<endl;
     return false; // veto xition region
   }
 
-  if( abs(phys.lep_p4().at(2).eta()) > 1.4 && abs(phys.lep_p4().at(2).eta()) < 1.6 ) {
+  if( fabs(phys.lep_p4().at(2).eta()) > 1.4 && fabs(phys.lep_p4().at(2).eta()) < 1.6 ) {
     numEvents->Fill(18); 
     if (printFail) cout<<phys.evt()<<" :Failed lep3 in xition region Z cut"<<endl;
     return false; // veto xition region
-  }
+  }*/
 
   //cout<<__LINE__<<endl;
 
-  if (! passLeptonHLTs()){
+  /*if (! passLeptonHLTs()){
     numEvents->Fill(20);
     if (printFail) cout<<phys.evt()<<" :Failed HLT cut"<<endl;
     return false;
-  }
+  }*/
 
   //cout<<__LINE__<<endl;
+
+  if ( conf->get("3lep_phi_MET_min") != "" ){
+    if ( fabs( (phys.lep_p4().at(0) + phys.lep_p4().at(1) + phys.lep_p4().at(2)).phi() - g_met_phi) <= stod(conf->get("3lep_phi_MET_min")) ){
+      numEvents->Fill(31); 
+      if (printFail) cout<<phys.evt()<<" :Failed phi of 3lep system within "<<stod(conf->get("3lep_phi_MET_min"))<<" of MET phi"<<endl;
+      return false;
+    }
+  }
 
   if( conf->get("num_OSSF_pairs") != "" ) {
     if ( stoi(conf->get("num_OSSF_pairs")) != getNumOSSFPairs()){
@@ -498,14 +506,119 @@ bool hasGood3l(){
   }
   //if (printStats) { cout<<"evt_type: "<<phys.evt_type()<<" "; }*/
 
-  if( conf->get("dilmass_Z_veto") == "true" ) {
-    if (getNumOSSFPairs() != 0){
-      pair<int,int> lepind = getMostZlikePair(phys.lep_p4());
-      if( abs((phys.lep_p4().at(lepind.first) + phys.lep_p4().at(lepind.second)).M() - Z_MASS) < Z_VETO_WINDOW ) {
-        numEvents->Fill(22); 
-        if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut"<<endl;
-        return false; // require opposite sign
+  if ( conf->get("Mll_SF_min") != "" ){
+    if ( fabs(phys.lep_pdgId().at(0)) == fabs(phys.lep_pdgId().at(1)) ){
+      if ( (phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() <= stod(conf->get("Mll_SF_min")) ){
+        numEvents->Fill(24); 
+        if (printFail) cout<<phys.evt()<<" :Failed Mll SF cut in 3 lep region for leps 1 and 2"<<endl;
+        return false;
       }
+    }
+
+    if ( fabs(phys.lep_pdgId().at(0)) == fabs(phys.lep_pdgId().at(2)) ){
+      if ( (phys.lep_p4().at(0) + phys.lep_p4().at(2)).M() <= stod(conf->get("Mll_SF_min")) ){
+        numEvents->Fill(24); 
+        if (printFail) cout<<phys.evt()<<" :Failed Mll SF cut in 3 lep region for leps 1 and 3"<<endl;
+        return false;
+      }
+    }
+
+    if ( fabs(phys.lep_pdgId().at(1)) == fabs(phys.lep_pdgId().at(2)) ){
+      if ( (phys.lep_p4().at(1) + phys.lep_p4().at(2)).M() <= stod(conf->get("Mll_SF_min")) ){
+        numEvents->Fill(24); 
+        if (printFail) cout<<phys.evt()<<" :Failed Mll SF cut in 3 lep region for leps 2 and 3"<<endl;
+        return false;
+      }
+    }
+  }
+
+  if( ( conf->get("dilmass_Z_veto") == "true" ) ) {
+    if ( conf->get("signal_region") == "3lep_0SFOS" ){
+      if ( ( fabs(phys.lep_pdgId().at(0)) == fabs(phys.lep_pdgId().at(1)) ) && ( fabs(phys.lep_pdgId().at(0)) == 11) ){
+        if ( fabs((phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() - Z_MASS ) <= 15 ){
+          numEvents->Fill(19); 
+          if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 0SFOS pairs"<<endl;
+          return false;
+        }
+      }
+      if ( ( fabs(phys.lep_pdgId().at(0)) == fabs(phys.lep_pdgId().at(2)) ) && ( fabs(phys.lep_pdgId().at(0)) == 11) ){
+        if ( fabs((phys.lep_p4().at(0) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 15 ){
+          numEvents->Fill(19); 
+          if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 0SFOS pairs"<<endl;
+          return false;
+        }
+      }
+      if ( ( fabs(phys.lep_pdgId().at(1)) == fabs(phys.lep_pdgId().at(2)) ) && ( fabs(phys.lep_pdgId().at(1)) == 11) ){
+        if ( fabs((phys.lep_p4().at(1) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 15 ){
+          numEvents->Fill(19); 
+          if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 0SFOS pairs"<<endl;
+          return false;
+        }
+      }
+    }
+
+    else if ( conf->get("signal_region") == "3lep_1SFOS" ){
+      if ( ( phys.lep_pdgId().at(0) == -phys.lep_pdgId().at(1) ) ){
+        //veto if mass within [MZ-35,MZ+20]
+        if ( ( ( (phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() - Z_MASS ) <= 20 ) && ( ( Z_MASS - (phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() ) <= 35 ) ){
+          numEvents->Fill(19); 
+          if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 1SFOS pairs"<<endl;
+          return false;
+        }
+      }
+
+      if ( ( phys.lep_pdgId().at(0) == -phys.lep_pdgId().at(2) ) ){
+        //veto if mass within [MZ-35,MZ+20]
+        if ( ( ( (phys.lep_p4().at(0) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 20 ) && ( ( Z_MASS - (phys.lep_p4().at(0) + phys.lep_p4().at(2)).M() ) <= 35 ) ){
+          numEvents->Fill(19); 
+          if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 1SFOS pairs"<<endl;
+          return false;
+        }
+      }
+
+      if ( ( phys.lep_pdgId().at(1) == -phys.lep_pdgId().at(2) ) ){
+        //veto if mass within [MZ-35,MZ+20]
+        if ( ( ( (phys.lep_p4().at(1) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 20 ) && ( ( Z_MASS - (phys.lep_p4().at(1) + phys.lep_p4().at(2)).M() ) <= 35 ) ){
+          numEvents->Fill(19); 
+          if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 1SFOS pairs"<<endl;
+          return false;
+        }
+      }
+    }
+
+    else if ( conf->get("signal_region") == "3lep_2SFOS" ){
+      if ( ( phys.lep_pdgId().at(0) == -phys.lep_pdgId().at(1) ) ){
+        //veto if mass within [MZ-35,MZ+20]
+        if ( fabs((phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() - Z_MASS ) <= 20 ){
+          numEvents->Fill(19); 
+          if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 2SFOS pairs"<<endl;
+          return false;
+        }
+      }
+
+      if ( ( phys.lep_pdgId().at(0) == -phys.lep_pdgId().at(2) ) ){
+        //veto if mass within [MZ-35,MZ+20]
+        if ( fabs((phys.lep_p4().at(0) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 20 ){
+          numEvents->Fill(19); 
+          if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 2SFOS pairs"<<endl;
+          return false;
+        }
+      }
+
+      if ( ( phys.lep_pdgId().at(1) == -phys.lep_pdgId().at(2) ) ){
+        //veto if mass within [MZ-35,MZ+20]
+        if ( fabs((phys.lep_p4().at(1) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 20 ){
+          numEvents->Fill(19); 
+          if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 2SFOS pairs"<<endl;
+          return false;
+        }
+      }
+    }
+    else{
+      cout<<"Throwing error, can not apply dilmass Z veto without a known signal region"<<endl;
+      std::stringstream message;
+      message<<"Don't know how to apply the dilepton mass Z veto with signal region: "<<conf->get("signal_region");
+      throw std::invalid_argument(message.str());
     }
   }
 
@@ -525,7 +638,7 @@ bool hasGood2l(){
   
   //cout<<__LINE__<<endl;
 
-  if( abs(phys.lep_p4().at(0).eta())     > 2.4       ) {
+  if( fabs(phys.lep_p4().at(0).eta())     > 2.4       ) {
     numEvents->Fill(13); 
     if (printFail) cout<<phys.evt()<<" :Failed lep1 eta > 2.4 Z cut"<<endl;
     return false; // eta < 2.4
@@ -534,7 +647,7 @@ bool hasGood2l(){
 
   //cout<<__LINE__<<endl;
   
-  if( abs(phys.lep_p4().at(1).eta())     > 2.4       ) {
+  if( fabs(phys.lep_p4().at(1).eta())     > 2.4       ) {
     numEvents->Fill(14); 
     if (printFail) cout<<phys.evt()<<" :Failed lep2 eta > 2.4 Z cut"<<endl;
     return false; // eta < 2.4
@@ -543,7 +656,7 @@ bool hasGood2l(){
   //cout<<__LINE__<<endl;
 
   //This is the original cut selection
-  /*if( abs(phys.lep_p4().at(0).eta()) > 1.4 && abs(phys.lep_p4().at(0).eta()) < 1.6 ){
+  /*if ( (fabs(phys.lep_pdgId().at(0)) == (11)) && ( fabs(phys.lep_p4().at(0).eta()) > 1.4 && fabs(phys.lep_p4().at(0).eta()) < 1.6 ) ){
     numEvents->Fill(17);
     if (printFail) cout<<phys.evt()<<" :Failed lep1 in xition region Z cut"<<endl;
     return false;
@@ -551,7 +664,7 @@ bool hasGood2l(){
 
   //cout<<__LINE__<<endl;
 
-  if( abs(phys.lep_p4().at(1).eta()) > 1.4 && abs(phys.lep_p4().at(1).eta()) < 1.6 ) {
+   if ( (fabs(phys.lep_pdgId().at(1)) == (11)) && ( fabs(phys.lep_p4().at(1).eta()) > 1.4 && fabs(phys.lep_p4().at(1).eta()) < 1.6 ) ){
     numEvents->Fill(18); 
     if (printFail) cout<<phys.evt()<<" :Failed lep2 in xition region Z cut"<<endl;
     return false; // veto xition region
@@ -615,36 +728,20 @@ bool hasGood2l(){
   //cout<<__LINE__<<endl;
 
   if ((conf->get("dilmass_Z_veto") == "true") && (phys.hyp_type() == 0) ){ //only apply for EE events
-    if( abs((phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() - Z_MASS) < Z_VETO_WINDOW ) {
+    if ( ( (phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() > Z_VETO_WINDOW_LOW ) && ( (phys.lep_p4().at(0) + phys.lep_p4().at(1)).M() < Z_VETO_WINDOW_HIGH ) ) {
       numEvents->Fill(22); 
-      if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut with mass: "<<(phys.lep_p4().at(0) + phys.lep_p4().at(1)).M()<<endl;
       return false; // require opposite sign
     }
   }
 
   //cout<<__LINE__<<endl;
 
-  /*if (g_njets >= 2){
-    if (W_JET_WINDOW > 0){
-      pair<int,int> jetind = getMostWlikePair(g_jets_p4);
-      if( abs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - W_MASS) > W_JET_WINDOW ) {
-      if( abs((g_jets_p4.at(0) + g_jets_p4.at(1)).M() - W_MASS) > W_JET_WINDOW ) {
-        numEvents->Fill(61); 
-        if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut"<<endl;
-        return false; // require at at least 2 Jets within the W mass window.
-      }
-    }
-  }
-  else{
-    numEvents->Fill(34); 
-      if (printFail) cout<<phys.evt()<<" :Failed Not enough jets"<<endl;
-      return false; // require at least 2 jets
-  }*/
-
   if (g_njets >= 2){
-    if( ((g_jets_p4.at(0) + g_jets_p4.at(1)).M() < 65) || ((g_jets_p4.at(0) + g_jets_p4.at(1)).M() > 105) ) {
+    double dijet_mass = ( g_jets_p4.at(0) + g_jets_p4.at(1) ).M();
+    if( (dijet_mass < W_JET_WINDOW_LOW) || (dijet_mass > W_JET_WINDOW_HIGH) ) {
       numEvents->Fill(61); 
-      if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut with dijet mass: "<< dijet_mass <<endl;
       return false; // require at at least 2 Jets within the W mass window.
     }
   }
@@ -719,7 +816,7 @@ void readyVPTReweight(TString save_path){
 
 double getEff(const double &pt, const double &eta){
   /* Returns the trigger efficiency from g_pt_eff */
-  if (abs(eta) < 1.4){
+  if (fabs(eta) < 1.4){
     return g_pt_eff_barrel->GetEfficiency(g_pt_eff_barrel->FindFixBin(pt));
   }
   else{
@@ -995,7 +1092,8 @@ bool passSignalRegionCuts(){
 
   //Num Bottom jets Max Cut
   if (conf->get("NBjets_loose_max") != ""){
-    if (phys.nBJetLoose() > stod(conf->get("NBjets_loose_max"))){
+    //cout<<"BJET evt: "<<phys.evt()<<" -- Checking for max loose bjets, have: "<<g_nBJetLoose<<endl;
+    if (g_nBJetLoose > stod(conf->get("NBjets_loose_max"))){
       numEvents->Fill(37);
       if (printFail) cout<<phys.evt()<<" :Failed max bjet cut"<<endl;
       return false;
@@ -1006,7 +1104,7 @@ bool passSignalRegionCuts(){
 
   //Num Bottom jets Min Cut
   if (conf->get("NBjets_loose_min") != ""){
-    if (phys.nBJetLoose() < stod(conf->get("NBjets_loose_min"))){
+    if (g_nBJetLoose < stod(conf->get("NBjets_loose_min"))){
       numEvents->Fill(36);
       if (printFail) cout<<phys.evt()<<" :Failed min bjet cut"<<endl;
       return false;
@@ -1084,8 +1182,8 @@ bool passSignalRegionCuts(){
   //cout<<__LINE__<<endl;
   //DiBottom mass difference from Higgs Mass
   if (conf->get("mbb_mh_diff") != ""){
-  //if (printStats) { cout<<"mbb_mh_diff: "<<abs(mbb - 125)<<" "; }
-    if (abs(g_mbb - 125) < stod(conf->get("mbb_mh_diff"))){
+  //if (printStats) { cout<<"mbb_mh_diff: "<<fabs(mbb - 125)<<" "; }
+    if (fabs(g_mbb - 125) < stod(conf->get("mbb_mh_diff"))){
       numEvents->Fill(42);
       if (printFail) cout<<phys.evt()<<" :Failed sum mbb_mh diff cut"<<endl;
       return false;
@@ -1105,8 +1203,8 @@ bool passSignalRegionCuts(){
       pt = phys.lep_pt().at(0) + phys.lep_pt().at(1);
     }
     //cout<<__LINE__<<endl;
-    //if (printStats) { cout<<"sum_HT_pt_pt: "<<abs(ht + pt )<<" "; }
-    if ( abs(g_ht + pt ) < stod(conf->get("sum_HT_pt_pt") ) ){
+    //if (printStats) { cout<<"sum_HT_pt_pt: "<<fabs(ht + pt )<<" "; }
+    if ( fabs(g_ht + pt ) < stod(conf->get("sum_HT_pt_pt") ) ){
       numEvents->Fill(43);
       if (printFail) cout<<phys.evt()<<" :Failed sum HT pt pt cut"<<endl;
       return false;
@@ -1146,7 +1244,7 @@ bool passSignalRegionCuts(){
   if (conf->get("MET_min") != ""){
     if ( g_met < stod( conf->get("MET_min") )){
       numEvents->Fill(56);
-      if (printFail) cout<<phys.evt()<<" :Failed lep2 min pt cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed MET min cut"<<endl;
       return false;
     }
   }
@@ -1156,7 +1254,7 @@ bool passSignalRegionCuts(){
   if (conf->get("MET_max") != ""){
     if ( g_met > stod( conf->get("MET_max") )){
       numEvents->Fill(57);
-      if (printFail) cout<<phys.evt()<<" :Failed lep2 min pt cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed MET max cut"<<endl;
       return false;
     }
   }
@@ -1166,7 +1264,7 @@ bool passSignalRegionCuts(){
   if (conf->get("Mbb_max") != ""){
     if ( g_mbb > stod( conf->get("Mbb_max") )){
       numEvents->Fill(58);
-      if (printFail) cout<<phys.evt()<<" :Failed lep2 min pt cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed Mbb max cut"<<endl;
       return false;
     }
   }
@@ -1176,7 +1274,7 @@ bool passSignalRegionCuts(){
   if (conf->get("Mbb_loose_max") != ""){
     if ( getMbb() > stod( conf->get("Mbb_loose_max") )){
       numEvents->Fill(58);
-      if (printFail) cout<<phys.evt()<<" :Failed lep2 min pt cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed Mbb loose max cut"<<endl;
       return false;
     }
   }
@@ -1201,14 +1299,14 @@ bool passSignalRegionCuts(){
     }
   }
 
-  if (conf->get("Mjj_Z_veto") == "true"){
+  /*if (conf->get("Mjj_Z_veto") == "true"){
     pair<int,int> jetind = getMostZlikePair(g_jets_p4);
-    if( abs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - Z_MASS) < Z_VETO_WINDOW ) {
+    if( fabs((g_jets_p4.at(jetind.first) + g_jets_p4.at(jetind.second)).M() - Z_MASS) < Z_VETO_WINDOW ) {
       numEvents->Fill(9); 
       if (printFail) cout<<phys.evt()<<" :Failed jet pair on Z mass cut"<<endl;
       return false; // Mjj Z Veto
     }
-  }
+  }*/
 
   //cout<<__LINE__<<endl;
   
@@ -1238,13 +1336,13 @@ bool passSignalRegionCuts(){
   if (conf->get("force_true_bjets") != ""){
     pair<int, int> b_index = getMostBlike();
 
-    if ( abs(phys.jets_mcFlavour().at(b_index.first)) != 5 ){
+    if ( fabs(phys.jets_mcFlavour().at(b_index.first)) != 5 ){
       numEvents->Fill(67);
       if (printFail) cout<<phys.evt()<<" :Failed truth level bjet cut"<<endl;
       return false;
     }
 
-    if ( abs(phys.jets_mcFlavour().at(b_index.second)) != 5 ){
+    if ( fabs(phys.jets_mcFlavour().at(b_index.second)) != 5 ){
       numEvents->Fill(67);
       if (printFail) cout<<phys.evt()<<" :Failed truth level bjet cut"<<endl;
       return false;
@@ -1256,7 +1354,7 @@ bool passSignalRegionCuts(){
   if (conf->get("force_fake_bjets") != ""){
     pair<int, int> b_index = getMostBlike();
 
-    if ( (abs(phys.jets_mcFlavour().at(b_index.first)) == 5) && (abs(phys.jets_mcFlavour().at(b_index.second)) == 5)){
+    if ( (fabs(phys.jets_mcFlavour().at(b_index.first)) == 5) && (fabs(phys.jets_mcFlavour().at(b_index.second)) == 5)){
       numEvents->Fill(67);
       if (printFail) cout<<phys.evt()<<" :Failed truth level bjet cut"<<endl;
       return false;
@@ -1276,7 +1374,7 @@ bool passSignalRegionCuts(){
   }
 
   if (conf->get("dEta_jj_max") != ""){
-      if ( abs(g_jets_p4.at(0).eta() - g_jets_p4.at(1).eta()) >  stod(conf->get("dEta_jj_max"))){
+      if ( fabs(g_jets_p4.at(0).eta() - g_jets_p4.at(1).eta()) >  stod(conf->get("dEta_jj_max"))){
         numEvents->Fill(74);
         if (printFail) cout<<phys.evt()<<" :Failed Delta Eta JJ Max cut at "<<stod(conf->get("dEta_jj_max"))<<endl;
         return false;
@@ -1313,7 +1411,7 @@ bool passSignalRegionCuts(){
 
   if (conf->get("ip3d_max") != ""){
     for (int i = 0; i < stoi(conf->get("num_leptons")); i++){
-      if ( phys.lep_ip3d().at(i) > stod(conf->get("ip3d_max")) ){
+      if ( fabs(phys.lep_ip3d().at(i)) > stod(conf->get("ip3d_max")) ){
         numEvents->Fill(66);
         if (printFail) cout<<phys.evt()<<" :Failed ip3d_max max: "<<stod(conf->get("ip3d_max"))<<" at lepton "<<i<<endl;
         return false;
@@ -1470,14 +1568,14 @@ bool passFileSelections(){
         numEvents->Fill(60);
         return false;
       }
-      if( abs(phys.gen_ht() - g_ht) > 300 ) {
+      if( fabs(phys.gen_ht() - g_ht) > 300 ) {
         //cout<<"skipped"<<endl;
         numEvents->Fill(69);
         return false;
       }
     }
     if( TString(currentFile->GetTitle()).Contains("dy_m50_mgmlm_ht100")){
-      if( abs(phys.gen_ht() - g_ht) > 300 ) {
+      if( fabs(phys.gen_ht() - g_ht) > 300 ) {
         //cout<<"skipped"<<endl;
         numEvents->Fill(69);
         return false;
@@ -1502,7 +1600,7 @@ bool passFileSelections(){
   if ( (! phys.isData()) && TString(conf->get("data_set")).Contains("GammaMC")){
     //cout<<"Photon MC event"<<endl;
     if( TString(currentFile->GetTitle()).Contains("gjetsht40") ||  TString(currentFile->GetTitle()).Contains("gjetsht100") ){
-      if( abs(phys.gen_ht() - g_ht) > 300 ) {
+      if( fabs(phys.gen_ht() - g_ht) > 300 ) {
         //cout<<"skipped"<<endl;
         numEvents->Fill(69);
         return false;
@@ -1547,7 +1645,7 @@ bool passFileSelections(){
       double eta = phys.gamma_eta().at(0);
       double phi = phys.gamma_phi().at(0);
       for(unsigned int iGen = 0; iGen < phys.genPart_pdgId().size(); iGen++){
-        if ((phys.genPart_pdgId().at(iGen) != 22) /*&& (abs(phys.genPart_pdgId().at(iGen)) != 11)*/ ) continue; // accept gen photons
+        if ((phys.genPart_pdgId().at(iGen) != 22) /*&& (fabs(phys.genPart_pdgId().at(iGen)) != 11)*/ ) continue; // accept gen photons
         if ((fabs(phys.genPart_motherId().at(iGen)) > 24) && (fabs (phys.genPart_motherId().at(iGen)) != 2212) ) continue; // don't want stuff from pions etc 
         if (phys.genPart_status().at(iGen) != 1  ) continue; 
         if (fabs(eta - phys.genPart_eta().at(iGen)) > 0.1 ) continue;
@@ -1615,14 +1713,16 @@ bool isOverlapJet(const LorentzVector &jet_p4){
   return true;
 }
 
-void writeCleanedJets(const vector<LorentzVector> &vecs){
+void writeCleanedJets(const vector<LorentzVector> &vecs, const vector<float> &csvs){
   /*This function writes only elements of the given vector to g_jets_p4 variable, it can be passed the up and down variations as well.*/
   int n_pass = 0;
   //cout<<__LINE__<<endl;
   for (int i = 0; i < (int) vecs.size(); i++){
     if (vecs.at(i).pt() < JET_PT_MIN) continue;
+    if (fabs(vecs.at(i).eta()) > JET_ETA_MAX) continue;
     if ( !isOverlapJet(vecs.at(i)) ) { 
       g_jets_p4.push_back(vecs.at(i)); 
+      g_jets_csv.push_back(csvs.at(i));
       n_pass++;
     }
   }
@@ -1634,14 +1734,20 @@ void writeCleanedJets(const vector<LorentzVector> &vecs){
 
 void writeCleanedBJets(const vector<LorentzVector> &vecs, const vector<float> &csvs){
   /*This function writes only elements of the given vector to g_jets_medb_p4 variable, it can be passed the up and down variations as well. Distingushed from the regular jet function because we need to keep track of the CSV values as well.*/
-  int n_pass = 0;
+  g_nBJetLoose = 0;
   //cout<<__LINE__<<endl;
   for (int i = 0; i < (int) vecs.size(); i++){
-    if (vecs.at(i).pt() < JET_PT_MIN) continue;
+    if (vecs.at(i).pt() < BJET_PT_MIN) continue;
+    if (fabs(vecs.at(i).eta()) > BJET_ETA_MAX) continue;
     if ( !isOverlapJet(vecs.at(i)) ) { 
-      g_jets_medb_p4.push_back(vecs.at(i)); 
-      g_jets_csv.push_back(csvs.at(i)); 
-      n_pass++;
+      if (csvs.at(i) > BJET_CSV_MED) {
+        g_jets_medb_p4.push_back(vecs.at(i)); 
+        g_nBJetLoose++;
+      }
+      else if (csvs.at(i) > BJET_CSV_LOOSE){
+        g_nBJetLoose++; 
+      }
+
     }
   }
   //cout<<__LINE__<<endl;
@@ -1651,10 +1757,15 @@ void writeCleanedBJets(const vector<LorentzVector> &vecs, const vector<float> &c
 }
 
 void setupGlobals(){
-  Z_VETO_WINDOW = (conf->get("z_veto_window") == "") ? 5 : stod(conf->get("z_veto_window"));
-  W_JET_WINDOW = (conf->get("w_jet_window") == "") ? 30 : stod(conf->get("w_jet_window"));
+  Z_VETO_WINDOW_LOW = (conf->get("z_veto_window_low") == "") ? 80 : stod(conf->get("z_veto_window_low"));
+  Z_VETO_WINDOW_HIGH = (conf->get("z_veto_window_high") == "") ? 100 : stod(conf->get("z_veto_window_high"));
+  W_JET_WINDOW_LOW = (conf->get("w_jet_window_low") == "") ? 65 : stod(conf->get("w_jet_window_low"));
+  W_JET_WINDOW_HIGH = (conf->get("w_jet_window_high") == "") ? 105 : stod(conf->get("w_jet_window_high"));
   MAX_DR_JET_LEP_OVERLAP = (conf->get("max_dr_jet_lep") == "") ? 0.4 : stod(conf->get("max_dr_jet_lep"));
-  JET_PT_MIN = (conf->get("jet_pt_min") == "") ? 30 : stod(conf->get("jet_pt_min"));
+  JET_PT_MIN = (conf->get("jet_pt_min") == "") ? 20 : stod(conf->get("jet_pt_min"));
+  JET_ETA_MAX = (conf->get("jet_eta_max") == "") ? 2.5 : stod(conf->get("jet_eta_max"));
+  BJET_PT_MIN = (conf->get("bjet_pt_min") == "") ? 20 : stod(conf->get("bjet_pt_min"));
+  BJET_ETA_MAX = (conf->get("bjet_eta_max") == "") ? 2.4 : stod(conf->get("bjet_eta_max"));
   
   g_jets_p4.clear();
   g_jets_medb_p4.clear();
@@ -1672,14 +1783,15 @@ void setupGlobals(){
     g_mt2b = phys.mt2b_up();
     g_ht = phys.ht_up();
 
-    g_jets_p4 = phys.jets_up_p4();
-    g_njets = phys.njets_up();
-    g_nBJetMedium = phys.nBJetMedium_up();
+    /*g_jets_p4 = phys.jets_up_p4();
+    g_njets = phys.njets_up();*/
+    /*g_nBJetMedium = phys.nBJetMedium_up();
+    g_nBJetLoose = phys.nBJetLoose_up();
     g_jets_medb_p4 = phys.jets_medb_up_p4();
-    g_jets_csv = phys.jets_up_csv();
+    g_jets_csv = phys.jets_up_csv();*/
 
-    /*writeCleanedJets(phys.jets_up_p4()); //g_jets_p4, g_njets
-    writeCleanedBJets(phys.jets_medb_up_p4(), phys.jets_up_csv());*/
+    writeCleanedJets(phys.jets_up_p4(), phys.jets_csv()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_up_p4(), phys.jets_up_csv());
   }
   else if (conf->get("uncertainty_mode") == "JES_dn"){
     g_dphi_metj1 = phys.dphi_metj1_dn();
@@ -1693,14 +1805,15 @@ void setupGlobals(){
     g_mt2b = phys.mt2b_dn();
     g_ht = phys.ht_dn();
 
-    g_jets_p4 = phys.jets_dn_p4();
-    g_njets = phys.njets_dn();
-    g_nBJetMedium = phys.nBJetMedium_dn();
+    /*g_jets_p4 = phys.jets_dn_p4();
+    g_njets = phys.njets_dn();*/
+    /*g_nBJetMedium = phys.nBJetMedium_dn();
+    g_nBJetLoose = phys.nBJetLoose_dn();
     g_jets_medb_p4 = phys.jets_medb_dn_p4();
-    g_jets_csv = phys.jets_dn_csv();
+    g_jets_csv = phys.jets_dn_csv();*/
 
-    /*writeCleanedJets(phys.jets_dn_p4()); //g_jets_p4, g_njets
-    writeCleanedBJets(phys.jets_medb_dn_p4(), phys.jets_dn_csv());*/
+    writeCleanedJets(phys.jets_dn_p4(), phys.jets_csv()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_dn_p4(), phys.jets_dn_csv());
   }
   else if (conf->get("uncertainty_mode") == "GenMet"){
     g_dphi_metj1 = phys.dphi_genmetj1();
@@ -1713,14 +1826,15 @@ void setupGlobals(){
     g_mbb = phys.mbb_csv();
     g_ht = phys.ht();
 
-    g_jets_p4 = phys.jets_p4();
-    g_njets = phys.njets();
-    g_nBJetMedium = phys.nBJetMedium();
+    /*g_jets_p4 = phys.jets_p4();
+    g_njets = phys.njets();*/
+    /*g_nBJetMedium = phys.nBJetMedium();
+    g_nBJetLoose = phys.nBJetLoose();
     g_jets_medb_p4 = phys.jets_medb_p4();
-    g_jets_csv = phys.jets_csv();
+    g_jets_csv = phys.jets_csv();*/
 
-    /*writeCleanedJets(phys.jets_p4()); //g_jets_p4, g_njets
-    writeCleanedBJets(phys.jets_medb_p4(), phys.jets_csv());*/
+    writeCleanedJets(phys.jets_p4(), phys.jets_csv()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_medb_p4(), phys.jets_csv());
   }
   else{
     g_dphi_metj1 = phys.dphi_metj1();
@@ -1733,14 +1847,15 @@ void setupGlobals(){
     g_mt2b = phys.mt2b();
     g_ht = phys.ht();
     
-    g_jets_p4 = phys.jets_p4();
-    g_njets = phys.njets();
-    g_nBJetMedium = phys.nBJetMedium();
+    /*g_jets_p4 = phys.jets_p4();
+    g_njets = phys.njets();*/
+    /*g_nBJetMedium = phys.nBJetMedium();
+    g_nBJetLoose = phys.nBJetLoose();
     g_jets_medb_p4 = phys.jets_medb_p4();
-    g_jets_csv = phys.jets_csv();
+    g_jets_csv = phys.jets_csv();*/
 
-    /*writeCleanedJets(phys.jets_p4()); //g_jets_p4, g_njets
-    writeCleanedBJets(phys.jets_medb_p4(), phys.jets_csv()); //g_jets_medb_p4, g_jets_csv, g_nBJetMedium*/
+    writeCleanedJets(phys.jets_p4(), phys.jets_csv()); //g_jets_p4, g_njets
+    writeCleanedBJets(phys.jets_p4(), phys.jets_csv()); //g_jets_medb_p4, g_jets_csv, g_nBJetMedium
   }
 }
 
@@ -2329,28 +2444,26 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       }
       //cout<<__LINE__<<endl;
       
-      /*if (conf->get("do_met_filters") != "false")
+      if (conf->get("do_met_filters") == "true")
       {
         //cout<<"checking MET filters"<<endl;
         if (! passMETFilters()) continue; ///met filters
-      }*/
+      }
       
       //double weight=1;
       double weight = getWeight();
-      weight_log->Fill(log10(abs(weight)));
-      weight_log_flat->Fill(abs(weight));
+      weight_log->Fill(log10(fabs(weight)));
+      weight_log_flat->Fill(fabs(weight));
 
-      if(conf->get("printEvtList") == "true"){
         // ----------------
         // DEBUG MODE
         // ----------------
         /*if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
           cout<<"NEW||evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<endl;
-          cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
+          //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
         }*/
         //When Debug mode is off, you can turn this on:
         //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
-      }
 //===========================================
 // Analysis Code
 //===========================================
@@ -2420,9 +2533,9 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         lep2_eta->Fill(phys.lep_eta().at(1), weight);
         lep3_eta->Fill(phys.lep_eta().at(2), weight);
 
-        int signs=(phys.lep_pdgId().at(0)/abs(phys.lep_pdgId().at(0)));
-        signs *= (phys.lep_pdgId().at(1)/abs(phys.lep_pdgId().at(1)));
-        signs *= (phys.lep_pdgId().at(2)/abs(phys.lep_pdgId().at(2)));
+        int signs=(phys.lep_pdgId().at(0)/fabs(phys.lep_pdgId().at(0)));
+        signs *= (phys.lep_pdgId().at(1)/fabs(phys.lep_pdgId().at(1)));
+        signs *= (phys.lep_pdgId().at(2)/fabs(phys.lep_pdgId().at(2)));
         lep_signs->Fill(signs, weight);
       }
       else{
@@ -2436,8 +2549,8 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         dilmass_zless->Fill((phys.lep_p4().at(0) + phys.lep_p4().at(1)).M(), weight);
         dilmass_sum->Fill(phys.lep_p4().at(0).M() + phys.lep_p4().at(1).M(), weight);
 
-        int signs=(phys.lep_pdgId().at(0)/abs(phys.lep_pdgId().at(0)));
-        signs *= (phys.lep_pdgId().at(1)/abs(phys.lep_pdgId().at(1)));
+        int signs=(phys.lep_pdgId().at(0)/fabs(phys.lep_pdgId().at(0)));
+        signs *= (phys.lep_pdgId().at(1)/fabs(phys.lep_pdgId().at(1)));
         lep_signs->Fill(signs, weight);
       }
 
@@ -2448,11 +2561,11 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       if (g_njets >= 2){
         pair<int, int> indicies = getMostZlikePair(g_jets_p4);
         mjj_zlike->Fill((g_jets_p4.at(indicies.first) + g_jets_p4.at(indicies.second)).M(), weight);
-        dEta_jj_zlike->Fill(abs(g_jets_p4.at(indicies.first).eta() - g_jets_p4.at(indicies.second).eta()), weight);
+        dEta_jj_zlike->Fill(fabs(g_jets_p4.at(indicies.first).eta() - g_jets_p4.at(indicies.second).eta()), weight);
 
         indicies = getMostWlikePair(g_jets_p4);
         mjj_wlike->Fill((g_jets_p4.at(indicies.first) + g_jets_p4.at(indicies.second)).M(), weight);
-        dEta_jj_wlike->Fill(abs(g_jets_p4.at(indicies.first).eta() - g_jets_p4.at(indicies.second).eta()), weight);
+        dEta_jj_wlike->Fill(fabs(g_jets_p4.at(indicies.first).eta() - g_jets_p4.at(indicies.second).eta()), weight);
 
         mt2_jl->Fill(getMT2_JL(), weight);
       }
@@ -2467,33 +2580,33 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         jet3_pt->Fill(g_jets_p4.at(2).pt(), weight);
       }
 
-      lep1_ip3d->Fill(abs(phys.lep_ip3d().at(0)), weight);
-      lep1_ip3derr->Fill(abs(phys.lep_ip3derr().at(0)), weight);
-      lep1_sip3d->Fill(abs(phys.lep_ip3d().at(0))/abs(phys.lep_ip3derr().at(0)), weight);
-      lep2_ip3d->Fill(abs(phys.lep_ip3d().at(1)), weight);
-      lep2_ip3derr->Fill(abs(phys.lep_ip3derr().at(1)), weight);
-      lep2_sip3d->Fill(abs(phys.lep_ip3d().at(1))/abs(phys.lep_ip3derr().at(1)), weight);
+      lep1_ip3d->Fill(fabs(phys.lep_ip3d().at(0)), weight);
+      lep1_ip3derr->Fill(fabs(phys.lep_ip3derr().at(0)), weight);
+      lep1_sip3d->Fill(fabs(phys.lep_ip3d().at(0))/fabs(phys.lep_ip3derr().at(0)), weight);
+      lep2_ip3d->Fill(fabs(phys.lep_ip3d().at(1)), weight);
+      lep2_ip3derr->Fill(fabs(phys.lep_ip3derr().at(1)), weight);
+      lep2_sip3d->Fill(fabs(phys.lep_ip3d().at(1))/fabs(phys.lep_ip3derr().at(1)), weight);
 
       if (phys.nlep() > 2){
-        lep3_ip3d->Fill(abs(phys.lep_ip3d().at(2)), weight);
-        lep3_ip3derr->Fill(abs(phys.lep_ip3derr().at(2)), weight);
-        lep3_sip3d->Fill(abs(phys.lep_ip3d().at(2))/abs(phys.lep_ip3derr().at(2)), weight);
+        lep3_ip3d->Fill(fabs(phys.lep_ip3d().at(2)), weight);
+        lep3_ip3derr->Fill(fabs(phys.lep_ip3derr().at(2)), weight);
+        lep3_sip3d->Fill(fabs(phys.lep_ip3d().at(2))/fabs(phys.lep_ip3derr().at(2)), weight);
       }
 
       for (int c = 0; c < (int) phys.lep_p4().size(); c++){
         if (isCleanLepFromW(c)){
-          Wleps_ip3d->Fill(abs(phys.lep_ip3d().at(c)), weight);
-          Wleps_sip3d->Fill(abs(phys.lep_ip3d().at(c))/abs(phys.lep_ip3derr().at(c)), weight);
-          Wleps_ip3derr->Fill(abs(phys.lep_ip3derr().at(c)), weight);  
-          Wleps_reliso04->Fill(abs(phys.lep_relIso04EA().at(c)), weight);
-          Wleps_ptRatio->Fill(abs(phys.lep_ptRatio().at(c)), weight);
+          Wleps_ip3d->Fill(fabs(phys.lep_ip3d().at(c)), weight);
+          Wleps_sip3d->Fill(fabs(phys.lep_ip3d().at(c))/fabs(phys.lep_ip3derr().at(c)), weight);
+          Wleps_ip3derr->Fill(fabs(phys.lep_ip3derr().at(c)), weight);  
+          Wleps_reliso04->Fill(fabs(phys.lep_relIso04EA().at(c)), weight);
+          Wleps_ptRatio->Fill(fabs(phys.lep_ptRatio().at(c)), weight);
         }
         else{
-          otherleps_ip3d->Fill(abs(phys.lep_ip3d().at(c)), weight);
-          otherleps_sip3d->Fill(abs(phys.lep_ip3d().at(c))/abs(phys.lep_ip3derr().at(c)), weight);
-          otherleps_ip3derr->Fill(abs(phys.lep_ip3derr().at(c)), weight);
-          otherleps_reliso04->Fill(abs(phys.lep_relIso04EA().at(c)), weight);
-          otherleps_ptRatio->Fill(abs(phys.lep_ptRatio().at(c)), weight);
+          otherleps_ip3d->Fill(fabs(phys.lep_ip3d().at(c)), weight);
+          otherleps_sip3d->Fill(fabs(phys.lep_ip3d().at(c))/fabs(phys.lep_ip3derr().at(c)), weight);
+          otherleps_ip3derr->Fill(fabs(phys.lep_ip3derr().at(c)), weight);
+          otherleps_reliso04->Fill(fabs(phys.lep_relIso04EA().at(c)), weight);
+          otherleps_ptRatio->Fill(fabs(phys.lep_ptRatio().at(c)), weight);
         }
       }
 

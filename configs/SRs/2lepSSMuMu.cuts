@@ -1,0 +1,34 @@
+DEFAULT::signal_region=2lepSSMuMu
+
+#================================
+# 2Lep SS MuMu Region
+#================================
+#Baseline--------------------
+DEFAULT::event_type=dilepton
+DEFAULT::MCTriggerEmulation=true
+DEFAULT::do_met_filters=false #MET filters off for now
+
+DEFAULT::dilmass_Z_veto=false
+#DEFAULT::tau_veto=true
+DEFAULT::NBjets_max=0
+DEFAULT::NBjets_loose_max=0
+DEFAULT::no_btag_sf=true
+#---------------------------
+
+DEFAULT::lep1_pt_min=30
+DEFAULT::lep2_pt_min=30
+
+#DEFAULT::MET_min=50
+DEFAULT::3chargeagree=true
+
+DEFAULT::reliso03_max=0.1
+DEFAULT::ip3d_max=0.015
+
+DEFAULT::jet1_pt_min=30
+DEFAULT::Mll_min=40
+DEFAULT::isotrack_veto=true
+DEFAULT::dEta_jj_max=1.5
+
+DEFAULT::dil_flavor=mumu
+DEFAULT::dil_sign=same
+DEFAULT::num_leptons=2

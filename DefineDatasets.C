@@ -58,17 +58,25 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     ch->Add(dir+"sttw_antitop_powheg*");
     ch->Add(dir+"sttw_top_powheg*");
   }
+  else if (set == "SingleTop"){
+    cout<<"Adding Single Top t and s channel"<<endl;  
+    
+    ch->Add(dir+"stt_antitop_incdec_powheg*");
+    ch->Add(dir+"stt_top_incdec_powheg*");
+    //ch->Add(dir+"sts_4f_leptonic_amcnlo*");
+  }
   else if (set == "TW"){
-    cout<<"Adding TW with no fully hadronic decay"<<endl; 
+    cout<<"Adding TW with no fully hadronic decay"<<endl;
     
     ch->Add(dir+"sttw_antitop_nofullhaddecay_powheg*");
-    ch->Add(dir+"sttw_top_nofullhaddecay_powheg*");
+    ch->Add(dir+"sttw_top_nofullhaddecay_powheg*"); 
   }
   //cout<<"Entries: "<<ch_fs->GetEntries()<<endl;
   else if (set == "WW"){
     cout<<"Adding WW"<<endl; 
     
     ch->Add(dir+"ww_2l2nu_powheg*.root");
+    ch->Add(dir+"ww_lnuqq_powheg*.root");
   }
   else if (set == "WJets"){
     cout<<"Adding WJets"<<endl; 
@@ -100,6 +108,7 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     
     ch->Add(dir+"zz_2l2n_powheg*");
     ch->Add(dir+"zz_2l2q_powheg*");
+    ch->Add(dir+"zz_2q2n_powheg*");
     ch->Add(dir+"zz_4l_powheg*");
   }
   else if (set == "WWW"){
@@ -137,6 +146,18 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     
     //ch->Add(dir+"ttz_2l2n_amcnlo*");
     ch->Add(dir+"ttz_incl_mgmlm*");
+  }
+  else if (set == "TTH"){
+    cout<<"Adding TTH"<<endl; 
+    
+    //ch->Add(dir+"ttz_2l2n_amcnlo*");
+    ch->Add(dir+"tth_bb_powheg*");
+    ch->Add(dir+"tth_nonbb_powheg*");
+  }
+  else if (set == "TTG"){
+    cout<<"Adding TTG"<<endl; 
+    
+    ch->Add(dir+"ttg_incl_amcnlo*");
   }
   else if (set == "TTW-inclusive"){
     cout<<"Adding TTW inclusive MC"<<endl; 
