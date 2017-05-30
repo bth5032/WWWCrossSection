@@ -74,11 +74,11 @@ TH1I *numEvents; //Holds the number of events in the whole script and the number
 // DEBUG MODE
 // ----------------
 
-//set<tuple<long,long,long>>  inspection_set_erl = {make_tuple(8091828,1,49950), make_tuple(7681082,1,47415)};
+set<tuple<long,long,long>>  inspection_set_erl = {make_tuple(1600134,1,11269), make_tuple(944882,1,6655), make_tuple(1215665,1,8561), make_tuple(3793537,1,26715), make_tuple(3161564,1,22265), make_tuple(3065612,1,21589), make_tuple(3922112,1,27621), make_tuple(3867464,1,27236), make_tuple(393193,1,2769), make_tuple(2698570,1,19005), make_tuple(3895906,1,27436), make_tuple(12026619,1,20033), make_tuple(8316210,1,13853), make_tuple(20295173,1,33806), make_tuple(3129628,1,5213), make_tuple(8703007,1,14497), make_tuple(14958843,1,24917), make_tuple(518008,1,863), make_tuple(20250631,1,33733), make_tuple(14651822,1,24406), make_tuple(21849611,1,36396), make_tuple(24391258,1,40630), make_tuple(9230235,1,15376), make_tuple(24297457,1,40474), make_tuple(1453059,1,2420), make_tuple(2533975,1,4221), make_tuple(16039218,1,26717), make_tuple(5425457,1,9038), make_tuple(25306736,1,42155), make_tuple(26062108,1,43413), make_tuple(1062197,1,1769), make_tuple(16653930,1,27742), make_tuple(3545054,1,5905), make_tuple(13610367,1,22672), make_tuple(12965144,1,21596), make_tuple(22355385,1,37238), make_tuple(14025939,1,23363), make_tuple(10900371,1,18157), make_tuple(6866420,1,11438), make_tuple(7111057,1,11845), make_tuple(12705532,1,21164), make_tuple(13737873,1,22884), make_tuple(21828665,1,36361), make_tuple(20920805,1,34849), make_tuple(13543401,1,22560), make_tuple(22070301,1,36764), make_tuple(12355981,1,20582), make_tuple(14453977,1,24077), make_tuple(467990,1,779), make_tuple(21569057,1,35929), make_tuple(7968614,1,13274), make_tuple(21206179,1,35324), make_tuple(18871114,1,31435), make_tuple(9012627,1,15013), make_tuple(7003001,1,11665), make_tuple(26700794,1,44477), make_tuple(20125093,1,33523), make_tuple(5005685,1,8338), make_tuple(23145096,1,38554), make_tuple(22275218,1,37105), make_tuple(836965,1,1741), make_tuple(33130670,1,68879), make_tuple(24565216,1,51071), make_tuple(6424757,1,13357), make_tuple(27697266,1,57583), make_tuple(30227066,1,62842), make_tuple(1340659,1,2787), make_tuple(2098427,1,4363), make_tuple(8252029,1,17156), make_tuple(6466834,1,13445), make_tuple(4068934,1,8459), make_tuple(18928244,1,39351), make_tuple(15765673,1,32777), make_tuple(26246814,1,54567)};
 
 //set<long> inspection_set = {99795815,998615983,998751102,999957050};
 
-//set<tuple<long,long,long>> inspection_copy = inspection_set_erl;
+set<tuple<long,long,long>> inspection_copy = inspection_set_erl;
 
 bool printStats = false;
 bool printFail = false;

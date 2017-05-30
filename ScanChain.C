@@ -206,15 +206,17 @@ pair<int,int> getMostWlikePair(const vector<LorentzVector> &vecs){
   return getPairWithMass(vecs, 80, true);
 }
 
-int getNumOSSFPairs(){
+int getNumSFOSPairs(){
   /*Loops through pairs of entries in the lep_pdgId vector and counts how many have opposite value*/
-  int num_OSSF = 0;
+  int num_SFOS = 0;
   for (int i = 0; i < (int) phys.lep_pdgId().size(); i++){
     for (int j = i+1; j < (int) phys.lep_pdgId().size(); j++){
-      if (phys.lep_pdgId().at(i) == -phys.lep_pdgId().at(j)) num_OSSF++;
+      //cout<<"looking at pair with ID ("<<phys.lep_pdgId().at(i)<<", "<<phys.lep_pdgId().at(j)<<")"<<endl;
+      if (phys.lep_pdgId().at(i) == -phys.lep_pdgId().at(j)) num_SFOS++;
     }
   }
-  return num_OSSF;
+  //cout<<"num SFOS pairs: "<<num_SFOS<<endl;
+  return num_SFOS;
 }
 
 TString getLepFlavorString(){
@@ -473,6 +475,8 @@ bool hasGood3l(){
     return false; // veto xition region
   }
 
+  //cout<<__LINE__<<endl;
+
   if( fabs(phys.lep_p4().at(2).eta()) > 1.4 && fabs(phys.lep_p4().at(2).eta()) < 1.6 ) {
     numEvents->Fill(18); 
     if (printFail) cout<<phys.evt()<<" :Failed lep3 in xition region Z cut"<<endl;
@@ -497,13 +501,18 @@ bool hasGood3l(){
     }
   }
 
-  if( conf->get("num_OSSF_pairs") != "" ) {
-    if ( stoi(conf->get("num_OSSF_pairs")) != getNumOSSFPairs()){
+  //cout<<__LINE__<<endl;
+
+  if( conf->get("num_SFOS_pairs") != "" ) {
+    if ( stoi(conf->get("num_SFOS_pairs")) != getNumSFOSPairs()){
       numEvents->Fill(21); 
       if (printFail) cout<<phys.evt()<<" :Failed Num SFOS pairs cut"<<endl;
       return false; // require correct number of SFOS pairs
     }
   }
+
+  //cout<<__LINE__<<endl;
+
   //if (printStats) { cout<<"evt_type: "<<phys.evt_type()<<" "; }*/
 
   if ( conf->get("Mll_SF_min") != "" ){
@@ -515,6 +524,8 @@ bool hasGood3l(){
       }
     }
 
+    //cout<<__LINE__<<endl;
+
     if ( fabs(phys.lep_pdgId().at(0)) == fabs(phys.lep_pdgId().at(2)) ){
       if ( (phys.lep_p4().at(0) + phys.lep_p4().at(2)).M() <= stod(conf->get("Mll_SF_min")) ){
         numEvents->Fill(24); 
@@ -523,6 +534,8 @@ bool hasGood3l(){
       }
     }
 
+    //cout<<__LINE__<<endl;
+
     if ( fabs(phys.lep_pdgId().at(1)) == fabs(phys.lep_pdgId().at(2)) ){
       if ( (phys.lep_p4().at(1) + phys.lep_p4().at(2)).M() <= stod(conf->get("Mll_SF_min")) ){
         numEvents->Fill(24); 
@@ -530,6 +543,8 @@ bool hasGood3l(){
         return false;
       }
     }
+
+    //cout<<__LINE__<<endl;
   }
 
   if( ( conf->get("dilmass_Z_veto") == "true" ) ) {
@@ -541,6 +556,9 @@ bool hasGood3l(){
           return false;
         }
       }
+
+      //cout<<__LINE__<<endl;
+
       if ( ( fabs(phys.lep_pdgId().at(0)) == fabs(phys.lep_pdgId().at(2)) ) && ( fabs(phys.lep_pdgId().at(0)) == 11) ){
         if ( fabs((phys.lep_p4().at(0) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 15 ){
           numEvents->Fill(19); 
@@ -548,6 +566,9 @@ bool hasGood3l(){
           return false;
         }
       }
+
+      //cout<<__LINE__<<endl;
+
       if ( ( fabs(phys.lep_pdgId().at(1)) == fabs(phys.lep_pdgId().at(2)) ) && ( fabs(phys.lep_pdgId().at(1)) == 11) ){
         if ( fabs((phys.lep_p4().at(1) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 15 ){
           numEvents->Fill(19); 
@@ -567,6 +588,8 @@ bool hasGood3l(){
         }
       }
 
+      //cout<<__LINE__<<endl;
+
       if ( ( phys.lep_pdgId().at(0) == -phys.lep_pdgId().at(2) ) ){
         //veto if mass within [MZ-35,MZ+20]
         if ( ( ( (phys.lep_p4().at(0) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 20 ) && ( ( Z_MASS - (phys.lep_p4().at(0) + phys.lep_p4().at(2)).M() ) <= 35 ) ){
@@ -576,6 +599,8 @@ bool hasGood3l(){
         }
       }
 
+      //cout<<__LINE__<<endl;
+
       if ( ( phys.lep_pdgId().at(1) == -phys.lep_pdgId().at(2) ) ){
         //veto if mass within [MZ-35,MZ+20]
         if ( ( ( (phys.lep_p4().at(1) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 20 ) && ( ( Z_MASS - (phys.lep_p4().at(1) + phys.lep_p4().at(2)).M() ) <= 35 ) ){
@@ -584,6 +609,8 @@ bool hasGood3l(){
           return false;
         }
       }
+
+      //cout<<__LINE__<<endl;
     }
 
     else if ( conf->get("signal_region") == "3lep_2SFOS" ){
@@ -596,6 +623,8 @@ bool hasGood3l(){
         }
       }
 
+      //cout<<__LINE__<<endl;
+
       if ( ( phys.lep_pdgId().at(0) == -phys.lep_pdgId().at(2) ) ){
         //veto if mass within [MZ-35,MZ+20]
         if ( fabs((phys.lep_p4().at(0) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 20 ){
@@ -605,6 +634,8 @@ bool hasGood3l(){
         }
       }
 
+      //cout<<__LINE__<<endl;
+
       if ( ( phys.lep_pdgId().at(1) == -phys.lep_pdgId().at(2) ) ){
         //veto if mass within [MZ-35,MZ+20]
         if ( fabs((phys.lep_p4().at(1) + phys.lep_p4().at(2)).M() - Z_MASS ) <= 20 ){
@@ -613,6 +644,8 @@ bool hasGood3l(){
           return false;
         }
       }
+
+      //cout<<__LINE__<<endl;
     }
     else{
       cout<<"Throwing error, can not apply dilmass Z veto without a known signal region"<<endl;
@@ -1421,7 +1454,7 @@ bool passSignalRegionCuts(){
 
   //cout<<__LINE__<<endl;
 
-  if (conf->get("jet1_pt_min") != "" ){
+  if ( (conf->get("jet1_pt_min") != "" ) && (g_njets > 0) ){
     if ( g_jets_p4.at(0).pt() < stod( conf->get("jet1_pt_min") )){
       numEvents->Fill(49);
       if (printFail) cout<<phys.evt()<<" :Failed jet1 min pt"<<endl;
@@ -2395,12 +2428,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       printFail = false;
 
       //if (inspection_set.count(phys.evt()) != 0){
-      /*if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
+      if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
         cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<endl;
         inspection_copy.erase(make_tuple(phys.evt(), phys.run(), phys.lumi()));
         printStats=true;
         printFail=true;
-      }*/
+      }
       /*else{ //Use if you don't want care about events in your list that are not in the other's
         continue;
       }*/
@@ -2458,10 +2491,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         // ----------------
         // DEBUG MODE
         // ----------------
-        /*if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
+        if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
           cout<<"NEW||evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<endl;
           //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
-        }*/
+        }
         //When Debug mode is off, you can turn this on:
         //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
 //===========================================
@@ -2652,10 +2685,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   // ----------------
   // DEBUG MODE
   // ----------------
-  /*cout<<"Events that weren't in your babies:"<<endl;
+  cout<<"Events that weren't in your babies:"<<endl;
   for (set<tuple<long,long,long>>::iterator it=inspection_copy.begin(); it!=inspection_copy.end(); ++it){
     cout<<"evt: "<<std::get<0>(*it)<<" run: "<<std::get<1>(*it)<<" lumi: "<<std::get<2>(*it)<<endl;
-  }*/
+  }
 
   cout<<"Num events passed: "<<eventCount<<endl;
   files_log<<"Num events passed: "<<eventCount<<endl;
