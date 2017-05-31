@@ -410,6 +410,14 @@ bool hasGood3l(){
   }
   //if (printStats) { cout<<"Number of Leptons: "<<phys.nlep()<<" "; }
   
+  int lep_charge_sum = abs(phys.lep_pdgId().at(0)/abs(phys.lep_pdgId().at(0)) + phys.lep_pdgId().at(1)/abs(phys.lep_pdgId().at(1)) + phys.lep_pdgId().at(2)/abs(phys.lep_pdgId().at(2)));
+
+  if( lep_charge_sum != 1 ){ 
+    numEvents->Fill(70);
+    if (printFail) cout<<phys.evt()<<" :Failed total lepton sum not 1"<<endl;
+    return false; // no WWW production should have total charge greater than 1
+  }
+
   //cout<<__LINE__<<endl;
 
   if( phys.lep_pt().at(0) < 10        ) {
@@ -494,7 +502,8 @@ bool hasGood3l(){
   //cout<<__LINE__<<endl;
 
   if ( conf->get("3lep_phi_MET_min") != "" ){
-    if ( fabs( (phys.lep_p4().at(0) + phys.lep_p4().at(1) + phys.lep_p4().at(2)).phi() - g_met_phi) <= stod(conf->get("3lep_phi_MET_min")) ){
+    //if (phys.evt()==19627 || phys.evt()==63040 || phys.evt()==125410 || phys.evt()==114456) cout<<"lep_phi: "<<(phys.lep_p4().at(0) + phys.lep_p4().at(1) + phys.lep_p4().at(2)).phi()<<" met_phi: "<<g_met_phi<<endl;
+    if ( fabs(acos(cos((phys.lep_p4().at(0) + phys.lep_p4().at(1) + phys.lep_p4().at(2)).phi() - g_met_phi))) <= stod(conf->get("3lep_phi_MET_min")) ){
       numEvents->Fill(31); 
       if (printFail) cout<<phys.evt()<<" :Failed phi of 3lep system within "<<stod(conf->get("3lep_phi_MET_min"))<<" of MET phi"<<endl;
       return false;
@@ -937,7 +946,7 @@ double getWeight(){
   }
   //cout<<__LINE__<<endl;
 
-  weight *= g_scale_factor;
+  /*weight *= g_scale_factor;
 
   if ( conf->get("reweight") == "true" || conf->get("vpt_reweight") == "true") {
     weight *= getReweight();
@@ -1031,7 +1040,7 @@ double getWeight(){
   }
 
 
-  //cout<<__LINE__<<endl;
+  //cout<<__LINE__<<endl;*/
 
   /*if (weight < 0 || weight > 0.3){
     cout<<"Odd Weight: "<<weight<<" "<<phys.evt()<<endl;
@@ -2428,12 +2437,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       printFail = false;
 
       //if (inspection_set.count(phys.evt()) != 0){
-      if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
+      /*if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
         cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<endl;
         inspection_copy.erase(make_tuple(phys.evt(), phys.run(), phys.lumi()));
         printStats=true;
         printFail=true;
-      }
+      }*/
       /*else{ //Use if you don't want care about events in your list that are not in the other's
         continue;
       }*/
@@ -2491,10 +2500,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         // ----------------
         // DEBUG MODE
         // ----------------
-        if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
+        /*if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
           cout<<"NEW||evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<endl;
           //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
-        }
+        }*/
         //When Debug mode is off, you can turn this on:
         //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
 //===========================================
@@ -2627,14 +2636,14 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       }
 
       for (int c = 0; c < (int) phys.lep_p4().size(); c++){
-        if (isCleanLepFromW(c)){
+        if (phys.lep_isFromW().at(c)){
           Wleps_ip3d->Fill(fabs(phys.lep_ip3d().at(c)), weight);
           Wleps_sip3d->Fill(fabs(phys.lep_ip3d().at(c))/fabs(phys.lep_ip3derr().at(c)), weight);
           Wleps_ip3derr->Fill(fabs(phys.lep_ip3derr().at(c)), weight);  
           Wleps_reliso04->Fill(fabs(phys.lep_relIso04EA().at(c)), weight);
           Wleps_ptRatio->Fill(fabs(phys.lep_ptRatio().at(c)), weight);
         }
-        else{
+        else if (phys.lep_isFromZ().at(c) || phys.lep_isFromB().at(c) || phys.lep_isFromC().at(c) || phys.lep_isFromL().at(c) || phys.lep_isFromLF().at(c) ){
           otherleps_ip3d->Fill(fabs(phys.lep_ip3d().at(c)), weight);
           otherleps_sip3d->Fill(fabs(phys.lep_ip3d().at(c))/fabs(phys.lep_ip3derr().at(c)), weight);
           otherleps_ip3derr->Fill(fabs(phys.lep_ip3derr().at(c)), weight);
@@ -2685,10 +2694,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   // ----------------
   // DEBUG MODE
   // ----------------
-  cout<<"Events that weren't in your babies:"<<endl;
+  /*cout<<"Events that weren't in your babies:"<<endl;
   for (set<tuple<long,long,long>>::iterator it=inspection_copy.begin(); it!=inspection_copy.end(); ++it){
     cout<<"evt: "<<std::get<0>(*it)<<" run: "<<std::get<1>(*it)<<" lumi: "<<std::get<2>(*it)<<endl;
-  }
+  }*/
 
   cout<<"Num events passed: "<<eventCount<<endl;
   files_log<<"Num events passed: "<<eventCount<<endl;

@@ -15,7 +15,7 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     base_path="/nfs-7/userdata/bhashemi/WWW_babies/";
   }
 
-  TString version="WWW_v0.1.4";
+  TString version="WWW_v0.1.5";
 
   TString dir;
   if (skimmed){

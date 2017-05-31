@@ -31,7 +31,7 @@ DEFAULT::jet_pt_min=25
 DEFAULT::jet_eta_max=4.5
 #DEFAULT::Mll_SF_min=20
 DEFAULT::3lep_phi_MET_min=2.5
-DEFAULT::isotrack_veto=true
+#DEFAULT::isotrack_veto=true
 
-DEFAULT::num_SFOS_pairs=0
+DEFAULT::num_SFOS_pairs=1
 DEFAULT::num_leptons=3
