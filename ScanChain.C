@@ -206,6 +206,31 @@ pair<int,int> getMostWlikePair(const vector<LorentzVector> &vecs){
   return getPairWithMass(vecs, 80, true);
 }
 
+pair<int,int> getClosestJetsInEta(){
+  /* Goes pairwise through jet collection and finds the pair of jets with the minium delta eta. */
+  if (g_njets < 2){
+    cout<<"Going to throw error finding closest dEta jet pair: Less than two jets!"<<endl;
+    std::stringstream message;
+    message<<"Can not find closest dEta jet pair to Higgs for event: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" the event only has "<<g_jets_p4.size()<<" jets";
+    throw std::underflow_error(message.str());
+  }
+
+  int j1 = 0;
+  int j2 = 1;
+  double best_deta = fabs(g_jets_p4.at(j1).eta() - g_jets_p4.at(j2).eta());
+
+  for (int i = 0; i < (int) vecs.size()-1; i++){
+    for (int j = i+1; j < (int) vecs.size(); j++){
+      if (fabs(g_jets_p4.at(i).eta() - g_jets_p4.at(j).eta()) < best_deta){
+        j1 = i;
+        j2 = j;
+      }
+    }
+  }
+
+  return make_pair(i,j);
+}
+
 int getNumSFOSPairs(){
   /*Loops through pairs of entries in the lep_pdgId vector and counts how many have opposite value*/
   int num_SFOS = 0;
@@ -780,10 +805,19 @@ bool hasGood2l(){
   //cout<<__LINE__<<endl;
 
   if (g_njets >= 2){
-    double dijet_mass = ( g_jets_p4.at(0) + g_jets_p4.at(1) ).M();
+    // MJJ for closest jets in eta
+    pair<int,int> jets_dEta = getClosestJetsInEta();
+    double dijet_mass = ( g_jets_p4.at(jets_dEta.first) + g_jets_p4.at(jets_dEta.second) ).M();
     if( (dijet_mass < W_JET_WINDOW_LOW) || (dijet_mass > W_JET_WINDOW_HIGH) ) {
       numEvents->Fill(61); 
       if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut with dijet mass: "<< dijet_mass <<endl;
+      return false; // require at at least 2 Jets within the W mass window.
+    }
+    //Safety cuts against Wpm Wpm VBS
+    double leading_dijet_mass = ( g_jets_p4.at(0) + g_jets_p4.at(1) ).M();
+    if ( leading_dijet_mass >= 400 ){
+      numEvents->Fill(58); 
+      if (printFail) cout<<phys.evt()<<" :Failed leading dijet mass >= 400 GeV: "<< leading_dijet_mass <<endl;
       return false; // require at at least 2 Jets within the W mass window.
     }
   }
@@ -1801,8 +1835,8 @@ void writeCleanedBJets(const vector<LorentzVector> &vecs, const vector<float> &c
 void setupGlobals(){
   Z_VETO_WINDOW_LOW = (conf->get("z_veto_window_low") == "") ? 80 : stod(conf->get("z_veto_window_low"));
   Z_VETO_WINDOW_HIGH = (conf->get("z_veto_window_high") == "") ? 100 : stod(conf->get("z_veto_window_high"));
-  W_JET_WINDOW_LOW = (conf->get("w_jet_window_low") == "") ? 65 : stod(conf->get("w_jet_window_low"));
-  W_JET_WINDOW_HIGH = (conf->get("w_jet_window_high") == "") ? 105 : stod(conf->get("w_jet_window_high"));
+  W_JET_WINDOW_LOW = (conf->get("w_jet_window_low") == "") ? 60 : stod(conf->get("w_jet_window_low"));
+  W_JET_WINDOW_HIGH = (conf->get("w_jet_window_high") == "") ? 100 : stod(conf->get("w_jet_window_high"));
   MAX_DR_JET_LEP_OVERLAP = (conf->get("max_dr_jet_lep") == "") ? 0.4 : stod(conf->get("max_dr_jet_lep"));
   JET_PT_MIN = (conf->get("jet_pt_min") == "") ? 20 : stod(conf->get("jet_pt_min"));
   JET_ETA_MAX = (conf->get("jet_eta_max") == "") ? 2.5 : stod(conf->get("jet_eta_max"));

@@ -154,6 +154,9 @@ pair<int,int> getMostZlikePair(const vector<LorentzVector> &vecs);
 pair<int,int> getLeastZlikePair(const vector<LorentzVector> &vecs);
 pair<int,int> getMostWlikePair(const vector<LorentzVector> &vecs);
 
+/* Goes pairwise through jet collection and finds the pair of jets with the minium delta eta. */
+pair<int,int> getClosestJetsInEta();
+
 /*Loops through pairs of entries in the lep_pdgId vector and counts how many have opposite value*/
 int getNumOSSFPairs();
 
