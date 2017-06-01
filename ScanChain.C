@@ -228,7 +228,7 @@ pair<int,int> getClosestJetsInEta(){
     }
   }
 
-  return make_pair(i,j);
+  return make_pair(j1,j2);
 }
 
 int getNumSFOSPairs(){
