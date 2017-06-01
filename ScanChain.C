@@ -219,8 +219,8 @@ pair<int,int> getClosestJetsInEta(){
   int j2 = 1;
   double best_deta = fabs(g_jets_p4.at(j1).eta() - g_jets_p4.at(j2).eta());
 
-  for (int i = 0; i < (int) vecs.size()-1; i++){
-    for (int j = i+1; j < (int) vecs.size(); j++){
+  for (int i = 0; i < (int) g_jets_p4.size()-1; i++){
+    for (int j = i+1; j < (int) g_jets_p4.size(); j++){
       if (fabs(g_jets_p4.at(i).eta() - g_jets_p4.at(j).eta()) < best_deta){
         j1 = i;
         j2 = j;
