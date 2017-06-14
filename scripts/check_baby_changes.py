@@ -79,7 +79,7 @@ def makePlotsFromTrees(plotdir,t1,t2,name1,name2):
 
         todraw = alias + (".pt()" if is_p4 else "")
         t1.Draw("{0}>>h1_{1}_v1".format(todraw,alias),"","goff",max_nevts)
-        h1 = r.gDirectory.Get("h1_{0}".format(alias))
+        h1 = r.gDirectory.Get("h1_{0}_v1".format(alias))
 
         # print h1.GetEntries(), h2.GetEntries(), h1.GetMean(), h2.GetMean()
 
@@ -103,7 +103,7 @@ def makePlotsFromTrees(plotdir,t1,t2,name1,name2):
 
         todraw = alias + (".pt()" if is_p4 else "")
         t2.Draw("{0}>>h2_{1}_v2".format(todraw,alias),"","goff",max_nevts)
-        h2 = r.gDirectory.Get("h2_{0}".format(alias))
+        h2 = r.gDirectory.Get("h2_{0}_v2".format(alias))
 
         h2.SetLineColor(r.kBlue)
 
