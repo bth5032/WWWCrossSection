@@ -68,6 +68,7 @@ def makePlotsFromTrees(plotdir,t1,t2,name1,name2):
 
         c1.SaveAs("{0}/both/h_{1}_{2}.png".format(plotdir,pchistr,alias))
     except:
+        print("Error: Caught exception %s" % e)
         pass
 
   for b in list(keys_1_not_2):
@@ -91,6 +92,7 @@ def makePlotsFromTrees(plotdir,t1,t2,name1,name2):
 
         c1.SaveAs("{0}/only_{1}/h_{2}.png".format(plotdir,name1,alias))
     except:
+        print("Error: Caught exception %s" % e)
         pass
 
   for b in list(keys_2_not_1):
@@ -111,7 +113,8 @@ def makePlotsFromTrees(plotdir,t1,t2,name1,name2):
         h2.Draw("hist")
 
         c1.SaveAs("{0}/only_{1}/h_{2}.png".format(plotdir,name2,alias))
-    except:
+    except Exception as e:
+        print("Error: Caught exception %s" % e)
         pass
 
 def compareForFiles(f1, f2):
