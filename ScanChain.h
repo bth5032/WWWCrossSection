@@ -103,6 +103,8 @@ vector<float> g_jets_csv;
 vector<LorentzVector> g_jets_p4;
 vector<LorentzVector> g_jets_medb_p4;
 
+vector<short> g_lep_inds; //Holds poition of "analysis leptons"
+
 
 const double Z_MASS = 91.1876;
 const double W_MASS = 80.385;
@@ -113,6 +115,23 @@ const double BJET_CSV_LOOSE = 0.5426;
 
 double MAX_DR_JET_LEP_OVERLAP, JET_PT_MIN, JET_ETA_MAX, BJET_PT_MIN, BJET_ETA_MAX;
 double W_JET_WINDOW_LOW, W_JET_WINDOW_HIGH, Z_VETO_WINDOW_LOW, Z_VETO_WINDOW_HIGH;
+
+/* OLD Standards:
+evt_type == flavor type. 0 == EE, 1 == MuMu, 2 == EMu
+hyp_type == charge type. 0 == SS, 1 == OS, 2 == Photon
+*/
+
+enum flavor_type {EE = 0, EMu, MuMu};
+const TString flavor_type_str[] = {"EE", "EMu", "MuMu"};
+enum charge_type {SS = 0, OS, SFOS0, SFOS1, SFOS2, NA};
+const TString charge_type_str[] = {"SS", "OS", "0SFOS", "1SFOS", "2SFOS", "NA"};
+
+flavor_type FT;
+charge_type CT;
+
+//=============================
+// Variable Computation
+//=============================
 
 /* returns two most B-like jet indicies */
 pair<int, int> getMostBlike();
@@ -168,6 +187,12 @@ double DeltaR(const LorentzVector p1, const LorentzVector p2);
 
 /* checks the gen record for a lepton with the index specified */
 bool isCleanLepFromW(int index);
+
+/* Checks whether the two leading analysis leptons are EE, EMu, or MuMu */
+flavor_type getFlavorType();
+
+/* Returns the charge type, SS or OS for 2 lep events, and SFOS0/1/2 for more than 2leps */
+charge_type getChargeType();
 //=============================
 // Triggers
 //=============================
@@ -266,6 +291,9 @@ bool passFileSelections();
 //=============================
 // Setup
 //=============================
+/* Loops through lepton objects and adds indexed to g_lep_inds if they pass the tight selection (or fakable object when we are doing fake rate study)*/
+void setLepIndexes();
+
 /*Takes in a p4 for a jet and determines whether that jet is less than MAX_DR_JET_LEP_OVERLAP for all leptons*/
 bool isOverlapJet(const LorentzVector &jet_p4);
 

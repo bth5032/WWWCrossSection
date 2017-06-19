@@ -8,7 +8,6 @@ DEFAULT::event_type=dilepton
 DEFAULT::MCTriggerEmulation=true
 DEFAULT::do_met_filters=false #MET filters off for now
 
-DEFAULT::dilmass_Z_veto=true
 #DEFAULT::tau_veto=true
 DEFAULT::NBjets_max=0
 DEFAULT::NBjets_loose_max=0
@@ -25,13 +24,19 @@ DEFAULT::MET_min=55
 DEFAULT::reliso03_max=0.1
 DEFAULT::ip3d_max=0.015
 
-DEFAULT::jet1_pt_min=25
+DEFAULT::jet1_pt_min=30
 DEFAULT::Njets_max=1
-DEFAULT::jet_pt_min=25
+DEFAULT::jet_pt_min=30
 DEFAULT::jet_eta_max=4.5
 #DEFAULT::Mll_SF_min=20
+DEFAULT::pt_3l_min=60
+
+DEFAULT::dilmass_Z_veto=true
+#DEFAULT::dilmass_ee_veto=true
+
 DEFAULT::3lep_phi_MET_min=2.5
 #DEFAULT::isotrack_veto=true
+DEFAULT::use_veto_leps=true
 
 DEFAULT::num_SFOS_pairs=2
 DEFAULT::num_leptons=3
