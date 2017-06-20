@@ -466,7 +466,7 @@ bool passLeptonHLTs(){
 bool hasGood3l(){
   //if (printStats) { cout<<"Number of Leptons: "<<phys.nlep()<<" "; }
   
-  if (g_lep_inds.size() != stoi(conf->get("num_leptons"))){
+  if ( ((int) g_lep_inds.size()) != stoi(conf->get("num_leptons"))){
       numEvents->Fill(10); 
       if (printFail) cout<<phys.evt()<<" :Failed num leptons cut. Needed "<<conf->get("num_leptons")<<" got "<<g_lep_inds.size()<<endl;
       return false; // require 2 leps
@@ -694,7 +694,7 @@ bool hasGood3l(){
 bool hasGood2l(){
   //cout<<__LINE__<<endl;
 
-  if (g_lep_inds.size() != stoi(conf->get("num_leptons"))){
+  if ( ((int) g_lep_inds.size()) != stoi(conf->get("num_leptons"))){
       numEvents->Fill(10); 
       if (printFail) cout<<phys.evt()<<" :Failed num leptons cut. Needed "<<conf->get("num_leptons")<<" got "<<g_lep_inds.size()<<endl;
       return false; // require 2 leps
