@@ -471,7 +471,7 @@ bool hasGood3l(){
       if (printFail) cout<<phys.evt()<<" :Failed num leptons cut. Needed "<<conf->get("num_leptons")<<" got "<<g_lep_inds.size()<<endl;
       return false; // require 2 leps
   }
-  
+
   int lep_charge_sum = abs(phys.lep_pdgId().at(g_lep_inds.at(0))/abs(phys.lep_pdgId().at(g_lep_inds.at(0))) + phys.lep_pdgId().at(g_lep_inds.at(1))/abs(phys.lep_pdgId().at(g_lep_inds.at(1))) + phys.lep_pdgId().at(g_lep_inds.at(2))/abs(phys.lep_pdgId().at(g_lep_inds.at(2))));
 
   if( lep_charge_sum != 1 ){ 
@@ -748,7 +748,7 @@ bool hasGood2l(){
   //cout<<__LINE__<<endl;
 
   if ((conf->get("dilmass_Z_veto") == "true") && (FT == EE) ){ //only apply for EE events
-    cout<<g_lep_inds.at(0)<<" "<<g_lep_inds.at(1)<<" "<<g_lep_inds.size()<<" "<<phys.nlep()<<endl;
+    //cout<<g_lep_inds.at(0)<<" "<<g_lep_inds.at(1)<<" "<<g_lep_inds.size()<<" "<<phys.nlep()<<endl;
     if ( ( (phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).M() > Z_VETO_WINDOW_LOW ) && ( (phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).M() < Z_VETO_WINDOW_HIGH ) ) {
       numEvents->Fill(22); 
       if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut with mass: "<<(phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).M()<<endl;
