@@ -577,7 +577,7 @@ bool hasGood3l(){
       }*/
     }
 
-    /* else */if ( conf->get("signal_region") == "3lep_1SFOS" ){
+    else if ( conf->get("signal_region") == "3lep_1SFOS" ){
       if ( ( phys.lep_pdgId().at(g_lep_inds.at(0)) == -phys.lep_pdgId().at(g_lep_inds.at(1)) ) ){
         //veto if mass within [MZ-35,MZ+20]
         if ( ( (phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).M() >= 55 ) && ( (phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).M() <= 110 ) ){
