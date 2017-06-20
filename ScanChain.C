@@ -546,8 +546,9 @@ bool hasGood3l(){
   }
 
   if( ( conf->get("dilmass_Z_veto") == "true" ) ) {
-    /*if ( conf->get("signal_region") == "3lep_0SFOS" ){
-      if ( ( fabs(phys.lep_pdgId().at(g_lep_inds.at(0))) == fabs(phys.lep_pdgId().at(g_lep_inds.at(1))) ) && ( fabs(phys.lep_pdgId().at(g_lep_inds.at(0))) == 11) ){
+    if ( conf->get("signal_region") == "3lep_0SFOS" ){
+      //Cut has been removed
+      /*if ( ( fabs(phys.lep_pdgId().at(g_lep_inds.at(0))) == fabs(phys.lep_pdgId().at(g_lep_inds.at(1))) ) && ( fabs(phys.lep_pdgId().at(g_lep_inds.at(0))) == 11) ){
         if ( fabs((phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).M() - Z_MASS ) <= 15 ){
           numEvents->Fill(19); 
           if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 0SFOS pairs"<<endl;
@@ -573,8 +574,8 @@ bool hasGood3l(){
           if (printFail) cout<<phys.evt()<<" :Failed dilmass Z veto for 3 lepton region with 0SFOS pairs"<<endl;
           return false;
         }
-      }
-    }*/
+      }*/
+    }
 
     /* else */if ( conf->get("signal_region") == "3lep_1SFOS" ){
       if ( ( phys.lep_pdgId().at(g_lep_inds.at(0)) == -phys.lep_pdgId().at(g_lep_inds.at(1)) ) ){
