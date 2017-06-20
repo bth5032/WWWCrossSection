@@ -465,7 +465,8 @@ bool passLeptonHLTs(){
 
 bool hasGood3l(){
   //if (printStats) { cout<<"Number of Leptons: "<<phys.nlep()<<" "; }
-  
+  //bool tmp = (((int) g_lep_inds.size()) == stoi(conf->get("num_leptons")));
+  //cout<<"Event has "<<(int) g_lep_inds.size()<<" leps, checking against "<<stoi(conf->get("num_leptons"))<<", with answer "<<tmp<<endl;
   if ( ((int) g_lep_inds.size()) != stoi(conf->get("num_leptons"))){
       numEvents->Fill(10); 
       if (printFail) cout<<phys.evt()<<" :Failed num leptons cut. Needed "<<conf->get("num_leptons")<<" got "<<g_lep_inds.size()<<endl;
@@ -695,6 +696,8 @@ bool hasGood3l(){
 bool hasGood2l(){
   //cout<<__LINE__<<endl;
 
+  //bool tmp = (((int) g_lep_inds.size()) == stoi(conf->get("num_leptons")));
+  //cout<<"Event has "<<(int) g_lep_inds.size()<<" leps, checking against "<<stoi(conf->get("num_leptons"))<<", with answer "<<tmp<<endl;
   if ( ((int) g_lep_inds.size()) != stoi(conf->get("num_leptons"))){
       numEvents->Fill(10); 
       if (printFail) cout<<phys.evt()<<" :Failed num leptons cut. Needed "<<conf->get("num_leptons")<<" got "<<g_lep_inds.size()<<endl;
@@ -704,14 +707,14 @@ bool hasGood2l(){
   if (conf->get("dil_sign") == "same"){
     if( !( CT == SS ) ) {
       numEvents->Fill(21); 
-      if (printFail) cout<<phys.evt()<<" :Failed same sign cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed same sign cut, got objects with PDG IDs: "<<phys.lep_pdgId().at(g_lep_inds.at(0))<<" and "<<phys.lep_pdgId().at(g_lep_inds.at(1))<<endl;
       return false; // require same sign
     }
   }
   else if (conf->get("dil_sign") == "opposite"){
     if( !( CT == OS ) ) {
       numEvents->Fill(21); 
-      if (printFail) cout<<phys.evt()<<" :Failed opposite sign cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed opposite sign cut, got objects with PDG IDs: "<<phys.lep_pdgId().at(g_lep_inds.at(0))<<" and "<<phys.lep_pdgId().at(g_lep_inds.at(1))<<endl;
       return false; // require opposite sign
     }
   }
@@ -719,28 +722,28 @@ bool hasGood2l(){
   if (conf->get("dil_flavor") == "emu"){ 
     if (! ( FT == EMu ) ){ //require explicit emu event
       numEvents->Fill(15); 
-      if (printFail) cout<<phys.evt()<<" :Failed not explicit e/mu event"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed not explicit e/mu event, got objects with PDG IDs: "<<phys.lep_pdgId().at(g_lep_inds.at(0))<<" and "<<phys.lep_pdgId().at(g_lep_inds.at(1))<<endl;
       return false; // require explicit opposite flavor event
     }
   }
   else if (conf->get("dil_flavor") == "same"){
     if( !( FT == EE || FT == MuMu ) ) {
         numEvents->Fill(15); 
-        if (printFail) cout<<phys.evt()<<" :Failed explicit mu/mu or e/e cut"<<endl;
+        if (printFail) cout<<phys.evt()<<" :Failed explicit mu/mu or e/e cut, got objects with PDG IDs: "<<phys.lep_pdgId().at(g_lep_inds.at(0))<<" and "<<phys.lep_pdgId().at(g_lep_inds.at(1))<<endl;
         return false; // require explicit same flavor event
     }
   }
   else if (conf->get("dil_flavor") == "ee"){
     if( !( FT == EE ) ) {
         numEvents->Fill(15); 
-        if (printFail) cout<<phys.evt()<<" :Failed explicit e/e cut"<<endl;
+        if (printFail) cout<<phys.evt()<<" :Failed explicit e/e cut, got objects with PDG IDs: "<<phys.lep_pdgId().at(g_lep_inds.at(0))<<" and "<<phys.lep_pdgId().at(g_lep_inds.at(1))<<endl;
         return false; // require explicit same flavor event
     }
   }
   else if (conf->get("dil_flavor") == "mumu"){
     if( !( FT == MuMu ) ) {
         numEvents->Fill(15); 
-        if (printFail) cout<<phys.evt()<<" :Failed explicit mu/mu cut"<<endl;
+        if (printFail) cout<<phys.evt()<<" :Failed explicit mu/mu cut, got objects with PDG IDs: "<<phys.lep_pdgId().at(g_lep_inds.at(0))<<" and "<<phys.lep_pdgId().at(g_lep_inds.at(1))<<endl;
         return false; // require explicit same flavor event
     }
   }
@@ -778,7 +781,7 @@ bool hasGood2l(){
   }
   else{
     numEvents->Fill(34); 
-    if (printFail) cout<<phys.evt()<<" :Failed Not enough jets"<<endl;
+    if (printFail) cout<<phys.evt()<<" :Failed Not enough jets, event has "<<g_njets<<" jets."<<endl;
     return false; // require at least 2 jets
   }
 
@@ -1766,20 +1769,27 @@ void setLepIndexes(){
     if(phys.lep_pass_VVV_cutbased_tight().at(i))                g_lep_inds.push_back(i);
     else if (FRS && phys.lep_pass_VVV_cutbased_fo().at(i))      g_lep_inds.push_back(i); 
   }
+
+  /*cout<<"Found "<<g_lep_inds.size()<<" leptons."<<endl;
+  for (int i = 0; i<(int) g_lep_inds.size(); i++){
+    cout<<"Lep ["<<i<<"] pt: "<<phys.lep_p4().at(g_lep_inds.at(i)).pt()<<"eta: "<<phys.lep_p4().at(g_lep_inds.at(i)).eta()<<" phi: "<<phys.lep_p4().at(g_lep_inds.at(i)).phi()<<" pass_VVV_cutbased_tight: "<<phys.lep_pass_VVV_cutbased_tight().at(g_lep_inds.at(i))<<endl;
+  }*/
 }
 
 bool isOverlapJet(const LorentzVector &jet_p4){
   /*Takes in a p4 for a jet and determines whether that jet is less than MAX_DR_JET_LEP_OVERLAP for all leptons*/ 
   //cout<<__LINE__<<endl;
+  //cout<<"Looping through "<<g_lep_inds.size()<<" leptons"<<endl;
   for (int i = 0; i< (int)g_lep_inds.size(); i++){
     if (DeltaR(jet_p4, phys.lep_p4().at(g_lep_inds.at(i))) > MAX_DR_JET_LEP_OVERLAP){
       //cout<<"Failed JET at (eta, phi, pt) = ("<<jet_p4.eta()<<", "<<jet_p4.phi()<<", "<<jet_p4.pt()<<") lep at ("<<phys.lep_p4().at(i).eta()<<", "<<phys.lep_p4().at(i).phi()<<", "<<phys.lep_p4().at(i).pt()<<") DR="<<DeltaR(jet_p4, phys.lep_p4().at(i))<<endl;
-      return false;
+      return true;
     }
   }
   //cout<<__LINE__<<endl;
+  //cout<<"Returning true"<<endl;
 
-  return true;
+  return false;
 }
 
 void writeCleanedJets(const vector<LorentzVector> &vecs, const vector<float> &csvs){
@@ -1787,9 +1797,11 @@ void writeCleanedJets(const vector<LorentzVector> &vecs, const vector<float> &cs
   int n_pass = 0;
   //cout<<__LINE__<<endl;
   for (int i = 0; i < (int) vecs.size(); i++){
-    if (vecs.at(i).pt() < JET_PT_MIN) continue;
-    if (fabs(vecs.at(i).eta()) > JET_ETA_MAX) continue;
+    //cout<<"Checking jet with pt "<<vecs.at(i).pt()<<" eta "<<vecs.at(i).eta()<<" phi "<<vecs.at(i).phi()<<endl;
+    if (vecs.at(i).pt() < JET_PT_MIN) continue; //{ cout<<"failed PT min cut at "<<JET_PT_MIN<<endl; continue;}
+    if (fabs(vecs.at(i).eta()) > JET_ETA_MAX) continue; //{ cout<<"failed Eta max cut at "<<JET_ETA_MAX<<endl; continue;}
     if ( !isOverlapJet(vecs.at(i)) ) { 
+      //cout<<"Jet made it"<<endl;
       g_jets_p4.push_back(vecs.at(i)); 
       g_jets_csv.push_back(csvs.at(i));
       n_pass++;
