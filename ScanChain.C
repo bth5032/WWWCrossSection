@@ -466,6 +466,12 @@ bool passLeptonHLTs(){
 bool hasGood3l(){
   //if (printStats) { cout<<"Number of Leptons: "<<phys.nlep()<<" "; }
   
+  if (g_lep_inds.size() != stoi(conf->get("num_leptons"))){
+      numEvents->Fill(10); 
+      if (printFail) cout<<phys.evt()<<" :Failed num leptons cut. Needed "<<conf->get("num_leptons")<<" got "<<g_lep_inds.size()<<endl;
+      return false; // require 2 leps
+  }
+  
   int lep_charge_sum = abs(phys.lep_pdgId().at(g_lep_inds.at(0))/abs(phys.lep_pdgId().at(g_lep_inds.at(0))) + phys.lep_pdgId().at(g_lep_inds.at(1))/abs(phys.lep_pdgId().at(g_lep_inds.at(1))) + phys.lep_pdgId().at(g_lep_inds.at(2))/abs(phys.lep_pdgId().at(g_lep_inds.at(2))));
 
   if( lep_charge_sum != 1 ){ 
@@ -688,6 +694,12 @@ bool hasGood3l(){
 bool hasGood2l(){
   //cout<<__LINE__<<endl;
 
+  if (g_lep_inds.size() != stoi(conf->get("num_leptons"))){
+      numEvents->Fill(10); 
+      if (printFail) cout<<phys.evt()<<" :Failed num leptons cut. Needed "<<conf->get("num_leptons")<<" got "<<g_lep_inds.size()<<endl;
+      return false; // require 2 leps
+  }
+
   if (conf->get("dil_sign") == "same"){
     if( !( CT == SS ) ) {
       numEvents->Fill(21); 
@@ -736,6 +748,7 @@ bool hasGood2l(){
   //cout<<__LINE__<<endl;
 
   if ((conf->get("dilmass_Z_veto") == "true") && (FT == EE) ){ //only apply for EE events
+    cout<<g_lep_inds.at(0)<<" "<<g_lep_inds.at(1)<<" "<<g_lep_inds.size()<<" "<<phys.nlep()<<endl;
     if ( ( (phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).M() > Z_VETO_WINDOW_LOW ) && ( (phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).M() < Z_VETO_WINDOW_HIGH ) ) {
       numEvents->Fill(22); 
       if (printFail) cout<<phys.evt()<<" :Failed lepton pair on Z mass cut with mass: "<<(phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).M()<<endl;
@@ -1746,7 +1759,6 @@ bool passFileSelections(){
 
 void setLepIndexes(){
   /* Loops through lepton objects and adds indexed to g_lep_inds if they pass the tight selection (or fakable object when we are doing fake rate study)*/
-  short max_leps = stoi(conf->get("num_leptons"));
   bool FRS = (conf->get("fakerate_study") == "true") ? true : false;
 
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
