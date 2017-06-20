@@ -314,9 +314,13 @@ bool isCleanLepFromW(int index){
 flavor_type getFlavorType(){
   /* Checks whether the two leading analysis leptons are EE, EMu, or MuMu */
   if ( (abs(phys.lep_pdgId().at(g_lep_inds.at(0))) == 11) && (abs(phys.lep_pdgId().at(g_lep_inds.at(1))) == 13) ) return EMu;
+  //cout<<__LINE__<<endl;
   if ( (abs(phys.lep_pdgId().at(g_lep_inds.at(0))) == 13) && (abs(phys.lep_pdgId().at(g_lep_inds.at(1))) == 11) ) return EMu;
+  //cout<<__LINE__<<endl;
   if ( (abs(phys.lep_pdgId().at(g_lep_inds.at(0))) == 11) && (abs(phys.lep_pdgId().at(g_lep_inds.at(1))) == 11) ) return EE;
+  //cout<<__LINE__<<endl;
   if ( (abs(phys.lep_pdgId().at(g_lep_inds.at(0))) == 13) && (abs(phys.lep_pdgId().at(g_lep_inds.at(1))) == 13) ) return MuMu;
+  //cout<<__LINE__<<endl;
 
   cout<<"Going to throw error finding flavor type in event"<<endl;
   std::stringstream message;
@@ -332,12 +336,18 @@ charge_type getChargeType(){
     if ( (id1/abs(id1)) == (id2/abs(id2)) )   return SS;
     else                                      return OS;
   }
+  
+  //cout<<__LINE__<<endl;
+
   int nsfof = getNumSFOSPairs();
 
   if (nsfof == 0)      return SFOS0;
   else if (nsfof == 1) return SFOS1;
   else if (nsfof == 2) return SFOS2;
-  else return NA;
+  
+  //cout<<__LINE__<<endl;
+
+  return NA; //In case we have more than 3 leps which can happen without lep veto. 
 }
 
 //=============================
@@ -1816,6 +1826,7 @@ void setupGlobals(){
   g_jets_p4.clear();
   g_jets_medb_p4.clear();
   g_jets_csv.clear();
+  g_lep_inds.clear();
 
   if ( conf->get("uncertainty_mode") == "JES_up" ){
     g_dphi_metj1 = phys.dphi_metj1_up();
@@ -1904,8 +1915,15 @@ void setupGlobals(){
     writeCleanedBJets(phys.jets_p4(), phys.jets_csv()); //g_jets_medb_p4, g_jets_csv, g_nBJetMedium
   }
 
-  FT = getFlavorType();
-  CT = getChargeType();
+  //cout<<__LINE__<<endl;
+  
+  setLepIndexes();
+  if (g_lep_inds.size() >= 2){
+    FT = getFlavorType();
+    CT = getChargeType();
+  }
+
+  //cout<<__LINE__<<endl;
 }
 
 int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/, int nEvents/* = -1*/) {
@@ -2658,7 +2676,6 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           otherleps_ptRatio->Fill(fabs(phys.lep_ptRatio().at(g_lep_inds.at(c))), weight);
         }
       }
-
 //===========================================
 // Signal Region Specific Histos
 //===========================================
