@@ -26,6 +26,10 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
   }
 
   cout<<"base_path: "<<base_path<<endl;
+  
+  //=============
+  // V+Jets
+  //=============
 
   if (set == "DY"){
     cout<<"Adding DY sample"<<endl;
@@ -40,44 +44,7 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     ch->Add(dir+"dy_m50_mgmlm_ht2500_nonext*");
     ch->Add(dir+"dy_m1050_mgmlm*.root");
   }
-  else if (set == "TTBar"){
-    cout<<"Adding TTBar (smaller stats sample)"<<endl; 
-    
-    ch->Add(dir+"ttbar_dilep_mgmlm_ext1_*");
-    ch->Add(dir+"ttbar_1ltop_mgmlm_ext1_*");
-    ch->Add(dir+"ttbar_1ltbr_mgmlm_ext1_*");
-  }
-  else if (set == "TTBar-highstats"){
-    cout<<"Adding TTBar (large stats sample)"<<endl; 
-    
-    ch->Add(dir+"ttbar_dilep_powheg*"); //larger stats
-  }
-  else if (set == "TW-inclusive"){
-    cout<<"Adding TW with inclusive decays"<<endl; 
-    
-    ch->Add(dir+"sttw_antitop_powheg*");
-    ch->Add(dir+"sttw_top_powheg*");
-  }
-  else if (set == "SingleTop"){
-    cout<<"Adding Single Top t and s channel"<<endl;  
-    
-    ch->Add(dir+"stt_antitop_incdec_powheg*");
-    ch->Add(dir+"stt_top_incdec_powheg*");
-    //ch->Add(dir+"sts_4f_leptonic_amcnlo*");
-  }
-  else if (set == "TW"){
-    cout<<"Adding TW with no fully hadronic decay"<<endl;
-    
-    ch->Add(dir+"sttw_antitop_nofullhaddecay_powheg*");
-    ch->Add(dir+"sttw_top_nofullhaddecay_powheg*"); 
-  }
-  //cout<<"Entries: "<<ch_fs->GetEntries()<<endl;
-  else if (set == "WW"){
-    cout<<"Adding WW"<<endl; 
-    
-    ch->Add(dir+"ww_2l2nu_powheg*.root");
-    ch->Add(dir+"ww_lnuqq_powheg*.root");
-  }
+
   else if (set == "WJets"){
     cout<<"Adding WJets"<<endl; 
     
@@ -90,11 +57,108 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     ch->Add(dir+"wjets_ht1200_mgmlm_nonext_*.root");
     ch->Add(dir+"wjets_ht2500_mgmlm_ext1_*.root");
   }
+  
+  //=============
+  // TTBar
+  //=============
+
+  else if (set == "TTBar2l"){
+    cout<<"Adding TTBar to 2lep (smaller stats sample)"<<endl; 
+    
+    ch->Add(dir+"ttbar_dilep_mgmlm_ext1*");
+  }
+  else if (set == "TTBar2l-highstats"){
+    cout<<"Adding TTBar to 2lep (large stats sample)"<<endl; 
+    
+    ch->Add(dir+"ttbar_dilep_powheg*"); //larger stats
+  }
+  else if (set == "TTBar1l"){
+    cout<<"Adding TTBar to 1 lep"<<endl; 
+    
+    ch->Add(dir+"ttbar_1ltop_mgmlm_ext1*");
+    ch->Add(dir+"ttbar_1ltbr_mgmlm_ext1*");
+  }
+
+  //=============
+  // t/tV
+  //=============
+  
+  else if (set == "TW-inclusive"){
+    cout<<"Adding TW with inclusive decays"<<endl; 
+    
+    ch->Add(dir+"sttw_antitop_powheg*");
+    ch->Add(dir+"sttw_top_powheg*");
+  }
+  else if (set == "SingleTop"){
+    cout<<"Adding Single Top t and s channel"<<endl;  
+    
+    ch->Add(dir+"stt_antitop_incdec_powheg*");
+    ch->Add(dir+"stt_top_incdec_powheg*");
+    ch->Add(dir+"sts_4f_leptonic_amcnlo*");
+  }
+  else if (set == "TW"){
+    cout<<"Adding TW with no fully hadronic decay"<<endl;
+    
+    ch->Add(dir+"sttw_antitop_nofullhaddecay_powheg*");
+    ch->Add(dir+"sttw_top_nofullhaddecay_powheg*"); 
+  }
+  else if (set == "TZq"){
+    cout<<"Adding TZq"<<endl; 
+    
+    ch->Add(dir+"tzq_ll_amcnlo*");
+  }
+  else if (set == "TWZ"){
+    cout<<"Adding TWZ"<<endl; 
+    
+    ch->Add(dir+"sttwll_madgraph*");
+  }
+  //cout<<"Entries: "<<ch_fs->GetEntries()<<endl;
+
+  //=============
+  // ttV
+  //=============
+
   else if (set == "TTW"){
     cout<<"Adding TTW MC"<<endl; 
     
     ch->Add(dir+"ttw_ln_amcnlo*");
     ch->Add(dir+"ttw_qq_amcnlo*");
+  }
+
+  else if (set == "TTZ"){
+    cout<<"Adding TTZ"<<endl; 
+    
+    //ch->Add(dir+"ttz_2l2n_amcnlo*");
+    ch->Add(dir+"ttz_incl_mgmlm*");
+  }
+  else if (set == "TTH"){
+    cout<<"Adding TTH"<<endl; 
+    
+    ch->Add(dir+"tth_bb_powheg*");
+    ch->Add(dir+"tth_nonbb_powheg*");
+  }
+  else if (set == "TTG"){
+    cout<<"Adding TTG"<<endl; 
+    
+    ch->Add(dir+"ttg_incl_amcnlo*");
+  }
+  else if (set == "TTW-inclusive"){
+    cout<<"Adding TTW inclusive MC"<<endl; 
+    
+    ch->Add(dir+"ttw_incl_mgmlm*");
+  } 
+
+  //=============
+  // VV
+  //=============
+
+  else if (set == "WW"){
+    cout<<"Adding WW"<<endl; 
+    
+    ch->Add(dir+"ww_2l2nu_powheg*.root");
+    ch->Add(dir+"ww_lnuqq_powheg*.root");
+    ch->Add(dir+"wpwpjj_ewk-qcd_madgraph*");
+    ch->Add(dir+"ww_2l2nu_dbl_scat*");
   }
   else if (set == "WZ"){
     cout<<"Adding WZ MC"<<endl; 
@@ -111,10 +175,25 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     ch->Add(dir+"zz_2q2n_powheg*");
     ch->Add(dir+"zz_4l_powheg*");
   }
+  else if (set == "VH"){
+    cout<<"Adding VH"<<endl; 
+
+    ch->Add(dir+"vh_nonbb_amcnlo*");
+  }
+  //=============
+  // VVV
+  //=============
+
   else if (set == "WWW"){
     cout<<"Adding WWW"<<endl; 
     
     ch->Add(dir+"www_incl_amcnlo*"); 
+  }
+  else if (set == "WWW-mia"){
+    cout<<"Adding WWW (Mia's samples)"<<endl; 
+    
+    ch->Add(dir+"www_2l_ext1_mia*"); 
+    ch->Add(dir+"www_2l_mia*"); 
   }
   else if (set == "WWZ"){
     cout<<"Adding WWZ"<<endl; 
@@ -131,39 +210,6 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     
     ch->Add(dir+"zzz_incl_amcnlo*"); 
   }
-  else if (set == "TZq"){
-    cout<<"Adding TZq"<<endl; 
-    
-    ch->Add(dir+"tzq_ll_amcnlo*");
-  }
-  else if (set == "TWZ"){
-    cout<<"Adding TWZ"<<endl; 
-    
-    ch->Add(dir+"sttwll_madgraph*");
-  }
-  else if (set == "TTZ"){
-    cout<<"Adding TTZ"<<endl; 
-    
-    //ch->Add(dir+"ttz_2l2n_amcnlo*");
-    ch->Add(dir+"ttz_incl_mgmlm*");
-  }
-  else if (set == "TTH"){
-    cout<<"Adding TTH"<<endl; 
-    
-    //ch->Add(dir+"ttz_2l2n_amcnlo*");
-    ch->Add(dir+"tth_bb_powheg*");
-    ch->Add(dir+"tth_nonbb_powheg*");
-  }
-  else if (set == "TTG"){
-    cout<<"Adding TTG"<<endl; 
-    
-    ch->Add(dir+"ttg_incl_amcnlo*");
-  }
-  else if (set == "TTW-inclusive"){
-    cout<<"Adding TTW inclusive MC"<<endl; 
-    
-    ch->Add(dir+"ttw_incl_mgmlm*");
-  } 
 
 //====================================
 // Photon Data
