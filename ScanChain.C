@@ -218,12 +218,43 @@ pair<int,int> getClosestJetsInEta(){
   int j1 = 0;
   int j2 = 1;
   double best_deta = fabs(g_jets_p4.at(j1).eta() - g_jets_p4.at(j2).eta());
+  double tmp_deta = 100;
 
   for (int i = 0; i < (int) g_jets_p4.size()-1; i++){
     for (int j = i+1; j < (int) g_jets_p4.size(); j++){
-      if (fabs(g_jets_p4.at(i).eta() - g_jets_p4.at(j).eta()) < best_deta){
+      tmp_deta = fabs(g_jets_p4.at(i).eta() - g_jets_p4.at(j).eta());
+      if ( tmp_deta < best_deta){
         j1 = i;
         j2 = j;
+        best_deta = tmp_deta;
+      }
+    }
+  }
+
+  return make_pair(j1,j2);
+}
+
+pair<int,int> getClosestJetsInDR(){
+  /* Goes pairwise through jet collection and finds the pair of jets with the minium delta R. */
+  if (g_njets < 2){
+    cout<<"Going to throw error finding closest dEta jet pair: Less than two jets!"<<endl;
+    std::stringstream message;
+    message<<"Can not find closest dEta jet pair to Higgs for event: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" the event only has "<<g_jets_p4.size()<<" jets";
+    throw std::underflow_error(message.str());
+  }
+
+  int j1 = 0;
+  int j2 = 1;
+  double best_dR = DeltaR(g_jets_p4.at(j1), g_jets_p4.at(j2));
+  double tmp_dR = 100;
+
+  for (int i = 0; i < (int) g_jets_p4.size()-1; i++){
+    for (int j = i+1; j < (int) g_jets_p4.size(); j++){
+      tmp_dR = DeltaR(g_jets_p4.at(i), g_jets_p4.at(j));
+      if ( tmp_dR < best_dR){
+        j1 = i;
+        j2 = j;
+        best_dR = tmp_dR;
       }
     }
   }
@@ -280,7 +311,8 @@ TString getLepFlavorString(){
 double DeltaR(const LorentzVector p1, const LorentzVector p2){
   /*Returns the DeltaR between objects p1 and p2.*/
   //cout<<__LINE__<<endl;
-  return sqrt( (p1.eta() - p2.eta())*(p1.eta() - p2.eta())+(p1.phi() - p2.phi())*(p1.phi() - p2.phi()) );
+  double dphi = acos( cos( p1.phi() - p2.phi() ) );
+  return sqrt( (p1.eta() - p2.eta())*(p1.eta() - p2.eta())+ dphi*dphi );
 }
 
 bool isCleanLepFromW(int index){
@@ -764,11 +796,12 @@ bool hasGood2l(){
 
   if (g_njets >= 2){
     // MJJ for closest jets in eta
-    pair<int,int> jets_dEta = getClosestJetsInEta();
-    double dijet_mass = ( g_jets_p4.at(jets_dEta.first) + g_jets_p4.at(jets_dEta.second) ).M();
+    pair<int,int> jets_dR = getClosestJetsInDR();
+    double dijet_mass = ( g_jets_p4.at(jets_dR.first) + g_jets_p4.at(jets_dR.second) ).M();
     if( (dijet_mass < W_JET_WINDOW_LOW) || (dijet_mass > W_JET_WINDOW_HIGH) ) {
       numEvents->Fill(61); 
       if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut with dijet mass: "<< dijet_mass <<endl;
+      //WWWUtils::printP4s(g_jets_p4, "Jets");
       return false; // require at at least 2 Jets within the W mass window.
     }
     //Safety cuts against Wpm Wpm VBS
@@ -2488,12 +2521,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       printFail = false;
 
       //if (inspection_set.count(phys.evt()) != 0){
-      /*if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
+      if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
         cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<endl;
         inspection_copy.erase(make_tuple(phys.evt(), phys.run(), phys.lumi()));
         printStats=true;
         printFail=true;
-      }*/
+      }
       /*else{ //Use if you don't want care about events in your list that are not in the other's
         continue;
       }*/
@@ -2551,10 +2584,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         // ----------------
         // DEBUG MODE
         // ----------------
-        /*if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
+        if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
           cout<<"NEW||evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<endl;
           //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
-        }*/
+        }
         //When Debug mode is off, you can turn this on:
         //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
 //===========================================
@@ -2767,10 +2800,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   // ----------------
   // DEBUG MODE
   // ----------------
-  /*cout<<"Events that weren't in your babies:"<<endl;
+  cout<<"Events that weren't in your babies:"<<endl;
   for (set<tuple<long,long,long>>::iterator it=inspection_copy.begin(); it!=inspection_copy.end(); ++it){
     cout<<"evt: "<<std::get<0>(*it)<<" run: "<<std::get<1>(*it)<<" lumi: "<<std::get<2>(*it)<<endl;
-  }*/
+  }
 
   cout<<"Num events passed: "<<eventCount<<endl;
   files_log<<"Num events passed: "<<eventCount<<endl;

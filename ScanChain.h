@@ -44,6 +44,9 @@ using namespace std;
 //using namespace zmet;
 using namespace duplicate_removal;
 
+// Utility stuff
+#include "Utils.C"
+
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
 //Global Vars
@@ -74,7 +77,7 @@ TH1I *numEvents; //Holds the number of events in the whole script and the number
 // DEBUG MODE
 // ----------------
 
-set<tuple<long,long,long>>  inspection_set_erl = {make_tuple(123855,1,620), make_tuple(137607,1,689)};
+set<tuple<long,long,long>>  inspection_set_erl = {make_tuple(8091828,1,49950), make_tuple(1010814,1,6240), make_tuple(4506650,1,27819), make_tuple(7681082,1,47415), make_tuple(5584183,1,34471), make_tuple(1544668,1,9535), make_tuple(2597533,1,18293), make_tuple(3703020,1,26078), make_tuple(4813,1,34), make_tuple(337896,1,2380), make_tuple(3835422,1,27011), make_tuple(2779506,1,19574), make_tuple(1098313,1,7735), make_tuple(123290,1,869), make_tuple(3524914,1,24823), make_tuple(3566662,1,25117), make_tuple(2210342,1,15566), make_tuple(1945560,1,13701), make_tuple(2230965,1,15711), make_tuple(2992020,1,21071), make_tuple(48636,1,343), make_tuple(608827,1,4288), make_tuple(1237101,1,8712), make_tuple(684532,1,4821), make_tuple(8910196,1,14842), make_tuple(21066901,1,35092), make_tuple(5232630,1,8716), make_tuple(11873372,1,19778), make_tuple(17280350,1,28784), make_tuple(2771044,1,4616), make_tuple(22722975,1,37850), make_tuple(848490,1,1414), make_tuple(13429880,1,22371), make_tuple(303906,1,506), make_tuple(10108662,1,16838), make_tuple(5170000,1,8612), make_tuple(28201172,1,46976), make_tuple(21061562,1,35083), make_tuple(8976499,1,14953), make_tuple(2355357,1,3923), make_tuple(25800948,1,42978), make_tuple(25888700,1,43124), make_tuple(27942461,1,46545), make_tuple(24482962,1,40783), make_tuple(27511875,1,45827), make_tuple(27405894,1,45652), make_tuple(375945,1,626), make_tuple(21949087,1,36562), make_tuple(23235422,1,38704), make_tuple(26650716,1,44393), make_tuple(6041102,1,10063), make_tuple(5609896,1,9344), make_tuple(16923406,1,28190), make_tuple(16295456,1,27145), make_tuple(18559602,1,30916), make_tuple(22319477,1,37178), make_tuple(22582080,1,37616), make_tuple(25534178,1,42533), make_tuple(23809090,1,39660), make_tuple(25444571,1,42385), make_tuple(26448250,1,44056), make_tuple(28081969,1,46777), make_tuple(24041611,1,40048), make_tuple(26889907,1,44792), make_tuple(27761932,1,46244), make_tuple(5677769,1,9458), make_tuple(24600612,1,40978), make_tuple(21130494,1,35198), make_tuple(438778,1,731), make_tuple(10994534,1,18314), make_tuple(8214193,1,13683), make_tuple(11761083,1,19591), make_tuple(984047,1,1639), make_tuple(15633793,1,26042), make_tuple(16177598,1,26948), make_tuple(15244477,1,25394), make_tuple(19267880,1,32095), make_tuple(7181788,1,11963), make_tuple(19447951,1,32395), make_tuple(22449079,1,37394), make_tuple(15735253,1,26211), make_tuple(23014875,1,38337), make_tuple(15101535,1,25156), make_tuple(11742877,1,19561), make_tuple(9109263,1,15173), make_tuple(3790813,1,6314), make_tuple(3375532,1,5623), make_tuple(3465125,1,5773), make_tuple(6752395,1,11248), make_tuple(10179675,1,16957), make_tuple(18636436,1,31043), make_tuple(31126,1,52), make_tuple(16169288,1,26934), make_tuple(23983748,1,39951), make_tuple(26808186,1,44656), make_tuple(27804981,1,46316), make_tuple(7766733,1,12938), make_tuple(925942,1,1543), make_tuple(20003461,1,33320), make_tuple(18795918,1,31309), make_tuple(18453823,1,30739), make_tuple(12898241,1,21485), make_tuple(1121548,1,1868), make_tuple(4418468,1,7360), make_tuple(2781170,1,4633), make_tuple(940871,1,1567), make_tuple(1173235,1,1954), make_tuple(15169316,1,25268), make_tuple(28234804,1,47032), make_tuple(25440990,1,42379), make_tuple(6056140,1,10088), make_tuple(17829456,1,29699), make_tuple(24764820,1,41252), make_tuple(17407089,1,28996), make_tuple(12803360,1,21328), make_tuple(23360149,1,48566), make_tuple(14089600,1,29293), make_tuple(33240470,1,69107), make_tuple(12208034,1,25381), make_tuple(18247892,1,37938), make_tuple(188638,1,393), make_tuple(9352204,1,19443), make_tuple(20064547,1,41714), make_tuple(32661506,1,67903), make_tuple(12868419,1,26754), make_tuple(33319553,1,69271), make_tuple(29866412,1,62093), make_tuple(6302025,1,13102), make_tuple(28251658,1,58735), make_tuple(21804326,1,45331), make_tuple(10498371,1,21826), make_tuple(28350702,1,58941), make_tuple(29506568,1,61345), make_tuple(174023,1,362), make_tuple(12841511,1,26698), make_tuple(28486932,1,59225), make_tuple(13910846,1,28921), make_tuple(3604168,1,7493), make_tuple(32134811,1,66809), make_tuple(33366839,1,69370), make_tuple(23427887,1,48707), make_tuple(2405042,1,5001), make_tuple(1335346,1,2777)};
 
 //set<long> inspection_set = {99795815,998615983,998751102,999957050};
 
@@ -176,6 +179,9 @@ pair<int,int> getMostWlikePair(const vector<LorentzVector> &vecs);
 
 /* Goes pairwise through jet collection and finds the pair of jets with the minium delta eta. */
 pair<int,int> getClosestJetsInEta();
+
+/* Goes pairwise through jet collection and finds the pair of jets with the minium delta R. */
+pair<int,int> getClosestJetsInDR();
 
 /*Loops through pairs of entries in the lep_pdgId vector and counts how many have opposite value*/
 int getNumOSSFPairs();
