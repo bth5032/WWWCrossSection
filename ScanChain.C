@@ -947,9 +947,13 @@ double getReweight(){
 double scale1fbFix(){
   /*This method stores fixes to the evt_scale1fb in the event of file corruptions. It's basically just a lookup table*/
 
-  if (TString(currentFile->GetTitle()).Contains("sttw_antitop_nofullhaddecay_powheg")){
+  if (TString(currentFile->GetTitle()).Contains("www_2l_ext1_mia")){
     //cout<<"Scale 1fb fixed for "<<TString(currentFile->GetTitle())<<endl;
-    return 1.03;
+    return 0.066805*164800./(91900.+164800.);
+  }
+  else if (TString(currentFile->GetTitle()).Contains("www_2l_mia")){
+    //cout<<"Scale 1fb fixed for "<<TString(currentFile->GetTitle())<<endl;
+    return 0.066805*91900./(91900.+164800.);
   }
   else{
     //cout<<"Scale 1fb is good for "<<TString(currentFile->GetTitle())<<endl;
@@ -1083,7 +1087,7 @@ double getWeight(){
     cout<<"Odd Weight: "<<weight<<" "<<phys.evt()<<endl;
   }*/
 
-  //weight *= scale1fbFix();
+  weight *= scale1fbFix();
   //cout<<"weight: "<<weight<<" evt: "<<phys.evt()<<endl;
 
   return weight;
