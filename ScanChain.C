@@ -145,13 +145,25 @@ double bosonPt(){
 
 double getMTLepMET(short id/*=0*/){
   /* Builds the MT from the lepton at index id and the MET vector (assumes massless particles)*/
-  return sqrt(g_met*phys.lep_p4().at(id).pt()*(1 - cos(g_met_phi - phys.lep_p4().at(id).phi())));
+  return sqrt( 2*g_met*phys.lep_p4().at(id).pt()*( 1 - cos( g_met_phi - phys.lep_p4().at(id).phi() ) ) );
 
   /* Massive Case
     ET1sq = m_1^2 + pt1^2 
     ET2sq = m_2^2 + pt2^2
     MT^2 = m_1^2  + m_2^2 + 2(sqrt(ET1sq*ET2sq) - pt1*pt2*cos(phi1 - phi2)) 
   */
+}
+
+double getMaxMTLepMET(bool verbose){
+  /* Loops through lepton collection and finds the lep that has the max MT when combined with the MET */
+  double max_mt = getMTLepMET(g_lep_inds.at(0));
+  double tmp_mt;
+  for (int i = 1; i<(int) g_lep_inds.size(); i++){
+    tmp_mt = getMTLepMET(g_lep_inds.at(i));
+    if (verbose) cout<<"First lep with "<<WWWUtils::printP4(phys.lep_p4().at(g_lep_inds.at(i)))<<" has MT: "<<tmp_mt<<endl;
+    if (tmp_mt > max_mt) max_mt = tmp_mt;
+  }
+  return max_mt;
 }
 
 double getdRGammaLep(short id/*=0*/){
@@ -801,7 +813,7 @@ bool hasGood2l(){
     if( (dijet_mass < W_JET_WINDOW_LOW) || (dijet_mass > W_JET_WINDOW_HIGH) ) {
       numEvents->Fill(61); 
       if (printFail) cout<<phys.evt()<<" :Failed jet pair near W mass cut with dijet mass: "<< dijet_mass <<endl;
-      //WWWUtils::printP4s(g_jets_p4, "Jets");
+      //WWWUtils::printJetP4s(g_jets_p4);
       return false; // require at at least 2 Jets within the W mass window.
     }
     //Safety cuts against Wpm Wpm VBS
@@ -1256,27 +1268,6 @@ bool passSignalRegionCuts(){
       return false;
     }
   }
-
-  //cout<<__LINE__<<endl;
-
-  //Wierd ATLAS SR cut
-  if (conf->get("sum_HT_pt_pt") != ""){
-    double pt;
-    //cout<<__LINE__<<endl;
-    if (phys.evt_type() == 2 && phys.ngamma() > 0){
-      pt = phys.gamma_pt().at(0);
-    }
-    else{
-      pt = phys.lep_pt().at(g_lep_inds.at(0)) + phys.lep_pt().at(g_lep_inds.at(1));
-    }
-    //cout<<__LINE__<<endl;
-    //if (printStats) { cout<<"sum_HT_pt_pt: "<<fabs(ht + pt )<<" "; }
-    if ( fabs(g_ht + pt ) < stod(conf->get("sum_HT_pt_pt") ) ){
-      numEvents->Fill(43);
-      if (printFail) cout<<phys.evt()<<" :Failed sum HT pt pt cut"<<endl;
-      return false;
-    }
-  }
   
   //cout<<__LINE__<<endl;
 
@@ -1349,9 +1340,10 @@ bool passSignalRegionCuts(){
   //cout<<__LINE__<<endl;
 
   if (conf->get("MT_LepMET_min") != ""){
-    if ( getMTLepMET() < stod( conf->get("MT_LepMET_min") ) ){
+    /* There should be an endpoint for events with a single W decay, but for mutliple Ws (signal) you can probably get larger than the endpoint */
+    if ( getMaxMTLepMET() < stod( conf->get("MT_LepMET_min") ) ){
       numEvents->Fill(63);
-      if (printFail) cout<<phys.evt()<<" :Failed MT from Lepton and MET min cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed MT from Lepton and MET (max possible) min cut with value"<<getMaxMTLepMET(true)<<endl;
       return false;
     }
   }
@@ -2521,12 +2513,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       printFail = false;
 
       //if (inspection_set.count(phys.evt()) != 0){
-      if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
+      /*if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
         cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<endl;
         inspection_copy.erase(make_tuple(phys.evt(), phys.run(), phys.lumi()));
         printStats=true;
         printFail=true;
-      }
+      }*/
       /*else{ //Use if you don't want care about events in your list that are not in the other's
         continue;
       }*/
@@ -2584,10 +2576,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         // ----------------
         // DEBUG MODE
         // ----------------
-        if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
+        /*if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
           cout<<"NEW||evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<endl;
           //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
-        }
+        }*/
         //When Debug mode is off, you can turn this on:
         //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
 //===========================================
@@ -2800,10 +2792,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   // ----------------
   // DEBUG MODE
   // ----------------
-  cout<<"Events that weren't in your babies:"<<endl;
+  /*cout<<"Events that weren't in your babies:"<<endl;
   for (set<tuple<long,long,long>>::iterator it=inspection_copy.begin(); it!=inspection_copy.end(); ++it){
     cout<<"evt: "<<std::get<0>(*it)<<" run: "<<std::get<1>(*it)<<" lumi: "<<std::get<2>(*it)<<endl;
-  }
+  }*/
 
   cout<<"Num events passed: "<<eventCount<<endl;
   files_log<<"Num events passed: "<<eventCount<<endl;

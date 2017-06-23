@@ -22,12 +22,20 @@
 #include "TH2.h"
 #include "TH3.h"
 
+typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
+
 namespace WWWUtils{
-  void printP4s(const std::vector<LorentzVector> & vecs, TString type="Jets"){
-    cout<<"Printing "<<vecs.size()<<" "<<type<<endl;
+  void printJetP4s(const std::vector<LorentzVector> & vecs){
+    cout<<"Printing "<<vecs.size()<<" Jets:"<<endl;
     for (int i = 0; i<(int) vecs.size(); i++){
       cout<<" p4 with pt: "<<vecs.at(i).pt()<<" eta: "<<vecs.at(i).eta()<<" phi: "<<vecs.at(i).phi()<<endl;
     }
+  }
+
+  string printP4(const LorentzVector & a){
+    std::stringstream ret;
+    ret<<"(pt, eta, phi) = ("<<a.pt()<<", "<<a.eta()<<", "<<a.phi()<<")";
+    return ret.str();
   }
 }
 
