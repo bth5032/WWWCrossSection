@@ -131,6 +131,13 @@ const TString flavor_type_str[] = {"EE", "EMu", "MuMu"};
 enum charge_type {SS = 0, OS, SFOS0, SFOS1, SFOS2, NA};
 const TString charge_type_str[] = {"SS", "OS", "0SFOS", "1SFOS", "2SFOS", "NA"};
 
+//Categories for Fake Rate Study
+// The naming is the number of tight objects, followed by whether they are all real or whether there was some number of fakes.
+// If none of the leps were tight, then there are the L_real and L_fake categories for when everything was loose. These are not
+// broken down into how many are real and fake at the moment, just whether there were any reals or fakes.
+enum FR_cat {T_real = 0, T_fake = 1, TT_real = 2, TT_fake = 3, TTT_real = 4, TTT_fake = 5, L_real = 6, L_fake = 7, CATERR = 8}; 
+const TString FR_cats_str[] = {"T_real", "T_fake", "TT_real", "TT_fake", "TTT_real", "TTT_fake", "L_real", "L_fake", "CATERR"};
+
 flavor_type FT;
 charge_type CT;
 
@@ -204,6 +211,9 @@ flavor_type getFlavorType();
 
 /* Returns the charge type, SS or OS for 2 lep events, and SFOS0/1/2 for more than 2leps */
 charge_type getChargeType();
+
+/* Returns the category for the event in the fake rate study. Loops through leps, counts reals and how many pass the tight ID, returns appropriate category.*/
+FR_cat getFRCategory();
 //=============================
 // Triggers
 //=============================

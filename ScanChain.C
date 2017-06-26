@@ -160,7 +160,7 @@ double getMaxMTLepMET(bool verbose){
   double tmp_mt;
   for (int i = 1; i<(int) g_lep_inds.size(); i++){
     tmp_mt = getMTLepMET(g_lep_inds.at(i));
-    if (verbose) cout<<"First lep with "<<WWWUtils::printP4(phys.lep_p4().at(g_lep_inds.at(i)))<<" has MT: "<<tmp_mt<<endl;
+    if (verbose) cout<<"First lep with "<<WWWUtils::printLep(g_lep_inds.at(i))<<" has MT: "<<tmp_mt<<endl;
     if (tmp_mt > max_mt) max_mt = tmp_mt;
   }
   return max_mt;
@@ -392,6 +392,45 @@ charge_type getChargeType(){
   //cout<<__LINE__<<endl;
 
   return NA; //In case we have more than 3 leps which can happen without lep veto. 
+}
+
+FR_cat getFRCategory(){
+  /* Returns the category for the event in the fake rate study. Loops through leps, counts reals and how many pass the tight ID, returns appropriate category.*/
+  short num_real = 0;
+  short num_tight = 0;
+
+  //motherId Codes:
+  //  1 == real, charge flip 
+  //  2 == real
+  // -1 == From B
+  // -2 == From C
+  // -3 == From Light Flavor
+
+  for (int i = 0; i<g_nlep; i++){
+    //cout<<"Checking lep: "<<WWWUtils::printLep(g_lep_inds.at(i))<<" with motherIdSS: "<<phys.lep_motherIdSS().at(g_lep_inds.at(i))<<endl;
+    if (phys.lep_pass_VVV_cutbased_tight().at(g_lep_inds.at(i)))                                         num_tight++ ;
+    if (phys.lep_motherIdSS().at(g_lep_inds.at(i)) == 1 || phys.lep_motherIdSS().at(g_lep_inds.at(i)) == 2) num_real++  ;
+  }
+
+  if (num_tight == 0){
+    if (num_real == g_nlep) return L_real;
+    else                    return L_fake;
+  }
+  else if (num_tight == 1){
+    if (num_real == g_nlep) return T_real;
+    else                    return T_fake;
+  }
+  else if (num_tight == 2){
+    if (num_real == g_nlep) return TT_real;
+    else                    return TT_fake;
+  }
+  else if (num_tight == 3){
+    if (num_real == g_nlep) return TTT_real;
+    else                    return TTT_fake;
+  }
+  else{
+    return CATERR;
+  }
 }
 
 //=============================
@@ -2248,6 +2287,14 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   lep3_sip3d->Sumw2();
 
   //-------------------------------------------
+  //Truth level tagging fake rate distributions
+
+  TH1D *fr_counts = new TH1D("fr_counts", "Fake Rate Counter", CATERR, T_real /*=0*/, CATERR /*=8*/);
+  fr_counts->SetDirectory(rootdir);
+  fr_counts->Sumw2();
+  for (int i = T_real; i<CATERR; i++) fr_counts->GetXaxis()->SetBinLabel(fr_counts->FindBin(i), FR_cats_str[i]); //Label bins with ENUM values
+
+  //-------------------------------------------
   //Truth level tagging W leps ip distributions
 
   TH1D *Wleps_ip3d = new TH1D("Wleps_ip3d", "Ip3d for leptons tagged as from a W"+g_sample_name, 6000,0,6);
@@ -2752,6 +2799,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           otherleps_ptRatio->Fill(fabs(phys.lep_ptRatio().at(g_lep_inds.at(c))), weight);
         }
       }
+      if (conf->get("fakerate_study") == "true"){ 
+        //FR_cat cat = getFRCategory();
+        //cout<<"Filling FR hist with category: "<<FR_cats_str[cat]<<endl;
+        //fr_counts->Fill(cat, weight);
+        fr_counts->Fill(getFRCategory(), weight);
+      }
 
       //cout<<__LINE__<<endl;
 //===========================================
@@ -2939,6 +2992,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   otherleps_reliso04->Write();
   //cout<<__LINE__<<endl;
   otherleps_ptRatio->Write();
+
+  if (conf->get("fakerate_study") == "true"){ 
+    fr_counts->Write();
+  }
 
   //close output file
   output->Write();
