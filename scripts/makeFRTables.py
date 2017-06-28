@@ -155,6 +155,7 @@ def main():
 
   if (args.help):
     parser.print_help()
+    exit()
 
   print("Going to use %s to make table..." %samples)
 
