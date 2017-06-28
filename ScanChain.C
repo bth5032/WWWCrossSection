@@ -1830,10 +1830,12 @@ bool passFileSelections(){
 void setLepIndexes(){
   /* Loops through lepton objects and adds indexed to g_lep_inds if they pass the tight selection (or fakable object when we are doing fake rate study)*/
   bool FRS = (conf->get("fakerate_study") == "true") ? true : false;
+  bool LooseIso = (conf->get("FRS_loose_iso") == "true") ? true : false;
 
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
     if(phys.lep_pass_VVV_cutbased_tight().at(i))                g_lep_inds.push_back(i);
     else if (FRS && phys.lep_pass_VVV_cutbased_fo().at(i))      g_lep_inds.push_back(i); 
+    else if (FRS && LooseIso && phys.lep_pass_VVV_cutbased_fo_noiso().at(i))      g_lep_inds.push_back(i); 
   }
 
   g_nlep = ((short) g_lep_inds.size());
@@ -2008,6 +2010,19 @@ void setupGlobals(){
   }
 
   //cout<<__LINE__<<endl;
+}
+
+void setupConstants(){
+  /* Sets up constant valued variables */
+  Z_VETO_WINDOW_LOW = (conf->get("z_veto_window_low") == "") ? 80 : stod(conf->get("z_veto_window_low"));
+  Z_VETO_WINDOW_HIGH = (conf->get("z_veto_window_high") == "") ? 100 : stod(conf->get("z_veto_window_high"));
+  W_JET_WINDOW_LOW = (conf->get("w_jet_window_low") == "") ? 60 : stod(conf->get("w_jet_window_low"));
+  W_JET_WINDOW_HIGH = (conf->get("w_jet_window_high") == "") ? 100 : stod(conf->get("w_jet_window_high"));
+  MAX_DR_JET_LEP_OVERLAP = (conf->get("max_dr_jet_lep") == "") ? 0.4 : stod(conf->get("max_dr_jet_lep"));
+  JET_PT_MIN = (conf->get("jet_pt_min") == "") ? 20 : stod(conf->get("jet_pt_min"));
+  JET_ETA_MAX = (conf->get("jet_eta_max") == "") ? 2.5 : stod(conf->get("jet_eta_max"));
+  BJET_PT_MIN = (conf->get("bjet_pt_min") == "") ? 20 : stod(conf->get("bjet_pt_min"));
+  BJET_ETA_MAX = (conf->get("bjet_eta_max") == "") ? 2.4 : stod(conf->get("bjet_eta_max"));
 }
 
 int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/, int nEvents/* = -1*/) {
@@ -2492,15 +2507,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     set_goodrun_file(json_file);
   }
 
-  Z_VETO_WINDOW_LOW = (conf->get("z_veto_window_low") == "") ? 80 : stod(conf->get("z_veto_window_low"));
-  Z_VETO_WINDOW_HIGH = (conf->get("z_veto_window_high") == "") ? 100 : stod(conf->get("z_veto_window_high"));
-  W_JET_WINDOW_LOW = (conf->get("w_jet_window_low") == "") ? 60 : stod(conf->get("w_jet_window_low"));
-  W_JET_WINDOW_HIGH = (conf->get("w_jet_window_high") == "") ? 100 : stod(conf->get("w_jet_window_high"));
-  MAX_DR_JET_LEP_OVERLAP = (conf->get("max_dr_jet_lep") == "") ? 0.4 : stod(conf->get("max_dr_jet_lep"));
-  JET_PT_MIN = (conf->get("jet_pt_min") == "") ? 20 : stod(conf->get("jet_pt_min"));
-  JET_ETA_MAX = (conf->get("jet_eta_max") == "") ? 2.5 : stod(conf->get("jet_eta_max"));
-  BJET_PT_MIN = (conf->get("bjet_pt_min") == "") ? 20 : stod(conf->get("bjet_pt_min"));
-  BJET_ETA_MAX = (conf->get("bjet_eta_max") == "") ? 2.4 : stod(conf->get("bjet_eta_max"));
+  setupConstants();
 
   //cout<<__LINE__<<endl;
   // Loop over events to Analyze

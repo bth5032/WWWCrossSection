@@ -327,5 +327,8 @@ void writeCleanedBJets(const vector<LorentzVector> &vecs, const vector<float> &c
 /*Sets up global variables for the event which are the quantities that might be fluctuated in the process of computing uncertainty limits*/
 void setupGlobals();
 
+/* Sets up constant valued variables */
+void setupConstants();
+
 /*Obvi the event looper*/
 int ScanChain( TChain* chain, ConfigParser *configuration, bool fast = true, int nEvents = -1);
