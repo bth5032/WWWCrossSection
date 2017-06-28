@@ -39,7 +39,8 @@ fake_loose_bins = {
   "3lep_2SFOS": [FR_enum["TT_fake"],FR_enum["T_fake"],FR_enum["L_fake"]]
 }
 
-def PrintTable(yields):
+def PrintTable(yields, study_dir):
+  print("Using Config: %s" % study_dir)
   print("\\begin{table}[ht!]")
   print("\\begin{center}")
   print("\\begin{tabular}{l|c|c|c|c}")
@@ -73,9 +74,9 @@ def getYieldsFromSample(hist_loc, SR):
 
   return (rt, rl, ft, fl)
 
-def getAllYields(samples):
+def getAllYields(samples, study_dir):
   """Constructs and returns the yields dictionary used in PrintTable. Goes through each SR and adds the yields for each sample in that SR and organizes them in the dict."""
-  base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRStudy/"
+  base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRStudy/%s/" % study_dir
   SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
 
   yields = {}
@@ -96,6 +97,8 @@ def getAllYields(samples):
 def main():
   parser = argparse.ArgumentParser(add_help=False)
 
+  parser.add_argument("-s", "--study_dir", help="The config directory name in FRStudy, e.g. LooseIso", type=str, default="")
+  
   parser.add_argument("--all", help="Use all histograms", action="store_true")
   parser.add_argument("--frbg", help="Use standard FR BG samples", action="store_true")
   parser.add_argument("--signal", help="Use signal samples", action="store_true")
@@ -152,8 +155,8 @@ def main():
 
   print("Going to use %s to make table..." %samples)
 
-  yields = getAllYields(samples)
-  PrintTable(yields)
+  yields = getAllYields(samples, args.study_dir)
+  PrintTable(yields, args.study_dir)
 
 if __name__ == "__main__":
   main()
