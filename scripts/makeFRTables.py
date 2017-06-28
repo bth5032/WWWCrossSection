@@ -153,6 +153,9 @@ def main():
   if (args.other or args.all or args.bg or args.frbg):
     samples.append("Other")
 
+  if (args.help):
+    parser.print_help()
+
   print("Going to use %s to make table..." %samples)
 
   yields = getAllYields(samples, args.study_dir)
