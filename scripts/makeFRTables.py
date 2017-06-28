@@ -97,7 +97,7 @@ def getAllYields(samples, study_dir):
 def main():
   parser = argparse.ArgumentParser(add_help=False)
 
-  parser.add_argument("-s", "--study_dir", help="The config directory name in FRStudy, e.g. LooseIso", type=str, default="")
+  parser.add_argument("-s", "--study_dir", help="The config directory name in FRStudy, e.g. LooseIso", type=str, default="Baseline")
   
   parser.add_argument("--all", help="Use all histograms", action="store_true")
   parser.add_argument("--frbg", help="Use standard FR BG samples", action="store_true")
@@ -154,6 +154,7 @@ def main():
     samples.append("Other")
 
   if (args.help):
+    print("going to print help!")
     parser.print_help()
     exit()
 
