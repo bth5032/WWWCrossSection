@@ -1,5 +1,32 @@
+import argparse, os, sys, root_utils, math
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-s", "--study_dir", help="The config directory name in FRStudy, e.g. LooseIso", type=str, default="Baseline")
+
+parser.add_argument("--all", help="Use all histograms", action="store_true")
+parser.add_argument("--frbg", help="Use standard FR BG samples", action="store_true")
+parser.add_argument("--signal", help="Use signal samples", action="store_true")
+parser.add_argument("--bg", help="Use all BG samples", action="store_true")
+
+parser.add_argument("--ttbar_dilep", help="Use TTBar to dilepton sample", action="store_true")
+parser.add_argument("--ttbar_1lep", help="Use TTBar to single lepton samples", action="store_true")
+parser.add_argument("--dy", help="Use DY sample", action="store_true")
+parser.add_argument("--wz", help="Use WZ sample", action="store_true")
+parser.add_argument("--ww", help="Use WW sample", action="store_true")
+parser.add_argument("--zz", help="Use ZZ sample", action="store_true")
+parser.add_argument("--vvv", help="Use VVV sample", action="store_true")
+parser.add_argument("--wjets", help="Use W+Jets sample", action="store_true")
+parser.add_argument("--ttv", help="Use TTV sample", action="store_true")
+parser.add_argument("--singletop", help="Use TTV sample", action="store_true")
+parser.add_argument("--other", help="Use Other (VH) sample", action="store_true")
+parser.add_argument("--www", help="Use WWW sample", action="store_true")
+
+#parser.add_argument("-h", "--help", help="Print help message and quit", action="store_true")
+
+args=parser.parse_args()
+
 import ROOT as r
-import argparse, os, sys, root_utils
 
 FR_enum = {"T_real": 0, "T_fake": 1, "TT_real": 2, "TT_fake": 3, "TTT_real": 4, "TTT_fake": 5, "L_real": 6, "L_fake": 7, "CATERR": 8};
 
@@ -46,12 +73,12 @@ def PrintTable(yields, study_dir):
   print("\\begin{tabular}{l|c|c|c|c}")
   print("Signal Region & Real/Tight & Real/Loose & Fake/Tight & Fake/Loose \\\\ \\hline")
   
-  print("SSee          & %0.2f      & %0.2f      & %0.2f      & %0.2f     \\\\" % (yields["2lepSSEE"]["rt"],yields["2lepSSEE"]["rl"],yields["2lepSSEE"]["ft"],yields["2lepSSEE"]["fl"]) )
-  print("SSe$\mu$      & %0.2f      & %0.2f      & %0.2f      & %0.2f     \\\\" % (yields["2lepSSEMu"]["rt"],yields["2lepSSEMu"]["rl"],yields["2lepSSEMu"]["ft"],yields["2lepSSEMu"]["fl"]) )
-  print("SS$\mu\mu$    & %0.2f      & %0.2f      & %0.2f      & %0.2f     \\\\" % (yields["2lepSSMuMu"]["rt"],yields["2lepSSMuMu"]["rl"],yields["2lepSSMuMu"]["ft"],yields["2lepSSMuMu"]["fl"]) )
-  print("3lep 0SFOS    & %0.2f      & %0.2f      & %0.2f      & %0.2f     \\\\" % (yields["3lep_0SFOS"]["rt"],yields["3lep_0SFOS"]["rl"],yields["3lep_0SFOS"]["ft"],yields["3lep_0SFOS"]["fl"]) )
-  print("3lep 1SFOS    & %0.2f      & %0.2f      & %0.2f      & %0.2f     \\\\" % (yields["3lep_1SFOS"]["rt"],yields["3lep_1SFOS"]["rl"],yields["3lep_1SFOS"]["ft"],yields["3lep_1SFOS"]["fl"]) )
-  print("3lep 2SFOS    & %0.2f      & %0.2f      & %0.2f      & %0.2f     \\\\" % (yields["3lep_2SFOS"]["rt"],yields["3lep_2SFOS"]["rl"],yields["3lep_2SFOS"]["ft"],yields["3lep_2SFOS"]["fl"]) )  
+  print("SSee          & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["2lepSSEE"]["rt"],yields["2lepSSEE"]["rt_unc"],yields["2lepSSEE"]["rl"],yields["2lepSSEE"]["rl_unc"],yields["2lepSSEE"]["ft"],yields["2lepSSEE"]["ft_unc"],yields["2lepSSEE"]["fl"],yields["2lepSSEE"]["fl_unc"]) )
+  print("SSe$\mu$      & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["2lepSSEMu"]["rt"],yields["2lepSSEMu"]["rt_unc"],yields["2lepSSEMu"]["rl"],yields["2lepSSEMu"]["rl_unc"],yields["2lepSSEMu"]["ft"],yields["2lepSSEMu"]["ft_unc"],yields["2lepSSEMu"]["fl"],yields["2lepSSEMu"]["fl_unc"]) )
+  print("SS$\mu\mu$    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["2lepSSMuMu"]["rt"],yields["2lepSSMuMu"]["rt_unc"],yields["2lepSSMuMu"]["rl"],yields["2lepSSMuMu"]["rl_unc"],yields["2lepSSMuMu"]["ft"],yields["2lepSSMuMu"]["ft_unc"],yields["2lepSSMuMu"]["fl"],yields["2lepSSMuMu"]["fl_unc"]) )
+  print("3lep 0SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_0SFOS"]["rt"],yields["3lep_0SFOS"]["rt_unc"],yields["3lep_0SFOS"]["rl"],yields["3lep_0SFOS"]["rl_unc"],yields["3lep_0SFOS"]["ft"],yields["3lep_0SFOS"]["ft_unc"],yields["3lep_0SFOS"]["fl"],yields["3lep_0SFOS"]["fl_unc"]) )
+  print("3lep 1SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_1SFOS"]["rt"],yields["3lep_1SFOS"]["rt_unc"],yields["3lep_1SFOS"]["rl"],yields["3lep_1SFOS"]["rl_unc"],yields["3lep_1SFOS"]["ft"],yields["3lep_1SFOS"]["ft_unc"],yields["3lep_1SFOS"]["fl"],yields["3lep_1SFOS"]["fl_unc"]) )
+  print("3lep 2SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_2SFOS"]["rt"],yields["3lep_2SFOS"]["rt_unc"],yields["3lep_2SFOS"]["rl"],yields["3lep_2SFOS"]["rl_unc"],yields["3lep_2SFOS"]["ft"],yields["3lep_2SFOS"]["ft_unc"],yields["3lep_2SFOS"]["fl"],yields["3lep_2SFOS"]["fl_unc"]) ) 
 
   print("\\end{tabular}")
   print("\\end{center}")
@@ -61,18 +88,27 @@ def getYieldsFromSample(hist_loc, SR):
   """Takes in Signal region and the location to a histogram, looks up the proper bins for what is called real tight, real loose, fake tight, fake loose, and returns the counts for the sample in a tuple (rt, rl, ft, fl)"""
   f = r.TFile(hist_loc)
   h = f.Get("fr_counts")
-  rt = rl = ft = fl = 0
+  rt = rl = ft = fl = rt_unc = rl_unc = ft_unc = fl_unc = 0 
 
   for b in real_tight_bins[SR]:
     rt+=h.GetBinContent(h.FindBin(b))
+    rt_unc+=h.GetBinError(h.FindBin(b))*h.GetBinError(h.FindBin(b))
   for b in real_loose_bins[SR]:
     rl+=h.GetBinContent(h.FindBin(b))
+    rl_unc+=h.GetBinError(h.FindBin(b))*h.GetBinError(h.FindBin(b))
   for b in fake_tight_bins[SR]:
     ft+=h.GetBinContent(h.FindBin(b))
+    ft_unc+=h.GetBinError(h.FindBin(b))*h.GetBinError(h.FindBin(b))
   for b in fake_loose_bins[SR]:
     fl+=h.GetBinContent(h.FindBin(b))    
+    fl_unc+=h.GetBinError(h.FindBin(b))*h.GetBinError(h.FindBin(b))
 
-  return (rt, rl, ft, fl)
+  rt_unc = math.sqrt(rt_unc)
+  rl_unc = math.sqrt(rl_unc)
+  ft_unc = math.sqrt(ft_unc)
+  fl_unc = math.sqrt(fl_unc)
+
+  return (rt, rl, ft, fl, rt_unc, rl_unc, ft_unc, fl_unc)
 
 def getAllYields(samples, study_dir):
   """Constructs and returns the yields dictionary used in PrintTable. Goes through each SR and adds the yields for each sample in that SR and organizes them in the dict."""
@@ -82,45 +118,28 @@ def getAllYields(samples, study_dir):
   yields = {}
 
   for sr in SRs:
-    rt = rl = ft = fl = 0
+    rt = rl = ft = fl = rt_unc = rl_unc = ft_unc = fl_unc = 0 
     for s in samples:
-      rt_, rl_, ft_, fl_ = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr)
+      rt_, rl_, ft_, fl_, rt_unc_, rl_unc_, ft_unc_, fl_unc_ = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr)
       rt += rt_
       rl += rl_
       ft += ft_
       fl += fl_
+      rt_unc+=rt_unc_*rt_unc_
+      rl_unc+=rl_unc_*rl_unc_
+      ft_unc+=ft_unc_*ft_unc_
+      fl_unc+=fl_unc_*fl_unc_
 
-    yields[sr] = {"rt": rt, "rl": rl, "ft": ft, "fl": fl}
+    rt_unc = math.sqrt(rt_unc)
+    rl_unc = math.sqrt(rl_unc)
+    ft_unc = math.sqrt(ft_unc)
+    fl_unc = math.sqrt(fl_unc)
+
+    yields[sr] = {"rt": rt, "rl": rl, "ft": ft, "fl": fl, "rt_unc": rt_unc, "rl_unc": rl_unc, "ft_unc": ft_unc, "fl_unc": fl_unc}
 
   return yields
 
 def main():
-  parser = argparse.ArgumentParser(add_help=False)
-
-  parser.add_argument("-s", "--study_dir", help="The config directory name in FRStudy, e.g. LooseIso", type=str, default="Baseline")
-  
-  parser.add_argument("--all", help="Use all histograms", action="store_true")
-  parser.add_argument("--frbg", help="Use standard FR BG samples", action="store_true")
-  parser.add_argument("--signal", help="Use signal samples", action="store_true")
-  parser.add_argument("--bg", help="Use all BG samples", action="store_true")
-  
-  parser.add_argument("--ttbar_dilep", help="Use TTBar to dilepton sample", action="store_true")
-  parser.add_argument("--ttbar_1lep", help="Use TTBar to single lepton samples", action="store_true")
-  parser.add_argument("--dy", help="Use DY sample", action="store_true")
-  parser.add_argument("--wz", help="Use WZ sample", action="store_true")
-  parser.add_argument("--ww", help="Use WW sample", action="store_true")
-  parser.add_argument("--zz", help="Use ZZ sample", action="store_true")
-  parser.add_argument("--vvv", help="Use VVV sample", action="store_true")
-  parser.add_argument("--wjets", help="Use W+Jets sample", action="store_true")
-  parser.add_argument("--ttv", help="Use TTV sample", action="store_true")
-  parser.add_argument("--singletop", help="Use TTV sample", action="store_true")
-  parser.add_argument("--other", help="Use Other (VH) sample", action="store_true")
-  parser.add_argument("--www", help="Use WWW sample", action="store_true")
-  
-  parser.add_argument("--help", help="Print help message and quit", action="store_true")
-
-  args=parser.parse_args()
-
   samples = []
 
   #Signal
@@ -153,10 +172,10 @@ def main():
   if (args.other or args.all or args.bg or args.frbg):
     samples.append("Other")
 
-  if (args.help):
-    print("going to print help!")
-    parser.print_help()
-    exit()
+  #if (args.help):
+  #  print("going to print help!")
+  #  parser.print_help()
+  #  exit()
 
   print("Going to use %s to make table..." %samples)
 
