@@ -26,7 +26,7 @@ DEFAULT::ip3d_max=0.015
 DEFAULT::jet1_pt_min=30
 DEFAULT::Njets_max=1
 DEFAULT::jet_pt_min=30
-DEFAULT::jet_eta_max=4.5
+DEFAULT::jet_eta_max=5
 #DEFAULT::Mll_SF_min=20
 DEFAULT::pt_3l_min=60
 
