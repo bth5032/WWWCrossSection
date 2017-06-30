@@ -433,6 +433,47 @@ FR_cat getFRCategory(){
   }
 }
 
+bool passGenLevelWHWWW(){
+  /* Checks whether the higgs decayed to WW in VH MC */
+  int nW = 0;
+  int nZ = 0;
+  int nWfromH = 0;
+  int nZfromH = 0;
+  if (TString(currentFile->GetTitle()).Contains("vh_nonbb_amcnlo"))
+  {
+    for (unsigned int igen = 0; igen < phys.genPart_pdgId().size(); ++igen)
+    {
+      if (abs(phys.genPart_pdgId().at(igen)) == 24 && phys.genPart_status().at(igen) == 22 && phys.genPart_motherId().at(igen) != 25) nW++;
+      if (abs(phys.genPart_pdgId().at(igen)) == 23 && phys.genPart_status().at(igen) == 22 && phys.genPart_motherId().at(igen) != 25) nZ++;
+      if (abs(phys.genPart_pdgId().at(igen)) == 24 && phys.genPart_status().at(igen) == 22 && phys.genPart_motherId().at(igen) == 25) nWfromH++;
+      if (abs(phys.genPart_pdgId().at(igen)) == 23 && phys.genPart_status().at(igen) == 22 && phys.genPart_motherId().at(igen) == 25) nZfromH++;
+    }
+
+    // WH
+    if (nW == 1)
+    {
+      if (nWfromH == 2)
+      {
+        //do nothing
+      }
+      else
+      {
+        return false;
+      }
+    }
+    // ZH
+    else if (nZ == 1)
+    {
+      return false;
+    }
+    // unknown
+    else
+    {
+      return false;
+    }
+  }
+  return true;
+}
 //=============================
 // Triggers
 //=============================
@@ -1820,6 +1861,23 @@ bool passFileSelections(){
     }   
   }
 
+  if (conf->get("filter_VH_for_WH") == "true"){
+    if ( ! passGenLevelWHWWW())
+    {
+        numEvents->Fill(43);
+        num_events_veto_WH++;
+        return false;
+    }
+  }
+  else if (conf->get("filter_VH_for_WH") == "invert"){
+    if ( passGenLevelWHWWW())
+    {
+        numEvents->Fill(43);
+        num_events_veto_WH++;
+        return false;
+    }
+  }
+
   return true;
 }
 
@@ -2639,7 +2697,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
         }*/
         //When Debug mode is off, you can turn this on:
-        //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
+        cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
 //===========================================
 // Analysis Code
 //===========================================

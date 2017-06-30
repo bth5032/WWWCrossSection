@@ -1,8 +1,10 @@
 import argparse, os, sys, root_utils, math
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(add_help=False)
 
 parser.add_argument("-s", "--study_dir", help="The config directory name in FRStudy, e.g. LooseIso", type=str, default="Baseline")
+parser.add_argument("--sample_table", help="Make table in format broken up by samples", action="store_true")
+parser.add_argument("--txt", help="Print table in txt format", action="store_true")
 
 parser.add_argument("--all", help="Use all histograms", action="store_true")
 parser.add_argument("--frbg", help="Use standard FR BG samples", action="store_true")
@@ -22,9 +24,13 @@ parser.add_argument("--singletop", help="Use TTV sample", action="store_true")
 parser.add_argument("--other", help="Use Other (VH) sample", action="store_true")
 parser.add_argument("--www", help="Use WWW sample", action="store_true")
 
-#parser.add_argument("-h", "--help", help="Print help message and quit", action="store_true")
+parser.add_argument("-h", "--help", help="Print help message and quit", action="store_true")
 
 args=parser.parse_args()
+
+if (args.help):
+  parser.print_help()
+  exit(0)
 
 import ROOT as r
 
@@ -66,7 +72,7 @@ fake_loose_bins = {
   "3lep_2SFOS": [FR_enum["TT_fake"],FR_enum["T_fake"],FR_enum["L_fake"]]
 }
 
-def PrintTable(yields, study_dir):
+def PrintSRTable(yields, study_dir, latex):
   print("Using Config: %s" % study_dir)
   print("\\begin{table}[ht!]")
   print("\\begin{center}")
@@ -83,6 +89,36 @@ def PrintTable(yields, study_dir):
   print("\\end{tabular}")
   print("\\end{center}")
   print("\\end{table}")
+
+def PrintSampleTable(yields, study_dir, latex):
+  print("Using Config: %s" % study_dir)
+  SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
+  for sr in SRs:
+    if (latex):
+      print("")
+      print("\\begin{table}[ht!]")
+      print("\\begin{center}")
+      print("")
+      print("\\textbf{%s}" % sr.replace('_', ' '))
+      print("")
+      print("\\begin{tabular}{l|c|c|c|c}")
+      print("Sample Name & Real/Tight & Real/Loose & Fake/Tight & Fake/Loose \\\\ \\hline")
+   
+      for s in yields[sr]: #for each sample
+        print("%s          & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (s, yields[sr][s]["rt"],yields[sr][s]["rt_unc"],yields[sr][s]["rl"],yields[sr][s]["rl_unc"],yields[sr][s]["ft"],yields[sr][s]["ft_unc"],yields[sr][s]["fl"],yields[sr][s]["fl_unc"]) )
+   
+      print("\\end{tabular}")
+      print("\\end{center}")
+      print("\\end{table}")
+      print("")
+    else:
+      print("+---------------------------------------------+")
+      print("SR: %s" % sr.replace('_', ' '))
+      print("+---------------------------------------------+")
+      print("Sample  Real/Tight  Real/Loose  Fake/Tight  Fake/Loose ")
+      for s in yields[sr]: #for each sample
+        print("%s %0.2f+/-%0.2f %0.2f+/-%0.2f %0.2f+/-%0.2f %0.2f+/-%0.2f" % (s, yields[sr][s]["rt"],yields[sr][s]["rt_unc"],yields[sr][s]["rl"],yields[sr][s]["rl_unc"],yields[sr][s]["ft"],yields[sr][s]["ft_unc"],yields[sr][s]["fl"],yields[sr][s]["fl_unc"]) )
+      print("")
 
 def getYieldsFromSample(hist_loc, SR):
   """Takes in Signal region and the location to a histogram, looks up the proper bins for what is called real tight, real loose, fake tight, fake loose, and returns the counts for the sample in a tuple (rt, rl, ft, fl)"""
@@ -110,7 +146,7 @@ def getYieldsFromSample(hist_loc, SR):
 
   return (rt, rl, ft, fl, rt_unc, rl_unc, ft_unc, fl_unc)
 
-def getAllYields(samples, study_dir):
+def getCombinedYields(samples, study_dir):
   """Constructs and returns the yields dictionary used in PrintTable. Goes through each SR and adds the yields for each sample in that SR and organizes them in the dict."""
   base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRStudy/%s/" % study_dir
   SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
@@ -139,8 +175,24 @@ def getAllYields(samples, study_dir):
 
   return yields
 
+def getSampleYields(samples, study_dir):
+  """Constructs and returns the yields dictionary used in PrintSampleTable. Goes through each SR and adds the yields to the dict for each sample (they are kept seperate as opposed to getCombinedYields) in that SR and organizes them in the dict."""
+  base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRStudy/%s/" % study_dir
+  SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
+
+  yields = {}
+
+  for sr in SRs:
+    yields[sr] = {}
+    for s in samples:
+      rt, rl, ft, fl, rt_unc, rl_unc, ft_unc, fl_unc = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr)
+      yields[sr][s] = {"rt": rt, "rl": rl, "ft": ft, "fl": fl, "rt_unc": rt_unc, "rl_unc": rl_unc, "ft_unc": ft_unc, "fl_unc": fl_unc}
+
+  return yields
+
 def main():
   samples = []
+  latex=True
 
   #Signal
   if (args.www or args.all or args.signal):
@@ -172,15 +224,18 @@ def main():
   if (args.other or args.all or args.bg or args.frbg):
     samples.append("Other")
 
-  #if (args.help):
-  #  print("going to print help!")
-  #  parser.print_help()
-  #  exit()
+  if (args.txt):
+    latex=False
+
 
   print("Going to use %s to make table..." %samples)
-
-  yields = getAllYields(samples, args.study_dir)
-  PrintTable(yields, args.study_dir)
+  
+  if (not args.sample_table):
+    yields = getCombinedYields(samples, args.study_dir)
+    PrintSRTable(yields, args.study_dir, latex)
+  else:
+    yields = getSampleYields(samples, args.study_dir)
+    PrintSampleTable(yields, args.study_dir, latex)
 
 if __name__ == "__main__":
   main()

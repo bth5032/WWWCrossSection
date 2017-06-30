@@ -55,6 +55,7 @@ ConfigParser *conf;
 int nDuplicates=0;
 int num_events_veto_ttbar=0;
 int num_events_veto_ttgamma=0;
+int num_events_veto_WH=0;
 bool MCTriggerEmulation = true;
 
 vector<pair <TH1D*, TString> > g_reweight_pairs;
@@ -214,6 +215,9 @@ charge_type getChargeType();
 
 /* Returns the category for the event in the fake rate study. Loops through leps, counts reals and how many pass the tight ID, returns appropriate category.*/
 FR_cat getFRCategory();
+
+/* Checks whether the higgs decayed to WW in VH MC */
+bool passGenLevelWHWWW();
 //=============================
 // Triggers
 //=============================
