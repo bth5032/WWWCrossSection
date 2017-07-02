@@ -1889,12 +1889,15 @@ void setLepIndexes(){
   /* Loops through lepton objects and adds indexed to g_lep_inds if they pass the tight selection (or fakable object when we are doing fake rate study)*/
   bool FRS = (conf->get("fakerate_study") == "true") ? true : false;
   bool LooseIso = (conf->get("FRS_loose_iso") == "true") ? true : false;
+  bool FRS_use_veto = (conf->get("FRS_use_veto") == "true") ? true : false;
 
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
-    if(phys.lep_pass_VVV_cutbased_tight().at(i))                g_lep_inds.push_back(i);
-    else if (FRS && phys.lep_pass_VVV_cutbased_fo().at(i))      g_lep_inds.push_back(i); 
-    else if (FRS && LooseIso && phys.lep_pass_VVV_cutbased_fo_noiso().at(i))      g_lep_inds.push_back(i); 
-  }
+    if(phys.lep_pass_VVV_cutbased_tight().at(i))                                                    g_lep_inds.push_back(i);
+    else if (FRS && phys.lep_pass_VVV_cutbased_fo().at(i))                                          g_lep_inds.push_back(i); 
+    else if (FRS && LooseIso && phys.lep_pass_VVV_cutbased_fo_noiso().at(i))                        g_lep_inds.push_back(i); 
+    else if (FRS && FRS_use_veto && LooseIso && phys.lep_pass_VVV_cutbased_veto_noiso().at(i))      g_lep_inds.push_back(i); 
+    else if (FRS && FRS_use_veto && phys.lep_pass_VVV_cutbased_veto().at(i))                        g_lep_inds.push_back(i); 
+  } 
 
   g_nlep = ((short) g_lep_inds.size());
   /*cout<<"Found "<<g_nlep<<"("<<g_lep_inds.size()<<") leptons."<<endl;
