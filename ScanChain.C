@@ -2089,16 +2089,16 @@ void setupConstants(){
 
   if (FRS){
     if (FRS_use_veto && LooseIso){
-      g_looseIDs = phys.lep_pass_VVV_cutbased_veto_noiso();
+      g_looseIDs = phys.lep_pass_VVV_cutbased_veto_noiso;
     }
     else if (FRS_use_veto){
-      g_looseIDs = phys.lep_pass_VVV_cutbased_veto();
+      g_looseIDs = phys.lep_pass_VVV_cutbased_veto;
     }
     else if (LooseIso){
-      g_looseIDs = phys.lep_pass_VVV_cutbased_fo_noiso();     
+      g_looseIDs = phys.lep_pass_VVV_cutbased_fo_noiso;     
     }
     else{
-      g_looseIDs = phys.lep_pass_VVV_cutbased_fo();
+      g_looseIDs = phys.lep_pass_VVV_cutbased_fo;
     }
   }
 }
