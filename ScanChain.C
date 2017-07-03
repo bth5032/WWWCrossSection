@@ -1910,7 +1910,11 @@ void setLepIndexes(){
 
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
     if(phys.lep_pass_VVV_cutbased_tight().at(i))    g_lep_inds.push_back(i);
-    else if (FRS && loose_IDs.at(i))                g_lep_inds.push_back(i);
+    //else if (FRS && loose_IDs.at(i))                g_lep_inds.push_back(i);
+    else if (FRS && loose_IDs.at(i)){
+      cout<<"Found One, evt: "<<phys.evt()<<endl;
+      g_lep_inds.push_back(i);
+    }
   } 
 
   g_nlep = ((short) g_lep_inds.size());
