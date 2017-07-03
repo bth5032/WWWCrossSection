@@ -1971,6 +1971,7 @@ void setupGlobals(){
   g_jets_medb_p4.clear();
   g_jets_csv.clear();
   g_lep_inds.clear();
+  g_looseIDs.clear();
 
   //cout<<__LINE__<<endl;
   
@@ -2069,6 +2070,21 @@ void setupGlobals(){
     writeCleanedBJets(phys.jets_p4(), phys.jets_csv()); //g_jets_medb_p4, g_jets_csv, g_nBJetMedium
   }
 
+  if (FRS){
+    if (FRS_use_veto && LooseIso){
+      g_looseIDs = phys.lep_pass_VVV_cutbased_veto_noiso();
+    }
+    else if (FRS_use_veto){
+      g_looseIDs = phys.lep_pass_VVV_cutbased_veto();
+    }
+    else if (LooseIso){
+      g_looseIDs = phys.lep_pass_VVV_cutbased_fo_noiso();
+    }
+    else{
+      g_looseIDs = phys.lep_pass_VVV_cutbased_fo();
+    }
+  }
+
   //cout<<__LINE__<<endl;
 }
 
@@ -2086,21 +2102,6 @@ void setupConstants(){
   FRS = (conf->get("fakerate_study") == "true") ? true : false;
   LooseIso = (conf->get("FRS_loose_iso") == "true") ? true : false;
   FRS_use_veto = (conf->get("FRS_use_veto") == "true") ? true : false;
-
-  if (FRS){
-    if (FRS_use_veto && LooseIso){
-      g_looseIDs = phys.lep_pass_VVV_cutbased_veto_noiso;
-    }
-    else if (FRS_use_veto){
-      g_looseIDs = phys.lep_pass_VVV_cutbased_veto;
-    }
-    else if (LooseIso){
-      g_looseIDs = phys.lep_pass_VVV_cutbased_fo_noiso;     
-    }
-    else{
-      g_looseIDs = phys.lep_pass_VVV_cutbased_fo;
-    }
-  }
 }
 
 int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/, int nEvents/* = -1*/) {

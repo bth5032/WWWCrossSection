@@ -42,7 +42,7 @@
 #include "ConfigHelper.C"
 
 // Needed for global vars for branches
-#include <functional>
+//#include <functional>
 
 
 using namespace std;
@@ -80,7 +80,7 @@ double g_scale_factor=1; //Holds scale factors for sample.
 TH1I *numEvents; //Holds the number of events in the whole script and the number that pass various cuts 
 
 bool FRS, LooseIso, FRS_use_veto;
-std::function<const std::vector<bool>&()> g_looseIDs; //holds loose IDs when doing the Fake Rate study.
+//std::function<const std::vector<bool>&()> g_looseIDs; //holds loose IDs when doing the Fake Rate study.
 
 // ----------------
 // DEBUG MODE
@@ -117,6 +117,7 @@ vector<LorentzVector> g_jets_medb_p4;
 
 vector<short> g_lep_inds; //Holds poition of "analysis leptons"
 short g_nlep;
+vector<bool> g_looseIDs;
 
 
 const double Z_MASS = 91.1876;
