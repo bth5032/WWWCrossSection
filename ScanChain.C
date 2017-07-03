@@ -1891,7 +1891,7 @@ void setLepIndexes(){
 
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
     if(phys.lep_pass_VVV_cutbased_tight().at(i))    g_lep_inds.push_back(i);
-    else if (FRS && loose_IDs.at(i))                g_lep_inds.push_back(i);
+    else if (FRS && g_looseIDs().at(i))                g_lep_inds.push_back(i);
     /*else if (FRS && loose_IDs.at(i)){
       cout<<"Found One, evt: "<<phys.evt()<<endl;
       g_lep_inds.push_back(i);
@@ -2087,20 +2087,18 @@ void setupConstants(){
   LooseIso = (conf->get("FRS_loose_iso") == "true") ? true : false;
   FRS_use_veto = (conf->get("FRS_use_veto") == "true") ? true : false;
 
-  vector<bool> loose_IDs;
-
   if (FRS){
     if (FRS_use_veto && LooseIso){
-      loose_IDs = phys.lep_pass_VVV_cutbased_veto_noiso();
+      g_looseIDs = phys.lep_pass_VVV_cutbased_veto_noiso();
     }
     else if (FRS_use_veto){
-      loose_IDs = phys.lep_pass_VVV_cutbased_veto();
+      g_looseIDs = phys.lep_pass_VVV_cutbased_veto();
     }
     else if (LooseIso){
-      loose_IDs = phys.lep_pass_VVV_cutbased_fo_noiso();     
+      g_looseIDs = phys.lep_pass_VVV_cutbased_fo_noiso();     
     }
     else{
-      loose_IDs = phys.lep_pass_VVV_cutbased_fo();
+      g_looseIDs = phys.lep_pass_VVV_cutbased_fo();
     }
   }
 }
