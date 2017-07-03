@@ -2650,7 +2650,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       printFail = false;
 
       for (int i = 0; i<g_nlep; i++){
-        if( ( ! phys.lep_pass_VVV_cutbased_fo().at(g_lep_inds(i)) ) && phys.lep_pass_VVV_cutbased_veto().at(g_lep_inds(i))){
+        if( ( ! phys.lep_pass_VVV_cutbased_fo().at(g_lep_inds.at(i)) ) && phys.lep_pass_VVV_cutbased_veto().at(g_lep_inds.at(i))){
           printFail = true;
         }
       }
