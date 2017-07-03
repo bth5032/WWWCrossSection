@@ -1914,9 +1914,6 @@ void setLepIndexes(){
     else if (FRS && loose_IDs.at(i)){
       cout<<"Found One, evt: "<<phys.evt()<<endl;
       g_lep_inds.push_back(i);
-      if( ( ! phys.lep_pass_VVV_cutbased_fo().at(i) ) && phys.lep_pass_VVV_cutbased_veto().at(i)){
-        cout<<"IP: "<<phys.lep_ip3d().at(i)<<"PT: "<<phys.lep_pt().at(i)<<endl;
-      }
     }
   } 
 
@@ -2651,6 +2648,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       // ----------------
       printStats = false;
       printFail = false;
+
+      for (int i = 0; i<g_nlep; i++){
+        if( ( ! phys.lep_pass_VVV_cutbased_fo().at(g_lep_inds(i)) ) && phys.lep_pass_VVV_cutbased_veto().at(g_lep_inds(i))){
+          printFail = true;
+        }
+      }
 
       //if (inspection_set.count(phys.evt()) != 0){
       /*if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
