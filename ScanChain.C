@@ -1888,7 +1888,20 @@ bool passFileSelections(){
 
 void setLepIndexes(){
   /* Loops through lepton objects and adds indexed to g_lep_inds if they pass the tight selection (or fakable object when we are doing fake rate study) */
-
+  if (FRS){
+    if (FRS_use_veto && LooseIso){
+      g_looseIDs = phys.lep_pass_VVV_cutbased_veto_noiso();
+    }
+    else if (FRS_use_veto){
+      g_looseIDs = phys.lep_pass_VVV_cutbased_veto();
+    }
+    else if (LooseIso){
+      g_looseIDs = phys.lep_pass_VVV_cutbased_fo_noiso();
+    }
+    else{
+      g_looseIDs = phys.lep_pass_VVV_cutbased_fo();
+    }
+  }
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
     if(phys.lep_pass_VVV_cutbased_tight().at(i))    g_lep_inds.push_back(i);
     else if (FRS && g_looseIDs.at(i))                g_lep_inds.push_back(i);
@@ -1970,7 +1983,6 @@ void setupGlobals(){
   g_looseIDs.clear();
 
   //cout<<__LINE__<<endl;
-  
   setLepIndexes();
   if (g_nlep >= 2){
     FT = getFlavorType();
@@ -2065,22 +2077,6 @@ void setupGlobals(){
     writeCleanedJets(phys.jets_p4(), phys.jets_csv()); //g_jets_p4, g_njets
     writeCleanedBJets(phys.jets_p4(), phys.jets_csv()); //g_jets_medb_p4, g_jets_csv, g_nBJetMedium
   }
-
-  if (FRS){
-    if (FRS_use_veto && LooseIso){
-      g_looseIDs = phys.lep_pass_VVV_cutbased_veto_noiso();
-    }
-    else if (FRS_use_veto){
-      g_looseIDs = phys.lep_pass_VVV_cutbased_veto();
-    }
-    else if (LooseIso){
-      g_looseIDs = phys.lep_pass_VVV_cutbased_fo_noiso();
-    }
-    else{
-      g_looseIDs = phys.lep_pass_VVV_cutbased_fo();
-    }
-  }
-
   //cout<<__LINE__<<endl;
 }
 
