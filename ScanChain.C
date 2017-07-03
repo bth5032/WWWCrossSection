@@ -1914,6 +1914,9 @@ void setLepIndexes(){
     else if (FRS && loose_IDs.at(i)){
       cout<<"Found One, evt: "<<phys.evt()<<endl;
       g_lep_inds.push_back(i);
+      if( ( ! phys.lep_pass_VVV_cutbased_fo().at(i) ) && phys.lep_pass_VVV_cutbased_veto().at(i)){
+        cout<<"IP: "<<phys.lep_ip3d().at(i)<<"PT: "<<phys.lep_pt().at(i)<<endl;
+      }
     }
   } 
 
