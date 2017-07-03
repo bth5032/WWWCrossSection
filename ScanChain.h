@@ -41,6 +41,10 @@
 #include "ConfigParser.C"
 #include "ConfigHelper.C"
 
+// Needed for global vars for branches
+#include <functional>
+
+
 using namespace std;
 //using namespace zmet;
 using namespace duplicate_removal;
@@ -74,6 +78,9 @@ TFile* currentFile = 0;
 double g_scale_factor=1; //Holds scale factors for sample.
 
 TH1I *numEvents; //Holds the number of events in the whole script and the number that pass various cuts 
+
+bool FRS, LooseIso, FRS_use_veto;
+std::function<const std::vector<bool>&()> g_looseIDs; //holds loose IDs when doing the Fake Rate study.
 
 // ----------------
 // DEBUG MODE
