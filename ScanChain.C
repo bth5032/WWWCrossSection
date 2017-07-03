@@ -1898,13 +1898,13 @@ void setLepIndexes(){
       loose_IDs = phys.lep_pass_VVV_cutbased_veto_noiso();
     }
     else if (FRS_use_veto){
-      phys.lep_pass_VVV_cutbased_veto();
+      loose_IDs = phys.lep_pass_VVV_cutbased_veto();
     }
     else if (LooseIso){
-      phys.lep_pass_VVV_cutbased_fo_noiso();     
+      loose_IDs = phys.lep_pass_VVV_cutbased_fo_noiso();     
     }
     else{
-      phys.lep_pass_VVV_cutbased_fo();
+      loose_IDs = phys.lep_pass_VVV_cutbased_fo();
     }
   }
 
