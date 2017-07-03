@@ -1689,7 +1689,7 @@ bool passBaseCut(){
   if(conf->get("num_leptons") != ""){
     if (conf->get("fakerate_study") == "true"){ 
       //When doing FR study, there are two ways to pass, either 2 tight leps, or 1 tight lep and 2 fo (which implies veto) leps.
-      if ((phys.nlep_VVV_cutbased_tight() != stod(conf->get("num_leptons")) ) && ( !(phys.nlep_VVV_cutbased_tight() == (stod(conf->get("num_leptons"))-1) && phys.nlep_VVV_cutbased_fo() == stod(conf->get("num_leptons"))))){ 
+      if ((phys.nlep_VVV_cutbased_tight() != stod(conf->get("num_leptons")) ) && ( !(phys.nlep_VVV_cutbased_tight() == (stod(conf->get("num_leptons"))-1)) ) ){ 
         numEvents->Fill(10);
         if (printFail) cout<<phys.evt()<<" :Failed 2 lepton cut"<<endl;
         return false; // require at least 2 good leptons
@@ -1891,11 +1891,7 @@ void setLepIndexes(){
 
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
     if(phys.lep_pass_VVV_cutbased_tight().at(i))    g_lep_inds.push_back(i);
-    else if (FRS && g_looseIDs().at(i))                g_lep_inds.push_back(i);
-    /*else if (FRS && loose_IDs.at(i)){
-      cout<<"Found One, evt: "<<phys.evt()<<endl;
-      g_lep_inds.push_back(i);
-    }*/
+    else if (FRS && g_looseIDs.at(i))                g_lep_inds.push_back(i);
   } 
 
   g_nlep = ((short) g_lep_inds.size());
