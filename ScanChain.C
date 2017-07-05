@@ -2442,15 +2442,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     loose_lep_reliso03EA->SetDirectory(rootdir);
     loose_lep_reliso03EA->Sumw2();  
   
-    loose_lep_pt = new TH1D("loose_lep_pt", "Loose Lepton p_{T} for "+g_sample_name, 6000,0,6);
+    loose_lep_pt = new TH1D("loose_lep_pt", "Loose Lepton p_{T} for "+g_sample_name, 6000,0,6000);
     loose_lep_pt->SetDirectory(rootdir);
     loose_lep_pt->Sumw2();  
   
-    loose_lep_eta = new TH1D("loose_lep_eta", "Loose Lepton #eta for "+g_sample_name, 6000,0,6);
+    loose_lep_eta = new TH1D("loose_lep_eta", "Loose Lepton #eta for "+g_sample_name, 1000,0,10);
     loose_lep_eta->SetDirectory(rootdir);
     loose_lep_eta->Sumw2();  
   
-    loose_lep_phi = new TH1D("loose_lep_phi", "Loose Lepton #phi for "+g_sample_name, 6000,0,6);
+    loose_lep_phi = new TH1D("loose_lep_phi", "Loose Lepton #phi for "+g_sample_name, 630,-3.15,3.15);
     loose_lep_phi->SetDirectory(rootdir);
     loose_lep_phi->Sumw2();  
   }
