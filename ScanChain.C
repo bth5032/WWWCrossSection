@@ -1596,6 +1596,25 @@ bool passSignalRegionCuts(){
     }
   }
 
+if (conf->get("FR_loose_not_tight") == "true"){
+    if (stoi(conf->get("num_leptons")) == 3){ 
+      FR_cat c = getFRCategory();
+      if ( ! (c == TT_fake || c == TT_real) ){
+        numEvents->Fill(55);
+        if (printFail) cout<<phys.evt()<<" :Failed loose not tight lepton selections"<<endl;
+        return false;
+      }
+    }
+    if (stoi(conf->get("num_leptons")) == 2){ 
+      FR_cat c = getFRCategory();
+      if ( ! (c == T_fake || c == T_real) ){
+        numEvents->Fill(55);
+        if (printFail) cout<<phys.evt()<<" :Failed loose not tight lepton selections"<<endl;
+        return false;
+      }
+    }
+  }
+
   //cout<<__LINE__<<endl;
   //if (printPass) cout<<phys.evt()<<": Passes Signal Region Cuts"<<endl;
   return true;
@@ -1905,7 +1924,7 @@ void setLepIndexes(){
     if(phys.lep_pass_VVV_cutbased_tight().at(i))    g_lep_inds.push_back(i);
     else if (FRS && g_looseIDs.at(i))                g_lep_inds.push_back(i);
 
-    if (fabs(phys.lep_pdgId().at(i)) == 13){
+    /*if (fabs(phys.lep_pdgId().at(i)) == 13){
       cout<<"Electron ";
       if (phys.lep_pass_VVV_cutbased_tight().at(i)) cout<<" ct pass ";
       else                                          cout<<" ct fail ";
@@ -1934,7 +1953,7 @@ void setLepIndexes(){
       if (phys.lep_pass_VVV_cutbased_veto_noiso().at(i)) cout<<" cvni pass ";
       else                                               cout<<" cvni fail ";
       cout<<endl;
-    }
+    }*/
   } 
 
   g_nlep = ((short) g_lep_inds.size());
