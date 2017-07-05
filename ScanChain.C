@@ -1918,6 +1918,7 @@ void setLepIndexes(){
 
       if (phys.lep_pass_VVV_cutbased_veto_noiso().at(i)) cout<<" cvni pass ";
       else                                               cout<<" cvni fail ";
+      cout<<endl;
     } 
     else if (fabs(phys.lep_pdgId().at(i)) == 11){
       cout<<"Muon ";
@@ -1932,6 +1933,7 @@ void setLepIndexes(){
 
       if (phys.lep_pass_VVV_cutbased_veto_noiso().at(i)) cout<<" cvni pass ";
       else                                               cout<<" cvni fail ";
+      cout<<endl;
     }
   } 
 
