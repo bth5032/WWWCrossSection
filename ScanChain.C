@@ -2397,6 +2397,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   lep1_sip3d->SetDirectory(rootdir);
   lep1_sip3d->Sumw2();
 
+  TH1D *lep1_reliso03EA = new TH1D("lep1_reliso03EA", "Leading lepton Relative Isolation (03EA cone) for "+g_sample_name, 6000,0,6);
+  lep1_reliso03EA->SetDirectory(rootdir);
+  lep1_reliso03EA->Sumw2();
+
   TH1D *lep2_ip3d = new TH1D("lep2_ip3d", "Subleading lepton ip3d for "+g_sample_name, 6000,0,6);
   lep2_ip3d->SetDirectory(rootdir);
   lep2_ip3d->Sumw2();
@@ -2409,6 +2413,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   lep2_sip3d->SetDirectory(rootdir);
   lep2_sip3d->Sumw2();
 
+  TH1D *lep2_reliso03EA = new TH1D("lep2_reliso03EA", "Subleading lepton Relative Isolation (03EA cone) for "+g_sample_name, 6000,0,6);
+  lep2_reliso03EA->SetDirectory(rootdir);
+  lep2_reliso03EA->Sumw2();
+
   TH1D *lep3_ip3d = new TH1D("lep3_ip3d", "Trailing lepton ip3d for "+g_sample_name, 6000,0,6);
   lep1_ip3d->SetDirectory(rootdir);
   lep1_ip3d->Sumw2();
@@ -2420,6 +2428,32 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   TH1D *lep3_sip3d = new TH1D("lep3_sip3d", "Trailing lepton sip3d for "+g_sample_name, 6000,0,6);
   lep3_sip3d->SetDirectory(rootdir);
   lep3_sip3d->Sumw2();
+
+  TH1D *lep3_reliso03EA = new TH1D("lep3_reliso03EA", "Trailing lepton Relative Isolation (03EA cone) for "+g_sample_name, 6000,0,6);
+  lep3_reliso03EA->SetDirectory(rootdir);
+  lep3_reliso03EA->Sumw2();
+
+  //-------------------------------------------
+  //Loose lepton kinematics
+
+  TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_phi;
+  if (conf->get("fakerate_study") == "true"){ 
+    loose_lep_reliso03EA = new TH1D("loose_lep_reliso03EA", "Loose Lepton Relative Isolation (03EA cone) for "+g_sample_name, 6000,0,6);
+    loose_lep_reliso03EA->SetDirectory(rootdir);
+    loose_lep_reliso03EA->Sumw2();  
+  
+    loose_lep_pt = new TH1D("loose_lep_pt", "Loose Lepton p_{T} for "+g_sample_name, 6000,0,6);
+    loose_lep_pt->SetDirectory(rootdir);
+    loose_lep_pt->Sumw2();  
+  
+    loose_lep_eta = new TH1D("loose_lep_eta", "Loose Lepton #eta for "+g_sample_name, 6000,0,6);
+    loose_lep_eta->SetDirectory(rootdir);
+    loose_lep_eta->Sumw2();  
+  
+    loose_lep_phi = new TH1D("loose_lep_phi", "Loose Lepton #phi for "+g_sample_name, 6000,0,6);
+    loose_lep_phi->SetDirectory(rootdir);
+    loose_lep_phi->Sumw2();  
+  }
 
   //-------------------------------------------
   //Truth level tagging fake rate distributions
@@ -2937,7 +2971,18 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         //cout<<"Filling FR hist with category: "<<FR_cats_str[cat]<<endl;
         //fr_counts->Fill(cat, weight);
         fr_counts->Fill(getFRCategory(), weight);
+        
+        short loose_lep_index = -1;
+        for (int i = 0; i < g_nlep; i++) if (! phys.lep_pass_VVV_cutbased_tight().at(g_lep_inds.at(i))) loose_lep_index = i;
+
+        if (loose_lep_index != -1){
+          loose_lep_reliso03EA->Fill(phys.lep_relIso03EA().at(loose_lep_index), weight);
+          loose_lep_pt->Fill(phys.lep_p4().at(loose_lep_index).pt(), weight);
+          loose_lep_eta->Fill(phys.lep_p4().at(loose_lep_index).eta(), weight);
+          loose_lep_phi->Fill(phys.lep_p4().at(loose_lep_index).phi(), weight);
+        }
       }
+
 
       //cout<<__LINE__<<endl;
 //===========================================
@@ -3128,6 +3173,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
 
   if (conf->get("fakerate_study") == "true"){ 
     fr_counts->Write();
+    loose_lep_reliso03EA->Write();
+    loose_lep_pt->Write();
+    loose_lep_eta->Write();
+    loose_lep_phi->Write();
   }
 
   //close output file
