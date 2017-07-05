@@ -1916,7 +1916,7 @@ void setLepIndexes(){
       if (phys.lep_pass_VVV_cutbased_veto().at(i)) cout<<" cv pass ";
       else                                         cout<<" cv fail ";
 
-      if (phys.lep_pass_VVV_cutbased_veto()_noiso.at(i)) cout<<" cvni pass ";
+      if (phys.lep_pass_VVV_cutbased_veto_noiso().at(i)) cout<<" cvni pass ";
       else                                               cout<<" cvni fail ";
     } 
     else if (fabs(phys.lep_pdgId().at(i)) == 11){
@@ -1930,7 +1930,7 @@ void setLepIndexes(){
       if (phys.lep_pass_VVV_cutbased_veto().at(i)) cout<<" cv pass ";
       else                                         cout<<" cv fail ";
 
-      if (phys.lep_pass_VVV_cutbased_veto()_noiso.at(i)) cout<<" cvni pass ";
+      if (phys.lep_pass_VVV_cutbased_veto_noiso().at(i)) cout<<" cvni pass ";
       else                                               cout<<" cvni fail ";
     }
   } 

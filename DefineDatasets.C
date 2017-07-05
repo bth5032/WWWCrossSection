@@ -124,7 +124,6 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     ch->Add(dir+"ttw_ln_amcnlo*");
     ch->Add(dir+"ttw_qq_amcnlo*");
   }
-
   else if (set == "TTZ"){
     cout<<"Adding TTZ"<<endl; 
     
