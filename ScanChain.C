@@ -1894,6 +1894,35 @@ void setLepIndexes(){
     if(phys.lep_pass_VVV_cutbased_tight().at(i))                g_lep_inds.push_back(i);
     else if (FRS && phys.lep_pass_VVV_cutbased_fo().at(i))      g_lep_inds.push_back(i); 
     else if (FRS && LooseIso && phys.lep_pass_VVV_cutbased_fo_noiso().at(i))      g_lep_inds.push_back(i); 
+
+    if (fabs(phys.lep_pdgId().at(i)) == 13){
+      cout<<"Electron ";
+      if (phys.lep_pass_VVV_cutbased_tight().at(i)) cout<<" ct pass ";
+      else                                          cout<<" ct fail ";
+
+      if (phys.lep_pass_VVV_cutbased_tight_noiso().at(i)) cout<<" ctni pass ";
+      else                                                cout<<" ctni fail ";
+
+      if (phys.lep_pass_VVV_cutbased_veto().at(i)) cout<<" cv pass ";
+      else                                         cout<<" cv fail ";
+
+      if (phys.lep_pass_VVV_cutbased_veto()_noiso.at(i)) cout<<" cvni pass ";
+      else                                               cout<<" cvni fail ";
+    } 
+    else if (fabs(phys.lep_pdgId().at(i)) == 11){
+      cout<<"Muon ";
+      if (phys.lep_pass_VVV_cutbased_tight().at(i)) cout<<" ct pass ";
+      else                                          cout<<" ct fail ";
+
+      if (phys.lep_pass_VVV_cutbased_tight_noiso().at(i)) cout<<" ctni pass ";
+      else                                                cout<<" ctni fail ";
+
+      if (phys.lep_pass_VVV_cutbased_veto().at(i)) cout<<" cv pass ";
+      else                                         cout<<" cv fail ";
+
+      if (phys.lep_pass_VVV_cutbased_veto()_noiso.at(i)) cout<<" cvni pass ";
+      else                                               cout<<" cvni fail ";
+    } 
   }
 
   g_nlep = ((short) g_lep_inds.size());
