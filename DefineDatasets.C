@@ -215,6 +215,12 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
 //====================================
   
   version="WWW_v0.1.11";
+  if (skimmed){
+    dir=base_path+version+"/skim/";
+  }
+  else{
+    dir=base_path+version+"/output/";
+  }
 
   if (set == "Data-EE"){
     cout<<"Adding EE Trigger Data"<<endl;
