@@ -214,7 +214,7 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
 // Leptonic Data
 //====================================
   
-  TString version="WWW_v0.1.11";
+  version="WWW_v0.1.11";
 
   if (set == "Data-EE"){
     cout<<"Adding EE Trigger Data"<<endl;
