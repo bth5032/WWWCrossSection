@@ -45,13 +45,22 @@ real_tight_bins = {
   "3lep_2SFOS": [FR_enum["TTT_real"]]
 }
 
-real_loose_bins = {
+"""real_loose_bins = {
   "2lepSSEE"  : [FR_enum["T_real"], FR_enum["L_real"]],
   "2lepSSEMu" : [FR_enum["T_real"], FR_enum["L_real"]],
   "2lepSSMuMu": [FR_enum["T_real"], FR_enum["L_real"]],
   "3lep_0SFOS": [FR_enum["TT_real"],FR_enum["T_real"],FR_enum["L_real"]],
   "3lep_1SFOS": [FR_enum["TT_real"],FR_enum["T_real"],FR_enum["L_real"]],
   "3lep_2SFOS": [FR_enum["TT_real"],FR_enum["T_real"],FR_enum["L_real"]]
+}"""
+
+real_loose_bins = {
+  "2lepSSEE"  : [FR_enum["T_real"]],
+  "2lepSSEMu" : [FR_enum["T_real"]],
+  "2lepSSMuMu": [FR_enum["T_real"]],
+  "3lep_0SFOS": [FR_enum["TT_real"]],
+  "3lep_1SFOS": [FR_enum["TT_real"]],
+  "3lep_2SFOS": [FR_enum["TT_real"]]
 }
 
 fake_tight_bins = {
@@ -63,13 +72,22 @@ fake_tight_bins = {
   "3lep_2SFOS": [FR_enum["TTT_fake"]]
 }
 
-fake_loose_bins = {
+"""fake_loose_bins = {
   "2lepSSEE"  : [FR_enum["T_fake"], FR_enum["L_fake"]],
   "2lepSSEMu" : [FR_enum["T_fake"], FR_enum["L_fake"]],
   "2lepSSMuMu": [FR_enum["T_fake"], FR_enum["L_fake"]],
   "3lep_0SFOS": [FR_enum["TT_fake"],FR_enum["T_fake"],FR_enum["L_fake"]],
   "3lep_1SFOS": [FR_enum["TT_fake"],FR_enum["T_fake"],FR_enum["L_fake"]],
   "3lep_2SFOS": [FR_enum["TT_fake"],FR_enum["T_fake"],FR_enum["L_fake"]]
+}"""
+
+fake_loose_bins = {
+  "2lepSSEE"  : [FR_enum["T_fake"]],
+  "2lepSSEMu" : [FR_enum["T_fake"]],
+  "2lepSSMuMu": [FR_enum["T_fake"]],
+  "3lep_0SFOS": [FR_enum["TT_fake"]],
+  "3lep_1SFOS": [FR_enum["TT_fake"]],
+  "3lep_2SFOS": [FR_enum["TT_fake"]]
 }
 
 def PrintSRTable(yields, study_dir, latex):

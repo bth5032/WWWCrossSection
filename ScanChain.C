@@ -1689,7 +1689,7 @@ bool passBaseCut(){
   if(conf->get("num_leptons") != ""){
     if (conf->get("fakerate_study") == "true"){ 
       //When doing FR study, there are two ways to pass, either 2 tight leps, or 1 tight lep and 2 fo (which implies veto) leps.
-      if ((phys.nlep_VVV_cutbased_tight() != stod(conf->get("num_leptons")) ) && ( !(phys.nlep_VVV_cutbased_tight() == (stod(conf->get("num_leptons"))-1) && phys.nlep_VVV_cutbased_fo() == stod(conf->get("num_leptons"))))){ 
+      if ((phys.nlep_VVV_cutbased_tight() != stod(conf->get("num_leptons")) ) && ( !(phys.nlep_VVV_cutbased_tight() == (stod(conf->get("num_leptons"))-1)) ) ){ 
         numEvents->Fill(10);
         if (printFail) cout<<phys.evt()<<" :Failed 2 lepton cut"<<endl;
         return false; // require at least 2 good leptons
@@ -1886,14 +1886,24 @@ bool passFileSelections(){
 //=============================
 
 void setLepIndexes(){
-  /* Loops through lepton objects and adds indexed to g_lep_inds if they pass the tight selection (or fakable object when we are doing fake rate study)*/
-  bool FRS = (conf->get("fakerate_study") == "true") ? true : false;
-  bool LooseIso = (conf->get("FRS_loose_iso") == "true") ? true : false;
-
+  /* Loops through lepton objects and adds indexed to g_lep_inds if they pass the tight selection (or fakable object when we are doing fake rate study) */
+  if (FRS){
+    if (FRS_use_veto && LooseIso){
+      g_looseIDs = phys.lep_pass_VVV_cutbased_veto_noiso();
+    }
+    else if (FRS_use_veto){
+      g_looseIDs = phys.lep_pass_VVV_cutbased_veto();
+    }
+    else if (LooseIso){
+      g_looseIDs = phys.lep_pass_VVV_cutbased_fo_noiso();
+    }
+    else{
+      g_looseIDs = phys.lep_pass_VVV_cutbased_fo();
+    }
+  }
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
-    if(phys.lep_pass_VVV_cutbased_tight().at(i))                g_lep_inds.push_back(i);
-    else if (FRS && phys.lep_pass_VVV_cutbased_fo().at(i))      g_lep_inds.push_back(i); 
-    else if (FRS && LooseIso && phys.lep_pass_VVV_cutbased_fo_noiso().at(i))      g_lep_inds.push_back(i); 
+    if(phys.lep_pass_VVV_cutbased_tight().at(i))    g_lep_inds.push_back(i);
+    else if (FRS && g_looseIDs.at(i))                g_lep_inds.push_back(i);
 
     if (fabs(phys.lep_pdgId().at(i)) == 13){
       cout<<"Electron ";
@@ -1922,8 +1932,8 @@ void setLepIndexes(){
 
       if (phys.lep_pass_VVV_cutbased_veto()_noiso.at(i)) cout<<" cvni pass ";
       else                                               cout<<" cvni fail ";
-    } 
-  }
+    }
+  } 
 
   g_nlep = ((short) g_lep_inds.size());
   /*cout<<"Found "<<g_nlep<<"("<<g_lep_inds.size()<<") leptons."<<endl;
@@ -1998,9 +2008,9 @@ void setupGlobals(){
   g_jets_medb_p4.clear();
   g_jets_csv.clear();
   g_lep_inds.clear();
+  g_looseIDs.clear();
 
   //cout<<__LINE__<<endl;
-  
   setLepIndexes();
   if (g_nlep >= 2){
     FT = getFlavorType();
@@ -2095,7 +2105,6 @@ void setupGlobals(){
     writeCleanedJets(phys.jets_p4(), phys.jets_csv()); //g_jets_p4, g_njets
     writeCleanedBJets(phys.jets_p4(), phys.jets_csv()); //g_jets_medb_p4, g_jets_csv, g_nBJetMedium
   }
-
   //cout<<__LINE__<<endl;
 }
 
@@ -2110,6 +2119,9 @@ void setupConstants(){
   JET_ETA_MAX = (conf->get("jet_eta_max") == "") ? 2.5 : stod(conf->get("jet_eta_max"));
   BJET_PT_MIN = (conf->get("bjet_pt_min") == "") ? 20 : stod(conf->get("bjet_pt_min"));
   BJET_ETA_MAX = (conf->get("bjet_eta_max") == "") ? 2.4 : stod(conf->get("bjet_eta_max"));
+  FRS = (conf->get("fakerate_study") == "true") ? true : false;
+  LooseIso = (conf->get("FRS_loose_iso") == "true") ? true : false;
+  FRS_use_veto = (conf->get("FRS_use_veto") == "true") ? true : false;
 }
 
 int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/, int nEvents/* = -1*/) {
@@ -2656,6 +2668,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       // ----------------
       printStats = false;
       printFail = false;
+
+      for (int i = 0; i<g_nlep; i++){
+        if( ( ! phys.lep_pass_VVV_cutbased_fo().at(g_lep_inds.at(i)) ) && phys.lep_pass_VVV_cutbased_veto().at(g_lep_inds.at(i))){
+          printFail = true;
+        }
+      }
 
       //if (inspection_set.count(phys.evt()) != 0){
       /*if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
