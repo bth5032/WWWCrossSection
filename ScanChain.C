@@ -1922,7 +1922,7 @@ void setLepIndexes(){
   }
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
     if(phys.lep_pass_VVV_cutbased_tight().at(i))    g_lep_inds.push_back(i);
-    else if (FRS && g_looseIDs.at(i))                g_lep_inds.push_back(i);
+    else if (FRS && g_looseIDs.at(i))               g_lep_inds.push_back(i);
 
     /*if (fabs(phys.lep_pdgId().at(i)) == 13){
       cout<<"Electron ";
@@ -2974,6 +2974,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         
         short loose_lep_index = -1;
         for (int i = 0; i < g_nlep; i++) if (! phys.lep_pass_VVV_cutbased_tight().at(g_lep_inds.at(i))) loose_lep_index = i;
+
+        if (phys.lep_relIso03EA().at(loose_lep_index) > 0.2){
+          cout<<"Wierd lep, evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" Num_leps: "<<g_nlep<<" Lep_index: "<<loose_lep_index<<"pdgId: "<<phys.lep_pdgId().at(loose_lep_index)<<" Iso: "<<phys.lep_relIso03EA().at(loose_lep_index)<<endl;
+        }
 
         if (loose_lep_index != -1){
           loose_lep_reliso03EA->Fill(phys.lep_relIso03EA().at(loose_lep_index), weight);
