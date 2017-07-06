@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+#include <map>
 
 #include "TChain.h"
 #include "TLegend.h"
@@ -37,22 +38,7 @@ TColor rc_light_green  = TColor(2010,120/255.,160/255.,0/255.);
 TColor rc_green        = TColor(2011,0/255.,158/255.,115/255.);
 TColor rc_pink         = TColor(2012,204/255.,121/255.,167/255.);
 
-map<string, int> sample_colors;
-
-sample_colors.insert( make_pair(TString("WZ"),        rc_orange.GetNumber())         );
-sample_colors.insert( make_pair(TString("WW"),        rc_blue_violet.GetNumer())     );
-sample_colors.insert( make_pair(TString("WJets"),     rc_dark_yellow.GetNumber())    );
-sample_colors.insert( make_pair(TString("ZZ"),        rc_green.GetNumber())          );
-sample_colors.insert( make_pair(TString("TTBar2l"),   rc_violet.GetNumber())         );
-sample_colors.insert( make_pair(TString("TTBar1l"),   rc_yellow.GetNumber())         );
-sample_colors.insert( make_pair(TString("DY"),        rc_light_green.GetNumber())    );
-sample_colors.insert( make_pair(TString("TTV"),       rc_brown.GetNumber())          );
-sample_colors.insert( make_pair(TString("SingleTop"), rc_dark_violet.GetNumber())    );
-sample_colors.insert( make_pair(TString("Other"),     rc_pink.GetNumber())           );
-sample_colors.insert( make_pair(TString("ZH"),        rc_pink.GetNumber())           );
-sample_colors.insert( make_pair(TString("Wh"),        46)                            );
-sample_colors.insert( make_pair(TString("VVV"),       kMagenta)                      );
-sample_colors.insert( make_pair(TString("WWW"),       kRed)                          );
+std::map<TString, Int_t> s_colors;
 
 /*std::pair<double,double> getLegendLocation(TH1D* bg_sum){
   // Returns the best (xmin, ymin) pair for the location of the legend 
@@ -458,7 +444,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   //cout<<__LINE__<<endl;
   if(conf->get("WWW_colors") == "true"){
     for (int i = 1; i<num_hists; i++){
-      hists[i]->SetFillColor(sample_colors[sample_names[i]]);
+      hists[i]->SetFillColor(s_colors[sample_names[i]]);
       //cout<<__LINE__<<endl;
       hists[i]->SetFillStyle(1001);
     }
@@ -1095,7 +1081,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   //cout<<__LINE__<<endl;
   if(conf->get("WWW_colors") == "true"){
     for (int i = 1; i<num_hists; i++){
-      hists[i]->SetFillColor(sample_colors[sample_names[i]]);
+      hists[i]->SetFillColor(s_colors[sample_names[i]]);
       //cout<<__LINE__<<endl;
       hists[i]->SetFillStyle(1001);
     }
@@ -2164,6 +2150,21 @@ void drawPlots(TString config_file, bool draw_debugs = true){
   ConfigParser *configs=new ConfigParser(config_file.Data());
 
   setTDRStyle();
+
+  s_colors[TString("WZ")]         =  rc_orange.GetNumber();
+  s_colors[TString("WW")]         =  rc_blue_violet.GetNumber();
+  s_colors[TString("WJets")]      =  rc_dark_yellow.GetNumber();
+  s_colors[TString("ZZ")]         =  rc_green.GetNumber();
+  s_colors[TString("TTBar2l")]    =  rc_violet.GetNumber();
+  s_colors[TString("TTBar1l")]    =  rc_yellow.GetNumber();
+  s_colors[TString("DY")]         =  rc_light_green.GetNumber();
+  s_colors[TString("TTV")]        =  rc_brown.GetNumber();
+  s_colors[TString("SingleTop")]  =  rc_dark_violet.GetNumber();
+  s_colors[TString("Other")]      =  rc_pink.GetNumber();
+  s_colors[TString("ZH")]         =  rc_pink.GetNumber();
+  s_colors[TString("Wh")]         =  46;
+  s_colors[TString("VVV")]        =  kMagenta;
+  s_colors[TString("WWW")]        =  kRed;
   
   TGaxis::SetExponentOffset(-0.07, 0, "y"); // X and Y offset for Y axis
   TGaxis::SetExponentOffset(-.8, -0.07, "x"); // X and Y offset for X axis
