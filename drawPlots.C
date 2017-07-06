@@ -721,9 +721,9 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   }
   else if (conf->get("horizontal_legend") == "true"){
     short n_cols = short(ceil(num_hists/3.0));
-    cout<<"n_cols "<<n_cols<<endl;
-    l1->SetNColumns(n_cols);
+    //cout<<"n_cols "<<n_cols<<endl;
     l1 = new TLegend(0, 0.8, 1, 0.93); 
+    l1->SetNColumns(n_cols);
   }
   else{
     /*cout<<"UtoPixel(0.65): "<<gPad->UtoPixel(.65)<<endl;
@@ -740,7 +740,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   l1->SetShadowColor(kWhite);
   l1->SetFillColor(kWhite);
   l1->SetTextSize(.03);
-  //cout<<__LINE__<<endl;
+  cout<<__LINE__<<endl;
   l1->AddEntry(hists[0], hist_labels[0], "pe");
   /* //Put objects in legend with the same order as the they go into the stack
   for (int i = hists_labeled.size()-1; i>=0; i--){
