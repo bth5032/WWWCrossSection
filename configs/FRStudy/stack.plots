@@ -561,13 +561,35 @@ ylabel=Count
 bin_size=25
 hist_0_name=loose_lep_abseta
 
+Name=loose_lep_eta
+plot_name=loose_leps_eta
+title=Loose Lepton \eta
+horizontal_legend=true
+xmin=-2.5
+xmax=2.5
+xlabel=|\eta|
+ylabel=Count
+bin_size=25
+hist_0_name=loose_lep_eta
+
 Name=loose_lep_phi
 plot_name=loose_lep_phi
 title=Loose Lepton \phi
 horizontal_legend=true
-xmin=0
+xmin=-3.15
 xmax=3.15
 xlabel=\phi
 ylabel=Count
 bin_size=50
 hist_0_name=loose_lep_phi
+
+Name=loose_lep_absphi
+plot_name=loose_lep_absphi
+title=Loose Lepton |\phi|
+horizontal_legend=true
+xmin=0
+xmax=3.15
+xlabel=|\phi|
+ylabel=Count
+bin_size=50
+hist_0_name=loose_lep_absphi
