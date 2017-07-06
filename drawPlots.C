@@ -721,6 +721,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   }
   else if (conf->get("horizontal_legend") == "true"){
     short n_cols = short(ceil(num_hists/3.0));
+    cout<<"n_cols "<<n_cols<<endl;
     l1->SetNColumns(n_cols);
     l1 = new TLegend(0, 0.8, 1, 0.93); 
   }
@@ -732,7 +733,6 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     
     cout<<"x under legend: "<<x_under_legend<<endl;
     cout<<"max count under legend: "<<max_count_under_legend<<endl;*/
-
     l1 = new TLegend(0.65, 0.6, 0.93, 0.93);
   }
   
