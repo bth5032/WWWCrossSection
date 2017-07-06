@@ -21,6 +21,34 @@
 using namespace std;
 
 std::array<int, 14> ROOT_COLOR_PALATE = {46,8,9,38,40,2,30,6,28,42,3,5,7,41};
+TColor rc_light_blue   = TColor(2001,91/255.,187/255.,241/255.);
+TColor rc_blue         = TColor(2002,60/255.,144/255.,196/255.);
+TColor rc_orange       = TColor(2003,230/255.,159/255.,0/255.);
+TColor rc_brown        = TColor(2004,180/255.,117/255.,0/255.);
+TColor rc_yellow       = TColor(2005,245/255.,236/255.,69/255.);
+TColor rc_dark_yellow  = TColor(2006,215/255.,200/255.,0/255.);
+TColor rc_blue_violet  = TColor(2007,70/255.,109/255.,171/255.);
+TColor rc_violet       = TColor(2008,70/255.,90/255.,134/255.);
+TColor rc_dark_violet  = TColor(2009,55/255.,65/255.,100/255.);
+TColor rc_light_green  = TColor(2010,120/255.,160/255.,0/255.);
+TColor rc_green        = TColor(2011,0/255.,158/255.,115/255.);
+TColor rc_pink         = TColor(2012,204/255.,121/255.,167/255.);
+
+map<TString, Int_t> sample_colors;
+sample_colors.insert( make_pair(TString("WZ"),        rc_orange.GetNumber())         );
+sample_colors.insert( make_pair(TString("WW"),        rc_blue_violet.GetNumer())     );
+sample_colors.insert( make_pair(TString("WJets"),     rc_dark_yellow.GetNumber())    );
+sample_colors.insert( make_pair(TString("ZZ"),        rc_green.GetNumber())          );
+sample_colors.insert( make_pair(TString("TTBar2l"),   rc_violet.GetNumber())         );
+sample_colors.insert( make_pair(TString("TTBar1l"),   rc_yellow.GetNumber())         );
+sample_colors.insert( make_pair(TString("DY"),        rc_light_green.GetNumber())    );
+sample_colors.insert( make_pair(TString("TTV"),       rc_brown.GetNumber())          );
+sample_colors.insert( make_pair(TString("SingleTop"), rc_dark_violet.GetNumber())    );
+sample_colors.insert( make_pair(TString("Other"),     rc_pink.GetNumber())           );
+sample_colors.insert( make_pair(TString("ZH"),        rc_pink.GetNumber())           );
+sample_colors.insert( make_pair(TString("Wh"),        46)                            );
+sample_colors.insert( make_pair(TString("VVV"),       kMagenta)                      );
+sample_colors.insert( make_pair(TString("WWW"),       kRed)                          );
 
 /*std::pair<double,double> getLegendLocation(TH1D* bg_sum){
   // Returns the best (xmin, ymin) pair for the location of the legend 
@@ -199,6 +227,12 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   vector<TString> hist_labels (num_hists);
   for (int i = 0; i<num_hists; i++){
     hist_labels[i]=parseLatex(conf->get("hist_"+to_string(i)+"_label"));    
+  } 
+
+  //Get sample names for Colors
+  vector<TString> sample_names (num_hists);
+  for (int i = 0; i<num_hists; i++){
+    sample_names[i]=conf->get("sample_"+to_string(i));    
   }  
 
 
@@ -418,11 +452,20 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   // SET MC COLORS
   //===========================
   //cout<<__LINE__<<endl;
-  for (int i = 1; i<num_hists; i++){
-    //cout<<__LINE__<<endl;
-    hists[i]->SetFillColor(ROOT_COLOR_PALATE[(i-1) % ROOT_COLOR_PALATE.size()]);
-    //cout<<__LINE__<<endl;
-    hists[i]->SetFillStyle(1001);
+  if(conf->get("WWW_colors") == "true"){
+    for (int i = 1; i<num_hists; i++){
+      hists[i]->SetFillColor(sample_colors[sample_names[i]]);
+      //cout<<__LINE__<<endl;
+      hists[i]->SetFillStyle(1001);
+    }
+  }
+  else{
+    for (int i = 1; i<num_hists; i++){
+      //cout<<__LINE__<<endl;
+      hists[i]->SetFillColor(ROOT_COLOR_PALATE[(i-1) % ROOT_COLOR_PALATE.size()]);
+      //cout<<__LINE__<<endl;
+      hists[i]->SetFillStyle(1001);
+    }
   }
   //cout<<__LINE__<<endl;
   hists[0]->SetMarkerStyle(20);
@@ -931,6 +974,12 @@ TString drawArbitraryNumber(ConfigParser *conf){
     hist_labels[i]=parseLatex(conf->get("hist_"+to_string(i)+"_label"));    
   }  
 
+  //Get sample names for Colors
+  vector<TString> sample_names (num_hists);
+  for (int i = 0; i<num_hists; i++){
+    sample_names[i]=conf->get("sample_"+to_string(i));    
+  }  
+
 
   cout<<"Hist names set"<<endl;
   TString xlabel=parseLatex(conf->get("xlabel"));
@@ -1040,11 +1089,20 @@ TString drawArbitraryNumber(ConfigParser *conf){
   // SET MC COLORS
   //===========================
   //cout<<__LINE__<<endl;
-  for (int i = 0; i<num_hists; i++){
-    //cout<<__LINE__<<endl;
-    hists[i]->SetFillColor(ROOT_COLOR_PALATE[(i) % ROOT_COLOR_PALATE.size()]);
-    //cout<<__LINE__<<endl;
-    hists[i]->SetFillStyle(1001);
+  if(conf->get("WWW_colors") == "true"){
+    for (int i = 1; i<num_hists; i++){
+      hists[i]->SetFillColor(sample_colors[sample_names[i]]);
+      //cout<<__LINE__<<endl;
+      hists[i]->SetFillStyle(1001);
+    }
+  }
+  else{
+    for (int i = 1; i<num_hists; i++){
+      //cout<<__LINE__<<endl;
+      hists[i]->SetFillColor(ROOT_COLOR_PALATE[(i-1) % ROOT_COLOR_PALATE.size()]);
+      //cout<<__LINE__<<endl;
+      hists[i]->SetFillStyle(1001);
+    }
   }
   //cout<<__LINE__<<endl;
 
@@ -1260,11 +1318,24 @@ TString drawArbitraryNumber(ConfigParser *conf){
   // BUILD LEGEND
   //===========================
 
-  TLegend *l1;
+    TLegend *l1;
   if (conf->get("small_legend") == "true"){
     l1 = new TLegend(0.78, 0.78, 0.93, 0.93);
   }
+  else if (conf->get("horizontal_legend") == "true"){
+    short n_cols = short(ceil(num_hists/3.0));
+    //cout<<"n_cols "<<n_cols<<endl;
+    l1 = new TLegend(0.151, 0.8, 0.95, 0.949); 
+    l1->SetNColumns(n_cols);
+  }
   else{
+    /*cout<<"UtoPixel(0.65): "<<gPad->UtoPixel(.65)<<endl;
+    cout<<"PixelToX(..): "<<gPad->PixeltoX(gPad->UtoPixel(.65))<<endl;
+    double x_under_legend = gPad->PixeltoX(gPad->UtoPixel(.65));
+    double max_count_under_legend = bg_sum->GetBinContent(bg_sum->FindBin(x_under_legend));
+    
+    cout<<"x under legend: "<<x_under_legend<<endl;
+    cout<<"max count under legend: "<<max_count_under_legend<<endl;*/
     l1 = new TLegend(0.65, 0.6, 0.93, 0.93);
   }
   
