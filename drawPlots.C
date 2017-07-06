@@ -10,6 +10,8 @@
 #include "TGaxis.h"
 #include "TCut.h"
 #include "TH1D.h"
+#include "TColor.h"
+#include "TString.h"
 
 #include "External/CTable.cpp"
 #include "External/tdrstyle_SUSY.C"
@@ -21,6 +23,7 @@
 using namespace std;
 
 std::array<int, 14> ROOT_COLOR_PALATE = {46,8,9,38,40,2,30,6,28,42,3,5,7,41};
+
 TColor rc_light_blue   = TColor(2001,91/255.,187/255.,241/255.);
 TColor rc_blue         = TColor(2002,60/255.,144/255.,196/255.);
 TColor rc_orange       = TColor(2003,230/255.,159/255.,0/255.);
