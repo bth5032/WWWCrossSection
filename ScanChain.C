@@ -2436,7 +2436,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   //-------------------------------------------
   //Loose lepton kinematics
 
-  TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_phi;
+  TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_abseta, *loose_lep_phi, *loose_lep_absphi;
   if (conf->get("fakerate_study") == "true"){ 
     loose_lep_reliso03EA = new TH1D("loose_lep_reliso03EA", "Loose Lepton Relative Isolation (03EA cone) for "+g_sample_name, 6000,0,6);
     loose_lep_reliso03EA->SetDirectory(rootdir);
@@ -2448,11 +2448,19 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   
     loose_lep_eta = new TH1D("loose_lep_eta", "Loose Lepton #eta for "+g_sample_name, 1000,-2.5,2.5);
     loose_lep_eta->SetDirectory(rootdir);
-    loose_lep_eta->Sumw2();  
+    loose_lep_eta->Sumw2();
+
+    loose_lep_abseta = new TH1D("loose_lep_abseta", "Loose Lepton |#eta| for "+g_sample_name, 1000,-2.5,2.5);
+    loose_lep_abseta->SetDirectory(rootdir);
+    loose_lep_abseta->Sumw2();  
   
     loose_lep_phi = new TH1D("loose_lep_phi", "Loose Lepton #phi for "+g_sample_name, 630,-3.15,3.15);
     loose_lep_phi->SetDirectory(rootdir);
     loose_lep_phi->Sumw2();  
+
+    loose_lep_absphi = new TH1D("loose_lep_absphi", "Loose Lepton |#phi| for "+g_sample_name, 630,-3.15,3.15);
+    loose_lep_absphi->SetDirectory(rootdir);
+    loose_lep_absphi->Sumw2();  
   }
 
   //-------------------------------------------
@@ -2983,7 +2991,9 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           loose_lep_reliso03EA->Fill(phys.lep_relIso03EA().at(loose_lep_index), weight);
           loose_lep_pt->Fill(phys.lep_p4().at(loose_lep_index).pt(), weight);
           loose_lep_eta->Fill(phys.lep_p4().at(loose_lep_index).eta(), weight);
+          loose_lep_abseta->Fill(fabs(phys.lep_p4().at(loose_lep_index).eta()), weight);
           loose_lep_phi->Fill(phys.lep_p4().at(loose_lep_index).phi(), weight);
+          loose_lep_absphi->Fill(fabs(phys.lep_p4().at(loose_lep_index).phi()), weight);
         }
       }
 
@@ -3180,7 +3190,9 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     loose_lep_reliso03EA->Write();
     loose_lep_pt->Write();
     loose_lep_eta->Write();
+    loose_lep_abseta->Write();
     loose_lep_phi->Write();
+    loose_lep_absphi->Write();
   }
 
   //close output file
