@@ -720,7 +720,9 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     l1 = new TLegend(0.78, 0.78, 0.93, 0.93);
   }
   else if (conf->get("horizontal_legend") == "true"){
-    l1 = new TLegend(0.78, 0.78, 0.93, 0.93); 
+    short n_cols = short(ceil(num_hists/3.0));
+    l1->SetNColumns(n_cols);
+    l1 = new TLegend(0, 0.8, 1, 0.93); 
   }
   else{
     /*cout<<"UtoPixel(0.65): "<<gPad->UtoPixel(.65)<<endl;
@@ -730,9 +732,8 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     
     cout<<"x under legend: "<<x_under_legend<<endl;
     cout<<"max count under legend: "<<max_count_under_legend<<endl;*/
-    short n_cols = short(ceil(num_hists/3.0));
-    l1->SetNColumns(n_cols);
-    l1 = new TLegend(0, 0.8, 1, 0.93);
+
+    l1 = new TLegend(0.65, 0.6, 0.93, 0.93);
   }
   
   l1->SetLineColor(kWhite);  
