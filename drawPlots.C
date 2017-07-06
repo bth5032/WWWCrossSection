@@ -730,7 +730,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     
     cout<<"x under legend: "<<x_under_legend<<endl;
     cout<<"max count under legend: "<<max_count_under_legend<<endl;*/
-    short n_cols = short ceil(num_hists/3.0);
+    short n_cols = short(ceil(num_hists/3.0));
     l1->SetNColumns(n_cols);
     l1 = new TLegend(0, 0.8, 1, 0.93);
   }
