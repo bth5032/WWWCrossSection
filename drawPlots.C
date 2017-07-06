@@ -37,7 +37,7 @@ TColor rc_light_green  = TColor(2010,120/255.,160/255.,0/255.);
 TColor rc_green        = TColor(2011,0/255.,158/255.,115/255.);
 TColor rc_pink         = TColor(2012,204/255.,121/255.,167/255.);
 
-map<TString, int> sample_colors;
+map<string, int> sample_colors;
 
 sample_colors.insert( make_pair(TString("WZ"),        rc_orange.GetNumber())         );
 sample_colors.insert( make_pair(TString("WW"),        rc_blue_violet.GetNumer())     );
