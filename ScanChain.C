@@ -1596,7 +1596,7 @@ bool passSignalRegionCuts(){
     }
   }
 
-if (conf->get("FR_loose_not_tight") == "true"){
+  if (conf->get("FR_loose_not_tight") == "true"){
     if (stoi(conf->get("num_leptons")) == 3){ 
       FR_cat c = getFRCategory();
       if ( ! (c == TT_fake || c == TT_real) ){
@@ -2349,15 +2349,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   lep3_pt->SetDirectory(rootdir);
   lep3_pt->Sumw2();
 
-  TH1D *lep1_eta = new TH1D("lep1_eta", "#eta for leading lepton "+g_sample_name, 100,0,3);
+  TH1D *lep1_eta = new TH1D("lep1_eta", "#eta for leading lepton "+g_sample_name, 200,-3,3);
   lep1_eta->SetDirectory(rootdir);
   lep1_eta->Sumw2();
 
-  TH1D *lep2_eta = new TH1D("lep2_eta", "#eta for subleading lepton "+g_sample_name, 100,0,3);
+  TH1D *lep2_eta = new TH1D("lep2_eta", "#eta for subleading lepton "+g_sample_name, 200,-3,3);
   lep2_eta->SetDirectory(rootdir);
   lep2_eta->Sumw2();
 
-  TH1D *lep3_eta = new TH1D("lep3_eta", "#eta for trailing lepton "+g_sample_name, 100,0,3);
+  TH1D *lep3_eta = new TH1D("lep3_eta", "#eta for trailing lepton "+g_sample_name, 200,-3,3);
   lep3_eta->SetDirectory(rootdir);
   lep3_eta->Sumw2();
 
@@ -2446,7 +2446,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     loose_lep_pt->SetDirectory(rootdir);
     loose_lep_pt->Sumw2();  
   
-    loose_lep_eta = new TH1D("loose_lep_eta", "Loose Lepton #eta for "+g_sample_name, 1000,0,10);
+    loose_lep_eta = new TH1D("loose_lep_eta", "Loose Lepton #eta for "+g_sample_name, 1000,-2.5,2.5);
     loose_lep_eta->SetDirectory(rootdir);
     loose_lep_eta->Sumw2();  
   
