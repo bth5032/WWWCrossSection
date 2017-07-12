@@ -20,7 +20,7 @@ def PrintSRTable(yields):
   print("Sample & EE & $\mu\mu$ & E$\mu$ & 0SFOS & 1SFOS & 2SFOS \\\\ \\hline")
   
   for sample in yields.keys():
-      print("%s & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (sample, yields[sample]["ee"]["cv"], yields[sample]["ee"]["unc"], yields[sample]["mm"]["cv"], yields[sample]["mm"]["unc"], yields[sample]["em"]["cv"], yields[sample]["em"]["unc"], yields[sample]["0sfos"]["cv"], yields[sample]["0sfos"]["unc"], yields[sample]["1sfos"]["cv"], yields[sample]["1sfos"]["unc"], yields[sample]["2sfos"]["cv"], yields[sample]["2sfos"]["unc"] )
+      print("%s & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (sample, yields[sample]["ee"]["cv"], yields[sample]["ee"]["unc"], yields[sample]["mm"]["cv"], yields[sample]["mm"]["unc"], yields[sample]["em"]["cv"], yields[sample]["em"]["unc"], yields[sample]["0sfos"]["cv"], yields[sample]["0sfos"]["unc"], yields[sample]["1sfos"]["cv"], yields[sample]["1sfos"]["unc"], yields[sample]["2sfos"]["cv"], yields[sample]["2sfos"]["unc"] ) )
 
   print("\\end{tabular}")
   print("\\end{center}")
