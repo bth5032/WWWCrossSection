@@ -49,7 +49,7 @@ def getSampleYields(samples, base_hists_path):
   return yields
 
 def main():
-  samples=["WZ", "WW", "WJets", "ZZ", "TTBar1l", "TTBar2l", "DY", "VVV", "TTV", "SingleTop", "Other", "WWW", "WH"]
+  samples=["WZ", "WW", "WJets", "ZZ", "TTBar1l", "TTBar2l", "DY", "VVV", "TTV", "SingleTop", "Other", "WWW", "Wh"]
   latex=True
   base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/%s/" % args.config
   
