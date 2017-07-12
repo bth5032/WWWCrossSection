@@ -14,7 +14,7 @@ DEFAULT::NBjets_loose_max=0
 DEFAULT::no_btag_sf=true
 #---------------------------
 
-DEFAULT::lep1_pt_min=20
+DEFAULT::lep1_pt_min=25
 DEFAULT::lep2_pt_min=20
 DEFAULT::lep3_pt_min=20
 

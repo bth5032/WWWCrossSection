@@ -1750,15 +1750,18 @@ bool passFileSelections(){
       if( phys.gen_ht() > 100 ) {
         //cout<<"skipped"<<endl;
         numEvents->Fill(44);
+        if (printFail) cout<<phys.evt()<<" :Failed Drell Yan MC gen_ht more 100 for inclusive sample"<<endl;
         return false;
       }
       if(phys.evt_scale1fb() > 30){
         numEvents->Fill(60);
+        if (printFail) cout<<phys.evt()<<" :Failed Drell Yan MC scale1fb above 30"<<endl;
         return false;
       }
       if( fabs(phys.gen_ht() - g_ht) > 300 ) {
         //cout<<"skipped"<<endl;
         numEvents->Fill(69);
+        if (printFail) cout<<phys.evt()<<" :Failed Drell Yan MC gen_ht more than 300 difference with reco ht"<<endl;
         return false;
       }
     }
@@ -1766,6 +1769,7 @@ bool passFileSelections(){
       if( fabs(phys.gen_ht() - g_ht) > 300 ) {
         //cout<<"skipped"<<endl;
         numEvents->Fill(69);
+        if (printFail) cout<<phys.evt()<<" :Failed Drell Yan MC gen_ht more than 300 difference with reco ht"<<endl;
         return false;
       }
     }
@@ -1778,6 +1782,7 @@ bool passFileSelections(){
       //cout<<"File: "<<currentFile->GetTitle()<<" with gen_ht: "<<phys.gen_ht()<<endl;
       if( phys.gen_ht() > 100 ) {
         //cout<<"skipped"<<endl;
+        if (printFail) cout<<phys.evt()<<" :Failed WJets MC gen_ht more 100 for inclusive sample"<<endl;
         numEvents->Fill(44);
         return false;
       }
@@ -1791,6 +1796,7 @@ bool passFileSelections(){
       if( fabs(phys.gen_ht() - g_ht) > 300 ) {
         //cout<<"skipped"<<endl;
         numEvents->Fill(69);
+        if (printFail) cout<<phys.evt()<<" :Failed Photon MC gen_ht more than 300 difference with reco ht"<<endl;
         return false;
       }
     }
@@ -1804,6 +1810,7 @@ bool passFileSelections(){
       //cout<<"File: "<<currentFile->GetTitle()<<" with gen_ht: "<<phys.gen_ht()<<endl;
       if( phys.gen_ht() > 100 ) {
         //cout<<"skipped"<<endl;
+        if (printFail) cout<<phys.evt()<<" :Failed WJets MC gen_ht more 100 for inclusive sample"<<endl;
         numEvents->Fill(44);
         return false;
       }
@@ -1814,6 +1821,7 @@ bool passFileSelections(){
       if( phys.ngamma() > 0 && phys.gamma_genIsPromptFinalState().at(0) == 1 ) {
         //cout<<"skipped"<<endl;
         numEvents->Fill(64);
+        if (printFail) cout<<phys.evt()<<" :Failed WJets MC hardest photon is prompt"<<endl;
         return false;
       }
     }
@@ -1821,6 +1829,7 @@ bool passFileSelections(){
       if( phys.ngamma() > 0 && phys.gamma_genIsPromptFinalState().at(0) != 1 ) {
         //cout<<"skipped"<<endl;
         numEvents->Fill(64);
+        if (printFail) cout<<phys.evt()<<" :Failed WGammaJets MC hardest photon is not prompt"<<endl;
         return false;
       }
     }
@@ -1845,10 +1854,12 @@ bool passFileSelections(){
       }
       if (bestMatch < 0){
         numEvents->Fill(72);
+        if (printFail) cout<<phys.evt()<<" :Failed WGammaJets MC could not find best DR match for photon in gen record"<<endl;
         return false;
       }
       else if (phys.genPart_pt().at(bestMatch) > 40){
         numEvents->Fill(72);
+        if (printFail) cout<<phys.evt()<<" :Failed WGammaJets MC best DR match for photon in gen record had pt less than 40"<<endl;
         return false; 
       }
     } 
@@ -1862,6 +1873,7 @@ bool passFileSelections(){
         //cout<<"skipped"<<endl;
         numEvents->Fill(64);
         num_events_veto_ttbar++;
+        if (printFail) cout<<phys.evt()<<" :Failed TTBar MC hardest photon is prompt"<<endl;
         return false;
       }
     }   
@@ -1874,6 +1886,7 @@ bool passFileSelections(){
       if( phys.ngamma() > 0 && (phys.gamma_genIsPromptFinalState().at(0) != 1 || phys.gamma_mcMatchId().at(0) != 22 ) ) {
         //cout<<"skipped"<<endl;
         numEvents->Fill(64);
+        if (printFail) cout<<phys.evt()<<" :Failed TTBarGamma MC hardest photon is not prompt"<<endl;
         num_events_veto_ttgamma++;
         return false;
       }
@@ -1885,6 +1898,7 @@ bool passFileSelections(){
     {
         numEvents->Fill(43);
         num_events_veto_WH++;
+        if (printFail) cout<<phys.evt()<<" :Failed VH MC skim for WH events"<<endl;
         return false;
     }
   }
@@ -1893,6 +1907,7 @@ bool passFileSelections(){
     {
         numEvents->Fill(43);
         num_events_veto_WH++;
+        if (printFail) cout<<phys.evt()<<" :Failed VH MC skim for non-WH events"<<endl;
         return false;
     }
   }
@@ -2732,19 +2747,19 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       printStats = false;
       printFail = false;
 
-      for (int i = 0; i<g_nlep; i++){
+      /*for (int i = 0; i<g_nlep; i++){
         if( ( ! phys.lep_pass_VVV_cutbased_fo().at(g_lep_inds.at(i)) ) && phys.lep_pass_VVV_cutbased_veto().at(g_lep_inds.at(i))){
           printFail = true;
         }
-      }
+      }*/
 
       //if (inspection_set.count(phys.evt()) != 0){
-      if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
+      /*if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
         cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<endl;
         inspection_copy.erase(make_tuple(phys.evt(), phys.run(), phys.lumi()));
         printStats=true;
         printFail=true;
-      }
+      }*/
       /*else{ //Use if you don't want care about events in your list that are not in the other's
         continue;
       }*/
@@ -2802,10 +2817,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         // ----------------
         // DEBUG MODE
         // ----------------
-        if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
+        /*if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
           cout<<"NEW||evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<endl;
           //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
-        }
+        }*/
         //When Debug mode is off, you can turn this on:
         //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
 //===========================================
@@ -3041,10 +3056,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   // ----------------
   // DEBUG MODE
   // ----------------
-  cout<<"Events that weren't in your babies:"<<endl;
+  /*cout<<"Events that weren't in your babies:"<<endl;
   for (set<tuple<long,long,long>>::iterator it=inspection_copy.begin(); it!=inspection_copy.end(); ++it){
     cout<<"evt: "<<std::get<0>(*it)<<" run: "<<std::get<1>(*it)<<" lumi: "<<std::get<2>(*it)<<endl;
-  }
+  }*/
 
   cout<<"Num events passed: "<<eventCount<<endl;
   files_log<<"Num events passed: "<<eventCount<<endl;
