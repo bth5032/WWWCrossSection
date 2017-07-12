@@ -20,7 +20,7 @@ def PrintSRTable(yields):
   print("Sample & EE & $\mu\mu$ & E$\mu$ & 0SFOS & 1SFOS & 2SFOS \\\\ \\hline")
   
   for sample in yields.keys():
-      print("%s & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (sample, yields[sample]["ee"]["cv"], yields[sample]["ee"]["unc"], yields[sample]["mm"]["cv"], yields[sample]["mm"]["unc"], yields[sample]["em"]["cv"], yields[sample]["em"]["unc"], yields[sample]["0sfos"]["cv"], yields[sample]["0sfos"]["unc"], yields[sample]["1sfos"]["cv"], yields[sample]["1sfos"]["unc"], yields[sample]["2sfos"]["cv"], yields[sample]["2sfos"]["unc"] ) )
+      print("%s & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (sample, yields[sample]["2lepSSEE"]["cv"], yields[sample]["2lepSSEE"]["unc"], yields[sample]["2lepSSMuMu"]["cv"], yields[sample]["2lepSSMuMu"]["unc"], yields[sample]["2lepSSEMu"]["cv"], yields[sample]["2lepSSEMu"]["unc"], yields[sample]["3lep_0SFOS"]["cv"], yields[sample]["3lep_0SFOS"]["unc"], yields[sample]["3lep_1SFOS"]["cv"], yields[sample]["3lep_1SFOS"]["unc"], yields[sample]["3lep_2SFOS"]["cv"], yields[sample]["3lep_2SFOS"]["unc"] ) )
 
   print("\\end{tabular}")
   print("\\end{center}")
@@ -29,8 +29,8 @@ def PrintSRTable(yields):
 def getYieldsFromSample(hist_loc):
   """Takes in the location to a histogram and gets the integral and error of the MET histogram through its entire range."""
   f = r.TFile(hist_loc)
-  h = f.Get("t1met")
-  unc=ROOT.Double()
+  h = f.Get("type1MET").Clone("met")
+  unc=r.Double()
   cv=h.IntegralAndError(1,-1, unc)
   return (cv, float(unc))
 
@@ -43,7 +43,7 @@ def getSampleYields(samples, base_hists_path):
   for sample in samples:
     yields[sample] = {}
     for sr in SRs:
-      cv, unc = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr)
+      cv, unc = getYieldsFromSample(base_hists_path+sr+"/"+sample+".root")
       yields[sample][sr] = {"cv": cv, "unc": unc}
 
   return yields
@@ -52,9 +52,6 @@ def main():
   samples=["WZ", "WW", "WJets", "ZZ", "TTBar1l", "TTBar2l", "DY", "VVV", "TTV", "SingleTop", "Other", "WWW"]
   latex=True
   base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/%s/" % args.config
-
-  if (args.txt):
-    latex=False
   
   yields = getSampleYields(samples, base_hists_path)
   PrintSRTable(yields)
