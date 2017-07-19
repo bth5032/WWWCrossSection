@@ -125,7 +125,7 @@ function makeAllForDir {
 	then
 		for i in `find $1/* -maxdepth 0 -type d`
 		do
-			echo "recursing into $1"
+			echo "recursing into $i"
 			makeAllForDir $i $2 $3
 		done
 	else
