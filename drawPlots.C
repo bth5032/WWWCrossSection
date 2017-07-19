@@ -174,6 +174,8 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   } 
 
 
+
+
   //Add files from which to obtain histos
   TString default_hist_dir = getDefaultHistDir(conf);
   vector<TFile*> hist_files (num_hists);
@@ -183,17 +185,9 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
       sample_loc = TString(conf->get("file_"+to_string(i)+"_path"));
     }
     else{
-      /*if (TString(conf->get("sample_"+to_string(i))).Contains(','){
-        TString new_file = conf->get("sample_"+to_string(i));
-        new_file.ReplaceAll('[','');
-        new_file.ReplaceAll(']','');
-        new_file.ReplaceAll(',','_');
-        new_file.ReplaceAll(' ','_');
-        TString default_hist_dir+new_file+".root";
-      }*/
       sample_loc = default_hist_dir+conf->get("sample_"+to_string(i))+".root";
+      hist_files[i]=new TFile(sample_loc);
     }
-    hist_files[i]=new TFile(sample_loc);
   }
   cout << "Found files "<<endl;
 
@@ -204,16 +198,6 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   }
   else{
     bin_size=1;
-  }
-  //Get name of hist to read from file
-  vector<TString> hist_names (num_hists);
-  for (int i = 0; i<num_hists; i++){
-    if (conf->get("hist_"+to_string(i)+"_name") != ""){
-      hist_names[i]=conf->get("hist_"+to_string(i)+"_name");    
-    }
-    else{
-      hist_names[i]= conf->get("hist_0_name");
-    }
   }
 
   cout<<"/////////////////////////////////////////////////"<<endl;
@@ -241,8 +225,23 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
 
   vector<TH1D*> hists (num_hists);
   for (int i = 0; i<num_hists; i++){
-    hists[i] = (TH1D*) ((TH1D*) hist_files[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name);
-    cout<<hist_names[i]<<" found in "<<hist_files[i]->GetName()<<endl;
+    if (sParseVector(conf->get("sample_"+to_string(i))).size() > 1){
+      //parse names;
+      //get vector of files for all the names
+      //make a tmp hist that is a clone of the first
+      //add all other hists to that
+      //push that hist into hists[i]
+      
+      //vector<TString> tmp_hists;
+      //tmp_hists.push_back((TH1D*) ((TH1D*) hist_files[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name));
+
+      cout<<"can't do multi-hists yet"<<endl;
+      exit(1);
+    }
+    else{
+      hists[i] = (TH1D*) ((TH1D*) hist_files[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name);
+      cout<<hist_names[i]<<" found in "<<hist_files[i]->GetName()<<endl;
+    }
     cout<<hist_labels[i]<<" Integral bin 0 to bin 100 Content: "<<hists[i]->Integral(0,100)<<endl;
   }  
   cout << "Histograms pulled from files, adding draw options"<<endl;

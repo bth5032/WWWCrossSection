@@ -113,4 +113,35 @@ vector<TString> sParseVector(TString opt){
   return ret;
 }
 
+/*TString combineTH1D(TString output_dir, TString sample_names, hist_name){
+  // This method will eventually be used to combine my files....
+
+  vector<TH1D*> hists;
+  vector<TString> fnames = sParseVector(sample_names);
+  for (int i = 0; i<(int)samples.size(); i++){
+    TFile *f = new TFile(output_dir+fnames[i]+".root", "r");
+    hists.push_back((TH1D*) fget(hist_name)->Clone("h_"+to_string(i)));
+  }
+  output_name = sample_names;
+  output_name.ReplaceAll("[", "");
+  output_name.ReplaceAll("]", "");
+  output_name.ReplaceAll(",", " ");
+  output_name.ReplaceAll(" ", "_");
+
+  TString new_file_name = TString(output_dir+'/'+output_name+".root");
+
+  TFile *f_new = new TFile(new_file_name, "w");
+  f_new->cd();
+  
+  TH1D* h_new = hists[0]->Clone(hist_name);
+  h_new->SetDirectory(rootdir);
+
+  for (int i = 1; i <(int) samples.size(); i++) h_new->Add(hists[i]);
+
+  h_new->Write();
+  f_new.close();
+
+  return new_file_name;
+}*/
+
 #endif
