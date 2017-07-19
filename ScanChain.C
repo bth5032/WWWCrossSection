@@ -3097,6 +3097,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         //cout<<__LINE__<<endl;
 
         if (loose_lep_index != -1){
+          if (phys.lep_relIso03EA().at(loose_lep_index) > 0.2) cout<<"Wierd event: "<<phys.evt()<<" lep with iso: "<<phys.lep_relIso03EA().at(loose_lep_index)<<endl;
           loose_lep_reliso03EA->Fill(phys.lep_relIso03EA().at(loose_lep_index), weight);
           loose_lep_pt->Fill(phys.lep_p4().at(loose_lep_index).pt(), weight);
           loose_lep_eta->Fill(phys.lep_p4().at(loose_lep_index).eta(), weight);
