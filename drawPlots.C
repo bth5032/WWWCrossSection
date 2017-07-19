@@ -234,16 +234,16 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   vector<TH1D*> hists (num_hists);
   for (int i = 0; i<num_hists; i++){
     if (sParseVector(conf->get("sample_"+to_string(i))).size() > 1){
-      //parse names;
+      /*//parse names;
       vector<TString> snames = sParseVector(conf->get("sample_"+to_string(i)));
       //get vector of files for all the names
       vector<TFile> sfiles;
       for (int i = 0; i<(int) snames.size(); i++) sfiles.push_back(TFile(default_hist_dir+snames[i]+".root","r"));
       hists[i] = (TH1D*) ((TH1D*) sfiles[i].Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name);
       for (int i = 0; i<(int) snames.size(); i++) hists[i]->Add((TH1D*) ((TH1D*) sfiles[i].Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name));
-      
-      //cout<<"can't do multi-hists yet"<<endl;
-      //exit(1);
+      */
+      cout<<"can't do multi-hists yet"<<endl;
+      exit(1);
     }
     else{
       hists[i] = (TH1D*) ((TH1D*) hist_files[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name);
