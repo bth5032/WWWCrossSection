@@ -3001,6 +3001,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         lep3_ip3derr->Fill(fabs(phys.lep_ip3derr().at(g_lep_inds.at(2))), weight);
         lep3_sip3d->Fill(fabs(phys.lep_ip3d().at(g_lep_inds.at(2)))/fabs(phys.lep_ip3derr().at(g_lep_inds.at(2))), weight);
       }
+      cout<<__LINE__<<endl;
 
       for (int c = 0; c < g_nlep; c++){
         if (phys.lep_isFromW().at(c)){
@@ -3018,6 +3019,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           otherleps_ptRatio->Fill(fabs(phys.lep_ptRatio().at(g_lep_inds.at(c))), weight);
         }
       }
+      cout<<__LINE__<<endl;
       if (conf->get("fakerate_study") == "true"){ 
         //FR_cat cat = getFRCategory();
         //cout<<"Filling FR hist with category: "<<FR_cats_str[cat]<<endl;
@@ -3026,8 +3028,11 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         
         short loose_lep_index = -1;
         for (int i = 0; i < g_nlep; i++){
+          cout<<__LINE__<<endl;
           if (! phys.lep_pass_VVV_cutbased_tight().at(g_lep_inds.at(i))) loose_lep_index = g_lep_inds.at(i);
 
+          cout<<__LINE__<<endl;
+          
           if (phys.lep_motherIdSS().at(g_lep_inds.at(i)) == 1 || phys.lep_motherIdSS().at(g_lep_inds.at(i)) == 2){
             real_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight);
           }
@@ -3037,11 +3042,14 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           else{
             nomatch_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight); 
           }
+          cout<<__LINE__<<endl;
         } 
 
         if (phys.lep_relIso03EA().at(loose_lep_index) > 0.2){
           cout<<"Wierd lep, evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" Num_leps: "<<g_nlep<<" Lep_index: "<<loose_lep_index<<"pdgId: "<<phys.lep_pdgId().at(loose_lep_index)<<" Iso: "<<phys.lep_relIso03EA().at(loose_lep_index)<<endl;
         }
+
+        cout<<__LINE__<<endl;
 
         if (loose_lep_index != -1){
           loose_lep_reliso03EA->Fill(phys.lep_relIso03EA().at(loose_lep_index), weight);
@@ -3051,6 +3059,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           loose_lep_phi->Fill(phys.lep_p4().at(loose_lep_index).phi(), weight);
           loose_lep_absphi->Fill(fabs(phys.lep_p4().at(loose_lep_index).phi()), weight);
         }
+        cout<<__LINE__<<endl;
       }
 
 
