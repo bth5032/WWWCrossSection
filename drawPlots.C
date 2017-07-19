@@ -201,6 +201,17 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   cout << "Making Plots for: "<<plot_name<<endl;
   cout<<"/////////////////////////////////////////////////"<<endl;
 
+  //Get name of hist to read from file
+  vector<TString> hist_names (num_hists);
+  for (int i = 0; i<num_hists; i++){
+    if (conf->get("hist_"+to_string(i)+"_name") != ""){
+      hist_names[i]=conf->get("hist_"+to_string(i)+"_name");    
+    }
+    else{
+      hist_names[i]= conf->get("hist_0_name");
+    }
+  }
+
   //Get labels for TLegend
   vector<TString> hist_labels (num_hists);
   for (int i = 0; i<num_hists; i++){
@@ -228,8 +239,8 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
       //get vector of files for all the names
       vector<TFile> sfiles;
       for (int i = 0; i<(int) snames.size(); i++) sfiles.push_back(TFile(default_hist_dir+snames[i]+".root","r"));
-      hists[i] = (TH1D*) ((TH1D*) sfiles[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name);
-      for (int i = 0; i<(int) snames.size(); i++) hists[i]->Add((TH1D*) ((TH1D*) sfiles[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name));
+      hists[i] = (TH1D*) ((TH1D*) sfiles[i].Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name);
+      for (int i = 0; i<(int) snames.size(); i++) hists[i]->Add((TH1D*) ((TH1D*) sfiles[i].Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name));
       
       //cout<<"can't do multi-hists yet"<<endl;
       //exit(1);
