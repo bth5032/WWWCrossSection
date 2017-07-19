@@ -183,9 +183,16 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
       sample_loc = TString(conf->get("file_"+to_string(i)+"_path"));
     }
     else{
+      /*if (TString(conf->get("sample_"+to_string(i))).Contains(','){
+        TString new_file = conf->get("sample_"+to_string(i));
+        new_file.ReplaceAll('[','');
+        new_file.ReplaceAll(']','');
+        new_file.ReplaceAll(',','_');
+        new_file.ReplaceAll(' ','_');
+        TString default_hist_dir+new_file+".root";
+      }*/
       sample_loc = default_hist_dir+conf->get("sample_"+to_string(i))+".root";
     }
-
     hist_files[i]=new TFile(sample_loc);
   }
   cout << "Found files "<<endl;
