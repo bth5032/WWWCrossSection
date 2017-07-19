@@ -3045,8 +3045,6 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           loose_lep_phi->Fill(phys.lep_p4().at(loose_lep_index).phi(), weight);
           loose_lep_absphi->Fill(fabs(phys.lep_p4().at(loose_lep_index).phi()), weight);
         }
-
-        if ()
       }
 
 
