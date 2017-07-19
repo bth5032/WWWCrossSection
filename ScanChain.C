@@ -1943,7 +1943,7 @@ void setLepIndexes(){
     int max_hits = stoi(conf->get("FR_lost_hits_max"));
 
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
-      pass_max_hits = (phys.lep_lostHits().at(i) > max_hits);
+      pass_max_hits = (phys.lep_lostHits().at(i) <= max_hits);
       g_looseIDs[i] = (g_looseIDs[i] && pass_max_hits);
     }
   }
@@ -1953,7 +1953,7 @@ void setLepIndexes(){
     double ip3d_max = stoi(conf->get("FR_ip3d_max"));
 
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
-      pass_ip3d = (phys.lep_ip3d().at(i) > ip3d_max);
+      pass_ip3d = (phys.lep_ip3d().at(i) <= ip3d_max);
       g_looseIDs[i] = (g_looseIDs[i] && pass_ip3d);
     }
   }
@@ -1964,7 +1964,7 @@ void setLepIndexes(){
 
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
       if(fabs(phys.lep_pdgId().at(i)) == 13 ){
-        pass_reliso03_max_mus = (phys.lep_relIso03EA().at(i) > reliso03_max_mus);
+        pass_reliso03_max_mus = (phys.lep_relIso03EA().at(i) <= reliso03_max_mus);
         g_looseIDs[i] = (g_looseIDs[i] && pass_reliso03_max_mus);
       }
     }
@@ -1976,7 +1976,7 @@ void setLepIndexes(){
 
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
       if(fabs(phys.lep_pdgId().at(i)) == 11 ){
-        pass_reliso03_max_els = (phys.lep_relIso03EA().at(i) > reliso03_max_els);
+        pass_reliso03_max_els = (phys.lep_relIso03EA().at(i) <= reliso03_max_els);
         g_looseIDs[i] = (g_looseIDs[i] && pass_reliso03_max_els);
       }
     }
