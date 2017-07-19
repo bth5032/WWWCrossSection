@@ -3045,10 +3045,6 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           cout<<__LINE__<<endl;
         } 
 
-        if (phys.lep_relIso03EA().at(loose_lep_index) > 0.2){
-          cout<<"Wierd lep, evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" Num_leps: "<<g_nlep<<" Lep_index: "<<loose_lep_index<<"pdgId: "<<phys.lep_pdgId().at(loose_lep_index)<<" Iso: "<<phys.lep_relIso03EA().at(loose_lep_index)<<endl;
-        }
-
         cout<<__LINE__<<endl;
 
         if (loose_lep_index != -1){
