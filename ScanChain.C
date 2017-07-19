@@ -2449,9 +2449,17 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   lep3_reliso03EA->Sumw2();
 
   //-------------------------------------------
+  //Truth level tagging fake rate distributions
+
+  TH1D *fr_counts = new TH1D("fr_counts", "Fake Rate Counter", CATERR, T_real /*=0*/, CATERR /*=8*/);
+  fr_counts->SetDirectory(rootdir);
+  fr_counts->Sumw2();
+  for (int i = T_real; i<CATERR; i++) fr_counts->GetXaxis()->SetBinLabel(fr_counts->FindBin(i), FR_cats_str[i]); //Label bins with ENUM values
+
+  //-------------------------------------------
   //Loose lepton kinematics
 
-  TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_abseta, *loose_lep_phi, *loose_lep_absphi;
+  TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_abseta, *loose_lep_phi, *loose_lep_absphi, *fake_pt, *real_pt, *nomatch_pt;
   if (conf->get("fakerate_study") == "true"){ 
     loose_lep_reliso03EA = new TH1D("loose_lep_reliso03EA", "Loose Lepton Relative Isolation (03EA cone) for "+g_sample_name, 6000,0,6);
     loose_lep_reliso03EA->SetDirectory(rootdir);
@@ -2476,15 +2484,19 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     loose_lep_absphi = new TH1D("loose_lep_absphi", "Loose Lepton |#phi| for "+g_sample_name, 630,-3.15,3.15);
     loose_lep_absphi->SetDirectory(rootdir);
     loose_lep_absphi->Sumw2();  
+
+    fake_pt = new TH1D("fake_pt", "p_{T} for fake leptons", 6000, 0, 6000 );
+    fake_pt->SetDirectory(rootdir);
+    fake_pt->Sumw2();
+
+    real_pt = new TH1D("real_pt", "p_{T} for real leptons", 6000, 0, 6000 );
+    real_pt->SetDirectory(rootdir);
+    real_pt->Sumw2();
+
+    nomatch_pt = new TH1D("nomatch_pt", "p_{T} for leptons not matched by motherId", 6000, 0, 6000 );
+    nomatch_pt->SetDirectory(rootdir);
+    nomatch_pt->Sumw2();
   }
-
-  //-------------------------------------------
-  //Truth level tagging fake rate distributions
-
-  TH1D *fr_counts = new TH1D("fr_counts", "Fake Rate Counter", CATERR, T_real /*=0*/, CATERR /*=8*/);
-  fr_counts->SetDirectory(rootdir);
-  fr_counts->Sumw2();
-  for (int i = T_real; i<CATERR; i++) fr_counts->GetXaxis()->SetBinLabel(fr_counts->FindBin(i), FR_cats_str[i]); //Label bins with ENUM values
 
   //-------------------------------------------
   //Truth level tagging W leps ip distributions
@@ -2996,7 +3008,19 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         fr_counts->Fill(getFRCategory(), weight);
         
         short loose_lep_index = -1;
-        for (int i = 0; i < g_nlep; i++) if (! phys.lep_pass_VVV_cutbased_tight().at(g_lep_inds.at(i))) loose_lep_index = g_lep_inds.at(i);
+        for (int i = 0; i < g_nlep; i++){
+          if (! phys.lep_pass_VVV_cutbased_tight().at(g_lep_inds.at(i))) loose_lep_index = g_lep_inds.at(i);
+
+          if (phys.lep_motherIdSS().at(g_lep_inds.at(i) == 1 || phys.lep_motherIdSS().at(g_lep_inds.at(i) == 2){
+            real_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight);
+          }
+          else if (phys.lep_motherIdSS().at(g_lep_inds(i) == < 0){
+            fake_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight);
+          }
+          else{
+            nomatch_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight); 
+          }
+        } 
 
         if (phys.lep_relIso03EA().at(loose_lep_index) > 0.2){
           cout<<"Wierd lep, evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" Num_leps: "<<g_nlep<<" Lep_index: "<<loose_lep_index<<"pdgId: "<<phys.lep_pdgId().at(loose_lep_index)<<" Iso: "<<phys.lep_relIso03EA().at(loose_lep_index)<<endl;
@@ -3010,6 +3034,8 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           loose_lep_phi->Fill(phys.lep_p4().at(loose_lep_index).phi(), weight);
           loose_lep_absphi->Fill(fabs(phys.lep_p4().at(loose_lep_index).phi()), weight);
         }
+
+        if ()
       }
 
 
@@ -3208,6 +3234,9 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     loose_lep_abseta->Write();
     loose_lep_phi->Write();
     loose_lep_absphi->Write();
+    fake_pt->Write();
+    real_pt->Write();
+    nomatch_pt->Write();
   }
 
   //close output file
