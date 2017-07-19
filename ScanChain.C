@@ -1938,13 +1938,47 @@ void setLepIndexes(){
 
   //cout<<__LINE__<<endl;
 
-  if (conf->get("lost_hits_max") != ""){
+  if (conf->get("FR_lost_hits_max") != ""){
     bool pass_max_hits = false;
-    int max_hits = stoi(conf->get("lost_hits_max"));
+    int max_hits = stoi(conf->get("FR_lost_hits_max"));
 
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
       pass_max_hits = (phys.lep_lostHits().at(i) > max_hits);
       g_looseIDs[i] = (g_looseIDs[i] && pass_max_hits);
+    }
+  }
+
+  if (conf->get("FR_ip3d_max") != ""){
+    bool pass_ip3d = false;
+    double ip3d_max = stoi(conf->get("FR_ip3d_max"));
+
+    for (int i = 0; i<(int) g_looseIDs.size(); i++){
+      pass_ip3d = (phys.lep_ip3d().at(i) > ip3d_max);
+      g_looseIDs[i] = (g_looseIDs[i] && pass_ip3d);
+    }
+  }
+
+  if (conf->get("FR_reliso03_max_mus") != ""){
+    bool pass_reliso03_max_mus = false;
+    double reliso03_max_mus = stoi(conf->get("FR_reliso03_max_mus"));
+
+    for (int i = 0; i<(int) g_looseIDs.size(); i++){
+      if(fabs(phys.lep_pdgId().at(i)) == 13 ){
+        pass_reliso03_max_mus = (phys.lep_relIso03EA().at(i) > reliso03_max_mus);
+        g_looseIDs[i] = (g_looseIDs[i] && pass_reliso03_max_mus);
+      }
+    }
+  }
+
+  if (conf->get("FR_reliso03_max_els") != ""){
+    bool pass_reliso03_max_els = false;
+    double reliso03_max_els = stoi(conf->get("FR_reliso03_max_els"));
+
+    for (int i = 0; i<(int) g_looseIDs.size(); i++){
+      if(fabs(phys.lep_pdgId().at(i)) == 11 ){
+        pass_reliso03_max_els = (phys.lep_relIso03EA().at(i) > reliso03_max_els);
+        g_looseIDs[i] = (g_looseIDs[i] && pass_reliso03_max_els);
+      }
     }
   }
 
@@ -2476,7 +2510,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   //-------------------------------------------
   //Loose lepton kinematics
 
-  TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_abseta, *loose_lep_phi, *loose_lep_absphi, *fake_pt, *real_pt, *nomatch_pt;
+  TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_abseta, *loose_lep_phi, *loose_lep_absphi, *fake_pt, *real_pt, *nomatch_pt, *tight_fake_pt, *tight_real_pt, *tight_nomatch_pt;
   if (conf->get("fakerate_study") == "true"){ 
     loose_lep_reliso03EA = new TH1D("loose_lep_reliso03EA", "Loose Lepton Relative Isolation (03EA cone) for "+g_sample_name, 6000,0,6);
     loose_lep_reliso03EA->SetDirectory(rootdir);
@@ -2513,6 +2547,18 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     nomatch_pt = new TH1D("nomatch_pt", "p_{T} for leptons not matched by motherId", 6000, 0, 6000 );
     nomatch_pt->SetDirectory(rootdir);
     nomatch_pt->Sumw2();
+
+    tight_fake_pt = new TH1D("tight_fake_pt", "p_{T} for fake leptons (only tight leps)", 6000, 0, 6000 );
+    tight_fake_pt->SetDirectory(rootdir);
+    tight_fake_pt->Sumw2();
+
+    tight_real_pt = new TH1D("tight_real_pt", "p_{T} for real leptons (only tight leps)", 6000, 0, 6000 );
+    tight_real_pt->SetDirectory(rootdir);
+    tight_real_pt->Sumw2();
+
+    tight_nomatch_pt = new TH1D("tight_nomatch_pt", "p_{T} for leptons not matched by motherId (only tight leps)", 6000, 0, 6000 );
+    tight_nomatch_pt->SetDirectory(rootdir);
+    tight_nomatch_pt->Sumw2();
   }
 
   //-------------------------------------------
@@ -3035,12 +3081,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           
           if (phys.lep_motherIdSS().at(g_lep_inds.at(i)) == 1 || phys.lep_motherIdSS().at(g_lep_inds.at(i)) == 2){
             real_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight);
+            if (phys.lep_pass_VVV_cutbased_tight().at(g_lep_inds.at(i))) tight_real_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight);
           }
           else if (phys.lep_motherIdSS().at(g_lep_inds.at(i)) < 0){
             fake_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight);
+            if (phys.lep_pass_VVV_cutbased_tight().at(g_lep_inds.at(i))) tight_fake_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight);
           }
           else{
             nomatch_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight); 
+            if (phys.lep_pass_VVV_cutbased_tight().at(g_lep_inds.at(i))) tight_nomatch_pt->Fill(phys.lep_pt().at(g_lep_inds.at(i)), weight);
           }
           //cout<<__LINE__<<endl;
         } 
@@ -3257,6 +3306,9 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     fake_pt->Write();
     real_pt->Write();
     nomatch_pt->Write();
+    tight_fake_pt->Write();
+    tight_real_pt->Write();
+    tight_nomatch_pt->Write();
   }
 
   //close output file
