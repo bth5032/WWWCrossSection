@@ -121,6 +121,13 @@ function makeAllForDir {
 	if [[ $# < 2 ]]
 	then
 		echo "makeAllForDir <path_to_configs> <all/hists/plots> <sample_name | only if given hists or all>"
+	elif [[ `find $1/* -maxdepth 0 -type d | wc -l` > 0 ]]
+	then
+		for i in `find $1/* -maxdepth 0 -type d`
+		do
+			echo "recursing into $1"
+			makeAllForDir $i $2 $3
+		done
 	else
 		echo -n `basename $1`" -- "
 		_makeAllForDir $1 $2 $3 &
