@@ -1940,7 +1940,7 @@ void setLepIndexes(){
     bool pass_max_hits = false;
     int max_hits = stoi(conf->get("lost_hits_max"));
 
-    for (int i = 0; i<g_looseIDs.size(); i++){
+    for (int i = 0; i<(int) g_looseIDs.size(); i++){
       pass_max_hits = (phys.lep_lostHits().at(i) > max_hits);
       g_looseIDs[i] = (g_looseIDs[i] && pass_max_hits);
     }
