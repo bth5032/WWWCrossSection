@@ -173,9 +173,6 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     return TString("Less than Two hists can not be turned into a residual plot, please call drawSingleTH1");
   } 
 
-
-
-
   //Add files from which to obtain histos
   TString default_hist_dir = getDefaultHistDir(conf);
   vector<TFile*> hist_files (num_hists);
@@ -227,16 +224,15 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   for (int i = 0; i<num_hists; i++){
     if (sParseVector(conf->get("sample_"+to_string(i))).size() > 1){
       //parse names;
+      vector<TString> snames = sParseVector(conf->get("sample_"+to_string(i)));
       //get vector of files for all the names
-      //make a tmp hist that is a clone of the first
-      //add all other hists to that
-      //push that hist into hists[i]
+      vector<TFile> sfiles;
+      for (int i = 0; i<(int) snames.size(); i++) sfiles.push_back(TFile(default_hist_dir+snames[i]+".root","r"));
+      hists[i] = (TH1D*) ((TH1D*) sfiles[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name);
+      for (int i = 0; i<(int) snames.size(); i++) hists[i]->Add((TH1D*) ((TH1D*) sfiles[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name));
       
-      //vector<TString> tmp_hists;
-      //tmp_hists.push_back((TH1D*) ((TH1D*) hist_files[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name));
-
-      cout<<"can't do multi-hists yet"<<endl;
-      exit(1);
+      //cout<<"can't do multi-hists yet"<<endl;
+      //exit(1);
     }
     else{
       hists[i] = (TH1D*) ((TH1D*) hist_files[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name);
