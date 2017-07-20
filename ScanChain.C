@@ -1948,7 +1948,7 @@ void setLepIndexes(){
       pass_max_hits = (phys.lep_lostHits().at(i) <= max_hits);
       cout<<"Lep "<<i<<" has "<<phys.lep_lostHits().at(i)<<" and pass: "<<pass_max_hits<<" loose ID was "<<g_looseIDs[i];
       g_looseIDs[i] = (g_looseIDs[i] && pass_max_hits);
-      cout<<" and now is "<<g_looseIDs<<endl;
+      cout<<" and now is "<<g_looseIDs[i]<<endl;
     }
   }
 
@@ -1962,7 +1962,7 @@ void setLepIndexes(){
       pass_ip3d = (phys.lep_ip3d().at(i) <= ip3d_max);
       cout<<"Lep "<<i<<" has ip3d "<<phys.lep_ip3d().at(i)<<" and pass: "<<pass_ip3d<<" loose ID was "<<g_looseIDs[i];
       g_looseIDs[i] = (g_looseIDs[i] && pass_ip3d);
-      cout<<" and now is "<<g_looseIDs<<endl;
+      cout<<" and now is "<<g_looseIDs[i]<<endl;
     }
   }
 
@@ -1977,7 +1977,7 @@ void setLepIndexes(){
         pass_reliso03_max_mus = (phys.lep_relIso03EA().at(i) <= reliso03_max_mus);
         cout<<"Muon at "<<i<<" has reliso03 "<<phys.lep_relIso03EA().at(i)<<" and pass: "<<pass_reliso03_max_mus<<" loose ID was "<<g_looseIDs[i];
         g_looseIDs[i] = (g_looseIDs[i] && pass_reliso03_max_mus);
-        cout<<" and now is "<<g_looseIDs<<endl;
+        cout<<" and now is "<<g_looseIDs[i]<<endl;
       }
     }
   }
@@ -1993,7 +1993,7 @@ void setLepIndexes(){
         pass_reliso03_max_els = (phys.lep_relIso03EA().at(i) <= reliso03_max_els);
         cout<<"Electron at "<<i<<" has reliso03 "<<phys.lep_relIso03EA().at(i)<<" and pass: "<<pass_reliso03_max_els<<" loose ID was "<<g_looseIDs[i];
         g_looseIDs[i] = (g_looseIDs[i] && pass_reliso03_max_els);
-        cout<<" and now is "<<g_looseIDs<<endl;
+        cout<<" and now is "<<g_looseIDs[i]<<endl;
       }
     }
   }
