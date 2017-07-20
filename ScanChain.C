@@ -1954,7 +1954,7 @@ void setLepIndexes(){
 
   if (conf->get("FR_ip3d_max") != ""){
     bool pass_ip3d = false;
-    double ip3d_max = stoi(conf->get("FR_ip3d_max"));
+    double ip3d_max = stod(conf->get("FR_ip3d_max"));
 
     cout<<"ip3d max cut found"<<endl;
 
@@ -1968,7 +1968,7 @@ void setLepIndexes(){
 
   if (conf->get("FR_reliso03_max_mus") != ""){
     bool pass_reliso03_max_mus = false;
-    double reliso03_max_mus = stoi(conf->get("FR_reliso03_max_mus"));
+    double reliso03_max_mus = stod(conf->get("FR_reliso03_max_mus"));
 
     cout<<"Muon reliso cut found at: "<<reliso03_max_mus<<endl;
 
@@ -1984,7 +1984,7 @@ void setLepIndexes(){
 
   if (conf->get("FR_reliso03_max_els") != ""){
     bool pass_reliso03_max_els = false;
-    double reliso03_max_els = stoi(conf->get("FR_reliso03_max_els"));
+    double reliso03_max_els = stod(conf->get("FR_reliso03_max_els"));
 
     cout<<"Electron reliso cut found at: "<<reliso03_max_els<<endl;
 
