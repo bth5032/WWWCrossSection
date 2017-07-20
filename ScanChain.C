@@ -1942,9 +1942,13 @@ void setLepIndexes(){
     bool pass_max_hits = false;
     int max_hits = stoi(conf->get("FR_lost_hits_max"));
 
+    cout<<"Lost hits max cut found at: "<<max_hits<<endl;
+
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
       pass_max_hits = (phys.lep_lostHits().at(i) <= max_hits);
+      cout<<"Lep "<<i<<" has "<<phys.lep_lostHits().at(i)<<" and pass: "<<pass_max_hits<<" loose ID was "<<g_looseIDs[i];
       g_looseIDs[i] = (g_looseIDs[i] && pass_max_hits);
+      cout<<" and now is "<<g_looseIDs<<endl;
     }
   }
 
@@ -1952,9 +1956,13 @@ void setLepIndexes(){
     bool pass_ip3d = false;
     double ip3d_max = stoi(conf->get("FR_ip3d_max"));
 
+    cout<<"ip3d max cut found"<<endl;
+
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
       pass_ip3d = (phys.lep_ip3d().at(i) <= ip3d_max);
+      cout<<"Lep "<<i<<" has ip3d "<<phys.lep_ip3d().at(i)<<" and pass: "<<pass_ip3d<<" loose ID was "<<g_looseIDs[i];
       g_looseIDs[i] = (g_looseIDs[i] && pass_ip3d);
+      cout<<" and now is "<<g_looseIDs<<endl;
     }
   }
 
@@ -1962,10 +1970,14 @@ void setLepIndexes(){
     bool pass_reliso03_max_mus = false;
     double reliso03_max_mus = stoi(conf->get("FR_reliso03_max_mus"));
 
+    cout<<"Muon reliso cut found at: "<<reliso03_max_mus<<endl;
+
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
       if(fabs(phys.lep_pdgId().at(i)) == 13 ){
         pass_reliso03_max_mus = (phys.lep_relIso03EA().at(i) <= reliso03_max_mus);
+        cout<<"Muon at "<<i<<" has reliso03 "<<phys.lep_relIso03EA().at(i)<<" and pass: "<<pass_reliso03_max_mus<<" loose ID was "<<g_looseIDs[i];
         g_looseIDs[i] = (g_looseIDs[i] && pass_reliso03_max_mus);
+        cout<<" and now is "<<g_looseIDs<<endl;
       }
     }
   }
@@ -1974,10 +1986,14 @@ void setLepIndexes(){
     bool pass_reliso03_max_els = false;
     double reliso03_max_els = stoi(conf->get("FR_reliso03_max_els"));
 
+    cout<<"Electron reliso cut found at: "<<reliso03_max_els<<endl;
+
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
       if(fabs(phys.lep_pdgId().at(i)) == 11 ){
         pass_reliso03_max_els = (phys.lep_relIso03EA().at(i) <= reliso03_max_els);
+        cout<<"Electron at "<<i<<" has reliso03 "<<phys.lep_relIso03EA().at(i)<<" and pass: "<<pass_reliso03_max_els<<" loose ID was "<<g_looseIDs[i];
         g_looseIDs[i] = (g_looseIDs[i] && pass_reliso03_max_els);
+        cout<<" and now is "<<g_looseIDs<<endl;
       }
     }
   }
