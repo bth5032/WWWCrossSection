@@ -34,6 +34,14 @@ if (args.help):
 
 import ROOT as r
 
+def err_ratio(num, den, Dnum, Dden):
+  """Returns the 1 sigma on a ratio"""
+  return (den*Dnum - num*Dden)/ (den*den)
+
+def getCell(num, den, Dnum, Dden):
+  """Returns (fr, Dfr) for the numerator and denomenator"""
+  return (float(num)/den, err_ratio(num, den, Dnum, Dden))
+
 def parsePtBins(bin_string):
   """Makes a list of ints from a string of the form [x0,x1,x2,...xN]"""
   s_bins = bin_string[1:-1].split(',')
@@ -45,6 +53,7 @@ def parsePtBins(bin_string):
   return bins
 
 def PrintSRTable(yields, study_dir, latex):
+  """Prints the yeilds tables for tight_fake/loose_fake and tight/loose (inclusive)"""
   print("Using Config: %s" % study_dir)
   print("\\begin{table}[ht!]")
   print("\\begin{center}")
@@ -57,17 +66,24 @@ def PrintSRTable(yields, study_dir, latex):
   head+="}"
   print(head)
   print(title)
-
-
-  # NEED TO FINISH HERE:
-  row = "SSee          & "
-  print("SSee          & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["2lepSSEE"]["rt"],yields["2lepSSEE"]["rt_unc"],yields["2lepSSEE"]["rl"],yields["2lepSSEE"]["rl_unc"],yields["2lepSSEE"]["ft"],yields["2lepSSEE"]["ft_unc"],yields["2lepSSEE"]["fl"],yields["2lepSSEE"]["fl_unc"]) )
   
-  print("SSe$\mu$      & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["2lepSSEMu"]["rt"],yields["2lepSSEMu"]["rt_unc"],yields["2lepSSEMu"]["rl"],yields["2lepSSEMu"]["rl_unc"],yields["2lepSSEMu"]["ft"],yields["2lepSSEMu"]["ft_unc"],yields["2lepSSEMu"]["fl"],yields["2lepSSEMu"]["fl_unc"]) )
-  print("SS$\mu\mu$    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["2lepSSMuMu"]["rt"],yields["2lepSSMuMu"]["rt_unc"],yields["2lepSSMuMu"]["rl"],yields["2lepSSMuMu"]["rl_unc"],yields["2lepSSMuMu"]["ft"],yields["2lepSSMuMu"]["ft_unc"],yields["2lepSSMuMu"]["fl"],yields["2lepSSMuMu"]["fl_unc"]) )
-  print("3lep 0SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_0SFOS"]["rt"],yields["3lep_0SFOS"]["rt_unc"],yields["3lep_0SFOS"]["rl"],yields["3lep_0SFOS"]["rl_unc"],yields["3lep_0SFOS"]["ft"],yields["3lep_0SFOS"]["ft_unc"],yields["3lep_0SFOS"]["fl"],yields["3lep_0SFOS"]["fl_unc"]) )
-  print("3lep 1SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_1SFOS"]["rt"],yields["3lep_1SFOS"]["rt_unc"],yields["3lep_1SFOS"]["rl"],yields["3lep_1SFOS"]["rl_unc"],yields["3lep_1SFOS"]["ft"],yields["3lep_1SFOS"]["ft_unc"],yields["3lep_1SFOS"]["fl"],yields["3lep_1SFOS"]["fl_unc"]) )
-  print("3lep 2SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_2SFOS"]["rt"],yields["3lep_2SFOS"]["rt_unc"],yields["3lep_2SFOS"]["rl"],yields["3lep_2SFOS"]["rl_unc"],yields["3lep_2SFOS"]["ft"],yields["3lep_2SFOS"]["ft_unc"],yields["3lep_2SFOS"]["fl"],yields["3lep_2SFOS"]["fl_unc"]) ) 
+  row = "SSee (fakes)         "
+  for i in xrange(len(pt_bins) - 1):
+    row += " & %0.2f $\pm$ %0.2f " % (getCell(yields["2lepSSEE"]["ft"][i], yields["2lepSSEE"]["fl"][i], yields["2lepSSEE"]["ft_unc"][i], yields["2lepSSEE"]["fl_unc"][i]))
+  row+= " \\\\"
+  print(row)
+
+  row = "SSee (inclusive)         "
+  for i in xrange(len(pt_bins) - 1):
+    row += " & %0.2f $\pm$ %0.2f " % (getCell(yields["2lepSSEE"]["ft"][i]+yields["2lepSSEE"]["rt"][i], yields["2lepSSEE"]["fl"][i]+yields["2lepSSEE"]["rl"][i], math.sqrt(yields["2lepSSEE"]["ft_unc"][i]*yields["2lepSSEE"]["ft_unc"][i] + yields["2lepSSEE"]["rt_unc"][i]*yields["2lepSSEE"]["rt_unc"][i]), math.sqrt(yields["2lepSSEE"]["fl_unc"][i]*yields["2lepSSEE"]["fl_unc"][i] + yields["2lepSSEE"]["rl_unc"][i]*yields["2lepSSEE"]["rl_unc"][i])))
+  row+= " \\\\"
+  print(row)
+
+  #print("SSe$\mu$      & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["2lepSSEMu"]["rt"],yields["2lepSSEMu"]["rt_unc"],yields["2lepSSEMu"]["rl"],yields["2lepSSEMu"]["rl_unc"],yields["2lepSSEMu"]["ft"],yields["2lepSSEMu"]["ft_unc"],yields["2lepSSEMu"]["fl"],yields["2lepSSEMu"]["fl_unc"]) )
+  #print("SS$\mu\mu$    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["2lepSSMuMu"]["rt"],yields["2lepSSMuMu"]["rt_unc"],yields["2lepSSMuMu"]["rl"],yields["2lepSSMuMu"]["rl_unc"],yields["2lepSSMuMu"]["ft"],yields["2lepSSMuMu"]["ft_unc"],yields["2lepSSMuMu"]["fl"],yields["2lepSSMuMu"]["fl_unc"]) )
+  #print("3lep 0SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_0SFOS"]["rt"],yields["3lep_0SFOS"]["rt_unc"],yields["3lep_0SFOS"]["rl"],yields["3lep_0SFOS"]["rl_unc"],yields["3lep_0SFOS"]["ft"],yields["3lep_0SFOS"]["ft_unc"],yields["3lep_0SFOS"]["fl"],yields["3lep_0SFOS"]["fl_unc"]) )
+  #print("3lep 1SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_1SFOS"]["rt"],yields["3lep_1SFOS"]["rt_unc"],yields["3lep_1SFOS"]["rl"],yields["3lep_1SFOS"]["rl_unc"],yields["3lep_1SFOS"]["ft"],yields["3lep_1SFOS"]["ft_unc"],yields["3lep_1SFOS"]["fl"],yields["3lep_1SFOS"]["fl_unc"]) )
+  #print("3lep 2SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_2SFOS"]["rt"],yields["3lep_2SFOS"]["rt_unc"],yields["3lep_2SFOS"]["rl"],yields["3lep_2SFOS"]["rl_unc"],yields["3lep_2SFOS"]["ft"],yields["3lep_2SFOS"]["ft_unc"],yields["3lep_2SFOS"]["fl"],yields["3lep_2SFOS"]["fl_unc"]) ) 
 
   print("\\end{tabular}")
   print("\\end{center}")
@@ -81,22 +97,40 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
   h_tight_fake_pt = f.Get("tight_fake_pt").Clone("h_tight_fake_pt_%s" % SR)
   h_loose_fake_pt = f.Get("loose_fake_pt").Clone("h_loose_fake_pt_%s" % SR)
 
+  rt = []
+  rt_unc = []
+  rl = []
+  rl_unc = []
+  ft = []
+  ft_unc = []
+  fl = []
+  fl_unc = []
+
   #loop over all pt intervals
   for i in xrange(len(pt_bins) - 1):
     low = pt_bins[i]
     high = pt_bins[i+1]
 
-    rt_unc=r.Double()
-    rt=h_tight_real_pt.IntegralAndError(low, high, rt_unc)
+    rt_unc_=r.Double()
+    rt_=h_tight_real_pt.IntegralAndError(low, high, rt_unc_)
 
-    rl_unc=r.Double()
-    rl=h_loose_real_pt.IntegralAndError(low, high, rl_unc)
+    rl_unc_=r.Double()
+    rl_=h_loose_real_pt.IntegralAndError(low, high, rl_unc_)
     
-    ft_unc=r.Double()
-    ft=h_tight_fake_pt.IntegralAndError(low, high, ft_unc)
+    ft_unc_=r.Double()
+    ft_=h_tight_fake_pt.IntegralAndError(low, high, ft_unc_)
     
-    fl_unc=r.Double()
-    fl=h_loose_fake_pt.IntegralAndError(low, high, fl_unc)
+    fl_unc_=r.Double()
+    fl_=h_loose_fake_pt.IntegralAndError(low, high, fl_unc_)
+
+    rt.append(rt_)
+    rt_unc.append(rt_unc_)
+    rl.append(rl_)
+    rl_unc.append(rl_unc_)
+    ft.append(ft_)
+    ft_unc.append(ft_unc_)
+    fl.append(fl_)
+    fl_unc.append(fl_unc_)
 
   return (rt, rl, ft, fl, rt_unc, rl_unc, ft_unc, fl_unc)
 
