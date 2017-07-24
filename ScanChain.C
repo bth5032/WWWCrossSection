@@ -2526,7 +2526,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   //-------------------------------------------
   //Loose lepton kinematics
 
-  TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_abseta, *loose_lep_phi, *loose_lep_absphi, *fake_pt, *real_pt, *nomatch_pt, *tight_fake_pt, *tight_real_pt, *tight_nomatch_pt;
+  TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_abseta, *loose_lep_phi, *loose_lep_absphi, *fake_pt, *real_pt, *nomatch_pt, *tight_fake_pt, *tight_real_pt, *tight_nomatch_pt, *loose_fake_pt, *loose_real_pt, *loose_nomatch_pt;
   if (conf->get("fakerate_study") == "true"){ 
     loose_lep_reliso03EA = new TH1D("loose_lep_reliso03EA", "Loose Lepton Relative Isolation (03EA cone) for "+g_sample_name, 6000,0,6);
     loose_lep_reliso03EA->SetDirectory(rootdir);
