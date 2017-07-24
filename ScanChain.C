@@ -2575,6 +2575,18 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     tight_nomatch_pt = new TH1D("tight_nomatch_pt", "p_{T} for leptons not matched by motherId (only tight leps)", 6000, 0, 6000 );
     tight_nomatch_pt->SetDirectory(rootdir);
     tight_nomatch_pt->Sumw2();
+
+    loose_fake_pt = new TH1D("loose_fake_pt", "p_{T} for fake leptons (only loose leps)", 6000, 0, 6000 );
+    loose_fake_pt->SetDirectory(rootdir);
+    loose_fake_pt->Sumw2();
+
+    loose_real_pt = new TH1D("loose_real_pt", "p_{T} for real leptons (only loose leps)", 6000, 0, 6000 );
+    loose_real_pt->SetDirectory(rootdir);
+    loose_real_pt->Sumw2();
+
+    loose_nomatch_pt = new TH1D("loose_nomatch_pt", "p_{T} for leptons not matched by motherId (only loose leps)", 6000, 0, 6000 );
+    loose_nomatch_pt->SetDirectory(rootdir);
+    loose_nomatch_pt->Sumw2();
   }
 
   //-------------------------------------------
@@ -3120,6 +3132,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           loose_lep_abseta->Fill(fabs(phys.lep_p4().at(loose_lep_index).eta()), weight);
           loose_lep_phi->Fill(phys.lep_p4().at(loose_lep_index).phi(), weight);
           loose_lep_absphi->Fill(fabs(phys.lep_p4().at(loose_lep_index).phi()), weight);
+          if (phys.lep_motherIdSS().at(loose_lep_index) == 1 || phys.lep_motherIdSS().at(loose_lep_index) == 2){
+            loose_real_pt->Fill(phys.lep_pt().at(loose_lep_index), weight);
+          }
+          else if (phys.lep_motherIdSS().at(g_lep_inds.at(i)) < 0){
+            loose_fake_pt->Fill(phys.lep_pt().at(loose_lep_index), weight); 
+          }
+          else{
+            loose_nomatch_pt->Fill(phys.lep_pt().at(loose_lep_index), weight);
+          }
         }
         //cout<<__LINE__<<endl;
       }
@@ -3326,6 +3347,9 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     tight_fake_pt->Write();
     tight_real_pt->Write();
     tight_nomatch_pt->Write();
+    loose_fake_pt->Write();
+    loose_real_pt->Write();
+    loose_nomatch_pt->Write();
   }
 
   //close output file
