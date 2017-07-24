@@ -3135,7 +3135,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           if (phys.lep_motherIdSS().at(loose_lep_index) == 1 || phys.lep_motherIdSS().at(loose_lep_index) == 2){
             loose_real_pt->Fill(phys.lep_pt().at(loose_lep_index), weight);
           }
-          else if (phys.lep_motherIdSS().at(g_lep_inds.at(i)) < 0){
+          else if (phys.lep_motherIdSS().at(loose_lep_index) < 0){
             loose_fake_pt->Fill(phys.lep_pt().at(loose_lep_index), weight); 
           }
           else{
