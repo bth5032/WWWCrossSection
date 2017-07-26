@@ -28,6 +28,14 @@ parser.add_argument("-h", "--help", help="Print help message and quit", action="
 
 args=parser.parse_args()
 
+SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
+pretty_SR_names = {"2lepSSEE": "SSee",
+"2lepSSEMu": "SSe$\mu$",
+"2lepSSMuMu": "SS$\mu\mu$",
+"3lep_0SFOS": "0SFOS",
+"3lep_1SFOS": "1SFOS",
+"3lep_2SFOS": "2SFOS"}
+
 if (args.help):
   parser.print_help()
   exit(0)
@@ -36,11 +44,14 @@ import ROOT as r
 
 def err_ratio(num, den, Dnum, Dden):
   """Returns the 1 sigma on a ratio"""
-  return (den*Dnum - num*Dden)/ (den*den)
+  return abs((den*Dnum - num*Dden)/(den*den))
 
 def getCell(num, den, Dnum, Dden):
   """Returns (fr, Dfr) for the numerator and denomenator"""
-  return (float(num)/den, err_ratio(num, den, Dnum, Dden))
+  try:
+    return (float(num)/den, err_ratio(num, den, Dnum, Dden))
+  except:
+    return (-1, -1)
 
 def parsePtBins(bin_string):
   """Makes a list of ints from a string of the form [x0,x1,x2,...xN]"""
@@ -52,7 +63,7 @@ def parsePtBins(bin_string):
     bins.append(6001.0)
   return bins
 
-def PrintSRTable(yields, study_dir, latex):
+def PrintSRTable(yields, study_dir, pt_bins, latex):
   """Prints the yeilds tables for tight_fake/loose_fake and tight/loose (inclusive)"""
   print("Using Config: %s" % study_dir)
   print("\\begin{table}[ht!]")
@@ -67,23 +78,12 @@ def PrintSRTable(yields, study_dir, latex):
   print(head)
   print(title)
   
-  row = "SSee (fakes)         "
-  for i in xrange(len(pt_bins) - 1):
-    row += " & %0.2f $\pm$ %0.2f " % (getCell(yields["2lepSSEE"]["ft"][i], yields["2lepSSEE"]["fl"][i], yields["2lepSSEE"]["ft_unc"][i], yields["2lepSSEE"]["fl_unc"][i]))
-  row+= " \\\\"
-  print(row)
-
-  row = "SSee (inclusive)         "
-  for i in xrange(len(pt_bins) - 1):
-    row += " & %0.2f $\pm$ %0.2f " % (getCell(yields["2lepSSEE"]["ft"][i]+yields["2lepSSEE"]["rt"][i], yields["2lepSSEE"]["fl"][i]+yields["2lepSSEE"]["rl"][i], math.sqrt(yields["2lepSSEE"]["ft_unc"][i]*yields["2lepSSEE"]["ft_unc"][i] + yields["2lepSSEE"]["rt_unc"][i]*yields["2lepSSEE"]["rt_unc"][i]), math.sqrt(yields["2lepSSEE"]["fl_unc"][i]*yields["2lepSSEE"]["fl_unc"][i] + yields["2lepSSEE"]["rl_unc"][i]*yields["2lepSSEE"]["rl_unc"][i])))
-  row+= " \\\\"
-  print(row)
-
-  #print("SSe$\mu$      & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["2lepSSEMu"]["rt"],yields["2lepSSEMu"]["rt_unc"],yields["2lepSSEMu"]["rl"],yields["2lepSSEMu"]["rl_unc"],yields["2lepSSEMu"]["ft"],yields["2lepSSEMu"]["ft_unc"],yields["2lepSSEMu"]["fl"],yields["2lepSSEMu"]["fl_unc"]) )
-  #print("SS$\mu\mu$    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["2lepSSMuMu"]["rt"],yields["2lepSSMuMu"]["rt_unc"],yields["2lepSSMuMu"]["rl"],yields["2lepSSMuMu"]["rl_unc"],yields["2lepSSMuMu"]["ft"],yields["2lepSSMuMu"]["ft_unc"],yields["2lepSSMuMu"]["fl"],yields["2lepSSMuMu"]["fl_unc"]) )
-  #print("3lep 0SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_0SFOS"]["rt"],yields["3lep_0SFOS"]["rt_unc"],yields["3lep_0SFOS"]["rl"],yields["3lep_0SFOS"]["rl_unc"],yields["3lep_0SFOS"]["ft"],yields["3lep_0SFOS"]["ft_unc"],yields["3lep_0SFOS"]["fl"],yields["3lep_0SFOS"]["fl_unc"]) )
-  #print("3lep 1SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_1SFOS"]["rt"],yields["3lep_1SFOS"]["rt_unc"],yields["3lep_1SFOS"]["rl"],yields["3lep_1SFOS"]["rl_unc"],yields["3lep_1SFOS"]["ft"],yields["3lep_1SFOS"]["ft_unc"],yields["3lep_1SFOS"]["fl"],yields["3lep_1SFOS"]["fl_unc"]) )
-  #print("3lep 2SFOS    & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (yields["3lep_2SFOS"]["rt"],yields["3lep_2SFOS"]["rt_unc"],yields["3lep_2SFOS"]["rl"],yields["3lep_2SFOS"]["rl_unc"],yields["3lep_2SFOS"]["ft"],yields["3lep_2SFOS"]["ft_unc"],yields["3lep_2SFOS"]["fl"],yields["3lep_2SFOS"]["fl_unc"]) ) 
+  for sr in SRs:
+    row = "%s (fakes)         " % pretty_SR_names[sr]
+    for i in xrange(len(pt_bins) - 1):
+      row += " & %0.2f $\pm$ %0.2f " % (getCell(yields[sr]["ft"][i], yields[sr]["fl"][i], yields[sr]["ft_unc"][i], yields[sr]["fl_unc"][i]))
+    row+= " \\\\"
+    print(row)
 
   print("\\end{tabular}")
   print("\\end{center}")
@@ -96,6 +96,8 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
   h_loose_real_pt = f.Get("loose_real_pt").Clone("h_loose_real_pt_%s" % SR)
   h_tight_fake_pt = f.Get("tight_fake_pt").Clone("h_tight_fake_pt_%s" % SR)
   h_loose_fake_pt = f.Get("loose_fake_pt").Clone("h_loose_fake_pt_%s" % SR)
+  h_tight_nomatch_pt = f.Get("tight_nomatch_pt").Clone("h_tight_nomatch_pt_%s" % SR)
+  h_loose_nomatch_pt = f.Get("loose_nomatch_pt").Clone("h_loose_nomatch_pt_%s" % SR)
 
   rt = []
   rt_unc = []
@@ -105,11 +107,15 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
   ft_unc = []
   fl = []
   fl_unc = []
+  nt = []
+  nt_unc = []
+  nl = []
+  nl_unc = []
 
   #loop over all pt intervals
   for i in xrange(len(pt_bins) - 1):
-    low = pt_bins[i]
-    high = pt_bins[i+1]
+    low = h_tight_real_pt.FindBin(pt_bins[i])
+    high = h_tight_real_pt.FindBin(pt_bins[i+1])
 
     rt_unc_=r.Double()
     rt_=h_tight_real_pt.IntegralAndError(low, high, rt_unc_)
@@ -123,41 +129,65 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
     fl_unc_=r.Double()
     fl_=h_loose_fake_pt.IntegralAndError(low, high, fl_unc_)
 
+    nt_unc_=r.Double()
+    nt_=h_tight_nomatch_pt.IntegralAndError(low, high, ft_unc_)
+    
+    nl_unc_=r.Double()
+    nl_=h_loose_nomatch_pt.IntegralAndError(low, high, fl_unc_)
+
     rt.append(rt_)
     rt_unc.append(rt_unc_)
     rl.append(rl_)
     rl_unc.append(rl_unc_)
-    ft.append(ft_)
-    ft_unc.append(ft_unc_)
-    fl.append(fl_)
-    fl_unc.append(fl_unc_)
+    ft.append(ft_+nt_)
+    ft_unc.append(math.sqrt(ft_unc_*ft_unc_ + nt_unc_*nt_unc_))
+    fl.append(fl_+nl_)
+    fl_unc.append(math.sqrt(fl_unc_*fl_unc_ + nl_unc_*nl_unc_))
 
   return (rt, rl, ft, fl, rt_unc, rl_unc, ft_unc, fl_unc)
 
 def getCombinedYields(samples, study_dir, pt_bins):
   """Constructs and returns the yields dictionary used in PrintTable. Goes through each SR and adds the yields for each sample in that SR and organizes them in the dict."""
   base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRStudy/%s/" % study_dir
-  SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
 
   yields = {}
 
   for sr in SRs:
-    rt = rl = ft = fl = rt_unc = rl_unc = ft_unc = fl_unc = 0 
+    rt = []
+    rl = []
+    ft = []
+    fl = []
+    rt_unc = []
+    rl_unc = []
+    ft_unc = []
+    fl_unc = []
+    for i in xrange(len(pt_bins) - 1):
+      rt.append(0)
+      rl.append(0)
+      ft.append(0)
+      fl.append(0)
+      rt_unc.append(0)
+      rl_unc.append(0)
+      ft_unc.append(0)
+      fl_unc.append(0)
+
     for s in samples:
       rt_, rl_, ft_, fl_, rt_unc_, rl_unc_, ft_unc_, fl_unc_ = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr, pt_bins)
-      rt += rt_
-      rl += rl_
-      ft += ft_
-      fl += fl_
-      rt_unc+=rt_unc_*rt_unc_
-      rl_unc+=rl_unc_*rl_unc_
-      ft_unc+=ft_unc_*ft_unc_
-      fl_unc+=fl_unc_*fl_unc_
+      for i in xrange(len(pt_bins) - 1):
+        rt[i] += rt_[i]
+        rl[i] += rl_[i]
+        ft[i] += ft_[i]
+        fl[i] += fl_[i]
+        rt_unc[i] += rt_unc_[i]*rt_unc_[i]
+        rl_unc[i] += rl_unc_[i]*rl_unc_[i]
+        ft_unc[i] += ft_unc_[i]*ft_unc_[i]
+        fl_unc[i] += fl_unc_[i]*fl_unc_[i]
 
-    rt_unc = math.sqrt(rt_unc)
-    rl_unc = math.sqrt(rl_unc)
-    ft_unc = math.sqrt(ft_unc)
-    fl_unc = math.sqrt(fl_unc)
+    for i in xrange(len(pt_bins) - 1):
+      rt_unc[i] = math.sqrt(rt_unc[i])
+      rl_unc[i] = math.sqrt(rl_unc[i])
+      ft_unc[i] = math.sqrt(ft_unc[i])
+      fl_unc[i] = math.sqrt(fl_unc[i])
 
     yields[sr] = {"rt": rt, "rl": rl, "ft": ft, "fl": fl, "rt_unc": rt_unc, "rl_unc": rl_unc, "ft_unc": ft_unc, "fl_unc": fl_unc}
 
@@ -206,7 +236,8 @@ def main():
   pt_bins = parsePtBins(args.bins)
 
   yields = getCombinedYields(samples, args.study_dir, pt_bins)
-  PrintSRTable(yields, args.study_dir, latex)
+  #print(yields)
+  PrintSRTable(yields, args.study_dir, pt_bins, latex)
 
 if __name__ == "__main__":
   main()
