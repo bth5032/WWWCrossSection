@@ -2528,7 +2528,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
 
   TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_abseta, *loose_lep_phi, *loose_lep_absphi, *fake_pt, *real_pt; 
   TH1D *nomatch_pt, *tight_fake_pt, *tight_real_pt, *tight_nomatch_pt, *loose_fake_pt, *loose_real_pt, *loose_nomatch_pt, *tight_fake_lep1pt;
-  TH1D *tight_fake_lep2pt, *tight_fake_lep3pt;
+  TH1D *tight_fake_lep2pt, *tight_fake_lep3pt, *loose_lep1pt, *loose_lep2pt, *loose_lep3pt, *tight_lep1pt, *tight_lep2pt, *tight_lep3pt;
 
   if (conf->get("fakerate_study") == "true"){ 
     loose_lep_reliso03EA = new TH1D("loose_lep_reliso03EA", "Loose Lepton Relative Isolation (03EA cone) for "+g_sample_name, 6000,0,6);
@@ -2603,6 +2603,29 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     tight_fake_lep3pt->SetDirectory(rootdir);
     tight_fake_lep3pt->Sumw2();
 
+    loose_lep1pt = new TH1D("loose_lep1pt", "Leading lepton p_{T} for loose events", 6000, 0, 6000 );
+    loose_lep1pt->SetDirectory(rootdir);
+    loose_lep1pt->Sumw2();
+
+    loose_lep2pt = new TH1D("loose_lep2pt", "Subleading lepton p_{T} for loose events", 6000, 0, 6000 );
+    loose_lep2pt->SetDirectory(rootdir);
+    loose_lep2pt->Sumw2();
+
+    loose_lep3pt = new TH1D("loose_lep3pt", "Trailing lepton p_{T} for loose events", 6000, 0, 6000 );
+    loose_lep3pt->SetDirectory(rootdir);
+    loose_lep3pt->Sumw2();
+
+    tight_lep1pt = new TH1D("tight_lep1pt", "Leading lepton p_{T} for tight events", 6000, 0, 6000 );
+    tight_lep1pt->SetDirectory(rootdir);
+    tight_lep1pt->Sumw2();
+
+    tight_lep2pt = new TH1D("tight_lep2pt", "Subleading lepton p_{T} for tight events", 6000, 0, 6000 );
+    tight_lep2pt->SetDirectory(rootdir);
+    tight_lep2pt->Sumw2();
+
+    tight_lep3pt = new TH1D("tight_lep3pt", "Trailing lepton p_{T} for tight events", 6000, 0, 6000 );
+    tight_lep3pt->SetDirectory(rootdir);
+    tight_lep3pt->Sumw2();
   }
 
   //-------------------------------------------
@@ -3141,7 +3164,6 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         //cout<<__LINE__<<endl;
 
         if (loose_lep_index != -1){
-          if (phys.lep_relIso03EA().at(loose_lep_index) > 0.2) cout<<"Wierd event: "<<phys.evt()<<" lep with iso: "<<phys.lep_relIso03EA().at(loose_lep_index)<<endl;
           loose_lep_reliso03EA->Fill(phys.lep_relIso03EA().at(loose_lep_index), weight);
           loose_lep_pt->Fill(phys.lep_p4().at(loose_lep_index).pt(), weight);
           loose_lep_eta->Fill(phys.lep_p4().at(loose_lep_index).eta(), weight);
@@ -3157,6 +3179,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           else{
             loose_nomatch_pt->Fill(phys.lep_pt().at(loose_lep_index), weight);
           }
+
+          loose_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[0]),weight);
+          loose_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[1]),weight);
+          loose_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
         }
         else{
           //cout<<__LINE__<<endl;
@@ -3170,6 +3196,9 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
             tight_fake_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[0]), weight);
             tight_fake_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[1]), weight);    
           }
+          tight_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[0]),weight);
+          tight_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[1]),weight);
+          tight_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
           //cout<<__LINE__<<endl;
         }
         //cout<<__LINE__<<endl;
@@ -3383,6 +3412,13 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     tight_fake_lep1pt->Write();
     tight_fake_lep2pt->Write();
     tight_fake_lep3pt->Write();
+
+    loose_lep1pt->Write();
+    loose_lep2pt->Write();
+    loose_lep3pt->Write();
+    tight_lep1pt->Write();
+    tight_lep2pt->Write();
+    tight_lep3pt->Write();
   }
 
   //close output file
