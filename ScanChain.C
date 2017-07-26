@@ -3174,6 +3174,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
             cout<<__LINE__<<endl;
             tight_fake_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[0]), weight);
             cout<<__LINE__<<endl;
+            cout<<"nlep: "<<g_nlep<<endl;
             tight_fake_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[1]), weight);    
             cout<<__LINE__<<endl;
           }
