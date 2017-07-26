@@ -81,7 +81,7 @@ def PrintSRTable(yields, study_dir, pt_bins, latex):
   for sr in SRs:
     row = "%s (fakes)         " % pretty_SR_names[sr]
     for i in xrange(len(pt_bins) - 1):
-      row += " & %0.2f $\pm$ %0.2f " % (getCell(yields[sr]["ft"][i], yields[sr]["fl"][i], yields[sr]["ft_unc"][i], yields[sr]["fl_unc"][i]))
+      row += " & %0.2f $\pm$ %0.2f " % (getCell(yields[sr]["t"][i], yields[sr]["l"][i], yields[sr]["t_unc"][i], yields[sr]["l_unc"][i]))
     row+= " \\\\"
     print(row)
 
@@ -92,59 +92,35 @@ def PrintSRTable(yields, study_dir, pt_bins, latex):
 def getYieldsFromSample(hist_loc, SR, pt_bins):
   """Takes in Signal region and the location to a histogram, looks up the proper bins for what is called real tight, real loose, fake tight, fake loose, and returns the counts for the sample in a tuple (rt, rl, ft, fl)"""
   f = r.TFile(hist_loc)
-  h_tight_real_pt = f.Get("tight_real_pt").Clone("h_tight_real_pt_%s" % SR)
-  h_loose_real_pt = f.Get("loose_real_pt").Clone("h_loose_real_pt_%s" % SR)
-  h_tight_fake_pt = f.Get("tight_fake_pt").Clone("h_tight_fake_pt_%s" % SR)
-  h_loose_fake_pt = f.Get("loose_fake_pt").Clone("h_loose_fake_pt_%s" % SR)
-  h_tight_nomatch_pt = f.Get("tight_nomatch_pt").Clone("h_tight_nomatch_pt_%s" % SR)
-  h_loose_nomatch_pt = f.Get("loose_nomatch_pt").Clone("h_loose_nomatch_pt_%s" % SR)
+  if (SR == "3lep_0SFOS" or SR == "3lep_1SFOS" or SR == "3lep_2SFOS"):
+    h_loose_pt = f.Get("loose_lep3pt").Clone("h_loose_pt_%s" % SR)
+    h_tight_pt = f.Get("tight_lep3pt").Clone("h_tight_pt_%s" % SR)
+  else:
+    h_loose_pt = f.Get("loose_lep2pt").Clone("h_loose_pt_%s" % SR)
+    h_tight_pt = f.Get("tight_lep2pt").Clone("h_tight_pt_%s" % SR)
 
-  rt = []
-  rt_unc = []
-  rl = []
-  rl_unc = []
-  ft = []
-  ft_unc = []
-  fl = []
-  fl_unc = []
-  nt = []
-  nt_unc = []
-  nl = []
-  nl_unc = []
+  t = []
+  t_unc = []
+  l = []
+  l_unc = []
 
   #loop over all pt intervals
   for i in xrange(len(pt_bins) - 1):
     low = h_tight_real_pt.FindBin(pt_bins[i])
     high = h_tight_real_pt.FindBin(pt_bins[i+1])
 
-    rt_unc_=r.Double()
-    rt_=h_tight_real_pt.IntegralAndError(low, high, rt_unc_)
+    t_unc_=r.Double()
+    t_=h_tight_real_pt.IntegralAndError(low, high, rt_unc_)
 
-    rl_unc_=r.Double()
-    rl_=h_loose_real_pt.IntegralAndError(low, high, rl_unc_)
-    
-    ft_unc_=r.Double()
-    ft_=h_tight_fake_pt.IntegralAndError(low, high, ft_unc_)
-    
-    fl_unc_=r.Double()
-    fl_=h_loose_fake_pt.IntegralAndError(low, high, fl_unc_)
+    l_unc_=r.Double()
+    l_=h_loose_real_pt.IntegralAndError(low, high, rl_unc_)
 
-    nt_unc_=r.Double()
-    nt_=h_tight_nomatch_pt.IntegralAndError(low, high, ft_unc_)
-    
-    nl_unc_=r.Double()
-    nl_=h_loose_nomatch_pt.IntegralAndError(low, high, fl_unc_)
+    t.append(t_)
+    t_unc.append(t_unc_)
+    l.append(l_)
+    l_unc.append(l_unc_)
 
-    rt.append(rt_)
-    rt_unc.append(rt_unc_)
-    rl.append(rl_)
-    rl_unc.append(rl_unc_)
-    ft.append(ft_+nt_)
-    ft_unc.append(math.sqrt(ft_unc_*ft_unc_ + nt_unc_*nt_unc_))
-    fl.append(fl_+nl_)
-    fl_unc.append(math.sqrt(fl_unc_*fl_unc_ + nl_unc_*nl_unc_))
-
-  return (rt, rl, ft, fl, rt_unc, rl_unc, ft_unc, fl_unc)
+  return (t, l, t_unc, l_unc)
 
 def getCombinedYields(samples, study_dir, pt_bins):
   """Constructs and returns the yields dictionary used in PrintTable. Goes through each SR and adds the yields for each sample in that SR and organizes them in the dict."""
@@ -153,43 +129,29 @@ def getCombinedYields(samples, study_dir, pt_bins):
   yields = {}
 
   for sr in SRs:
-    rt = []
-    rl = []
-    ft = []
-    fl = []
-    rt_unc = []
-    rl_unc = []
-    ft_unc = []
-    fl_unc = []
+    t = []
+    l = []
+    t_unc = []
+    l_unc = []
     for i in xrange(len(pt_bins) - 1):
-      rt.append(0)
-      rl.append(0)
-      ft.append(0)
-      fl.append(0)
-      rt_unc.append(0)
-      rl_unc.append(0)
-      ft_unc.append(0)
-      fl_unc.append(0)
+      t.append(0)
+      l.append(0)
+      t_unc.append(0)
+      l_unc.append(0)
 
     for s in samples:
-      rt_, rl_, ft_, fl_, rt_unc_, rl_unc_, ft_unc_, fl_unc_ = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr, pt_bins)
+      t_, l_, t_unc_, l_unc_ = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr, pt_bins)
       for i in xrange(len(pt_bins) - 1):
-        rt[i] += rt_[i]
-        rl[i] += rl_[i]
-        ft[i] += ft_[i]
-        fl[i] += fl_[i]
-        rt_unc[i] += rt_unc_[i]*rt_unc_[i]
-        rl_unc[i] += rl_unc_[i]*rl_unc_[i]
-        ft_unc[i] += ft_unc_[i]*ft_unc_[i]
-        fl_unc[i] += fl_unc_[i]*fl_unc_[i]
+        t[i] += t_[i]
+        l[i] += l_[i]
+        t_unc[i] += t_unc_[i]*t_unc_[i]
+        l_unc[i] += l_unc_[i]*l_unc_[i]
 
     for i in xrange(len(pt_bins) - 1):
-      rt_unc[i] = math.sqrt(rt_unc[i])
-      rl_unc[i] = math.sqrt(rl_unc[i])
-      ft_unc[i] = math.sqrt(ft_unc[i])
-      fl_unc[i] = math.sqrt(fl_unc[i])
+      t_unc[i] = math.sqrt(t_unc[i])
+      l_unc[i] = math.sqrt(l_unc[i])
 
-    yields[sr] = {"rt": rt, "rl": rl, "ft": ft, "fl": fl, "rt_unc": rt_unc, "rl_unc": rl_unc, "ft_unc": ft_unc, "fl_unc": fl_unc}
+    yields[sr] = {"t": t, "l": l, "t_unc": t_unc, "l_unc": l_unc}
 
   return yields
 

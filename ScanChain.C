@@ -3182,7 +3182,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
 
           loose_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[0]),weight);
           loose_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[1]),weight);
-          loose_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
+          if (g_nlep > 2) loose_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
         }
         else{
           //cout<<__LINE__<<endl;
@@ -3198,7 +3198,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           }
           tight_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[0]),weight);
           tight_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[1]),weight);
-          tight_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
+          if (g_nlep > 2) tight_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
           //cout<<__LINE__<<endl;
         }
         //cout<<__LINE__<<endl;
