@@ -24,7 +24,7 @@ parser.add_argument("--singletop", help="Use TTV sample", action="store_true")
 parser.add_argument("--other", help="Use Other (VH) sample", action="store_true")
 parser.add_argument("--www", help="Use WWW sample", action="store_true")
 
-parser.add_argument("-h", "--help", help="Print help message and quit", action="store_true")
+parser.add_argument("-u", "--usage", help="Print help message and quit", action="store_true")
 
 args=parser.parse_args()
 
@@ -36,7 +36,7 @@ pretty_SR_names = {"2lepSSEE": "SSee",
 "3lep_1SFOS": "1SFOS",
 "3lep_2SFOS": "2SFOS"}
 
-if (args.help):
+if (args.usage):
   parser.print_help()
   exit(0)
 
@@ -81,6 +81,7 @@ def PrintSRTable(yields, study_dir, pt_bins, latex):
   for sr in SRs:
     row = "%s (fakes)         " % pretty_SR_names[sr]
     for i in xrange(len(pt_bins) - 1):
+      FR
       row += " & %0.2f $\pm$ %0.2f " % (getCell(yields[sr]["t"][i], yields[sr]["l"][i], yields[sr]["t_unc"][i], yields[sr]["l_unc"][i]))
     row+= " \\\\"
     print(row)
@@ -103,6 +104,8 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
   t_unc = []
   l = []
   l_unc = []
+  fr = []
+  fr_unc = []
 
   #loop over all pt intervals
   for i in xrange(len(pt_bins) - 1):

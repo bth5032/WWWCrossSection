@@ -24,7 +24,7 @@ parser.add_argument("--singletop", help="Use TTV sample", action="store_true")
 parser.add_argument("--other", help="Use Other (VH) sample", action="store_true")
 parser.add_argument("--www", help="Use WWW sample", action="store_true")
 
-parser.add_argument("-h", "--help", help="Print help message and quit", action="store_true")
+parser.add_argument("-u", "--usage", help="Print help message and quit", action="store_true")
 
 args=parser.parse_args()
 
@@ -36,7 +36,7 @@ pretty_SR_names = {"2lepSSEE": "SSee",
 "3lep_1SFOS": "1SFOS",
 "3lep_2SFOS": "2SFOS"}
 
-if (args.help):
+if (args.usage):
   parser.print_help()
   exit(0)
 
