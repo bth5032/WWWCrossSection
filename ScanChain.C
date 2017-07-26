@@ -3162,13 +3162,20 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           cout<<__LINE__<<endl;
           FR_cat c = getFRCategory();
           if ( c == TTT_fake ){
+            cout<<__LINE__<<endl;
             tight_fake_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[1]), weight);
+            cout<<__LINE__<<endl;
             tight_fake_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[2]), weight);
+            cout<<__LINE__<<endl;
             tight_fake_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[3]), weight);
+            cout<<__LINE__<<endl;
           }
           else if ( c == TT_fake ){
+            cout<<__LINE__<<endl;
             tight_fake_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[1]), weight);
+            cout<<__LINE__<<endl;
             tight_fake_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[2]), weight);    
+            cout<<__LINE__<<endl;
           }
           cout<<__LINE__<<endl;
         }
