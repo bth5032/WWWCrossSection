@@ -112,11 +112,10 @@ def PrintSRTable(yields, study_dir, pt_bins, fr_bins, latex):
 
     row_loose += "\\\\"
     row_tight += "\\\\"
-    row_fr += "\\\\"
+    row_fr += "\\\\ \\hline"
     print(row_loose)
     print(row_tight)
     print(row_fr)
-    print("\\hline \\\\")
 
   print("\\end{tabular}")
   print("\\end{center}")
