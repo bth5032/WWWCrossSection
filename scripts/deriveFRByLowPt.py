@@ -5,7 +5,7 @@ parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument("-s", "--study_dir", help="The config directory name in FRStudy, e.g. LooseIso", type=str, default="LooseIso")
 parser.add_argument("-b", "--bins", help="Choose Pt bins for the study, ex: [0,10,20,30]", type=str, default="[0,25,50,75,100,150]")
 parser.add_argument("--txt", help="Print table in txt format", action="store_true")
-parser.add_argument("-f", "--fake_rate", help="give fake rate either as a single number or list, ex: 0.1 or [0.1,0.2,0.3,0.2] ", type="string", default="0.1")
+parser.add_argument("-f", "--fake_rate", help="give fake rate either as a single number or list, ex: 0.1 or [0.1,0.2,0.3,0.2] ", type=str, default="0.1")
 
 parser.add_argument("--all", help="Use all histograms", action="store_true")
 parser.add_argument("--frbg", help="Use standard FR BG samples", action="store_true")
@@ -16,6 +16,7 @@ parser.add_argument("--ttbar_dilep", help="Use TTBar to dilepton sample", action
 parser.add_argument("--ttbar_1lep", help="Use TTBar to single lepton samples", action="store_true")
 parser.add_argument("--dy", help="Use DY sample", action="store_true")
 parser.add_argument("--wz", help="Use WZ sample", action="store_true")
+parser.add_argument("--wh", help="Use WH sample", action="store_true")
 parser.add_argument("--ww", help="Use WW sample", action="store_true")
 parser.add_argument("--zz", help="Use ZZ sample", action="store_true")
 parser.add_argument("--vvv", help="Use VVV sample", action="store_true")
@@ -31,11 +32,11 @@ args=parser.parse_args()
 
 SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
 pretty_SR_names = {"2lepSSEE": "SSee",
-"2lepSSEMu": "SSe$\mu$",
+"2lepSSEMu":  "SSe$\mu$  ",
 "2lepSSMuMu": "SS$\mu\mu$",
-"3lep_0SFOS": "0SFOS",
-"3lep_1SFOS": "1SFOS",
-"3lep_2SFOS": "2SFOS"}
+"3lep_0SFOS": "0SFOS     ",
+"3lep_1SFOS": "1SFOS     ",
+"3lep_2SFOS": "2SFOS     "}
 
 if (args.usage):
   parser.print_help()
@@ -90,25 +91,32 @@ def PrintSRTable(yields, study_dir, pt_bins, fr_bins, latex):
   print("\\begin{table}[ht!]")
   print("\\begin{center}")
   head="\\begin{tabular}{l"
-  title = "Source "
+  title = "$p_{T}$ bin: "
   for i in xrange(len(pt_bins) - 1):
-    title+=" & %0.0f - %0.0f " % (pt_bins[i], pt_bins[i+1])
+    title+=" & %0.0f - %0.0f [GeV]" % (pt_bins[i], pt_bins[i+1])
     head+="|c"
-  title+= " %s-%s (FRx2.5) \\\\ \\hline" % (pt_bins[-2], pt_bins[-1])
-  head+="|c}"
+  title+= " \\\\ \\hline"
+  head+="}"
   print(head)
   print(title)
   
   for sr in SRs:
-    row_loose = "%s (loose)         " % pretty_SR_names[sr]
-    row_loose = "%s (tight)         " % pretty_SR_names[sr]
+    row_loose = "%s (loose):     " % pretty_SR_names[sr]
+    row_tight = "%s (tight):     " % pretty_SR_names[sr]
+    row_fr    = "%s (fake rate): " % pretty_SR_names[sr]
     for i in xrange(len(pt_bins) - 1):
-      row_loose += " & %0.2f $\pm$ %0.2f (%0.2f $\pm$ %0.2f)" % (yields[sr]["l"][i], yields[sr]["l_unc"][i], yields[sr]["l"][i]*fr_bins[i], yields[sr]["l_unc"][i]*fr_bins[i]*.5)
+      fr, fr_unc = getCell(yields[sr]["tf"][i], yields[sr]["lf"][i], yields[sr]["tf_unc"][i], yields[sr]["lf_unc"][i])
+      row_loose += " & %0.2f $\pm$ %0.2f (%0.2f $\pm$ %0.2f)" % (yields[sr]["l"][i], yields[sr]["l_unc"][i], yields[sr]["lf"][i], yields[sr]["lf_unc"][i])
       row_tight += " & %0.2f $\pm$ %0.2f (%0.2f $\pm$ %0.2f)" % (yields[sr]["t"][i], yields[sr]["t_unc"][i], yields[sr]["tf"][i], yields[sr]["tf_unc"][i])
+      row_fr    += " & %0.2f $\pm$ %0.2f " % (fr, fr_unc)
 
-    row_loose += " & %0.2f $\pm$ %0.2f (%0.2f $\pm$ %0.2f) \\\\" % (yields[sr]["l"][i], yields[sr]["l_unc"][i], yields[sr]["l"][i]*fr_bins[i]*2.5, yields[sr]["l_unc"][i]*fr_bins[i]*2.5*.5)
-    row_tight += " & %0.2f $\pm$ %0.2f (%0.2f $\pm$ %0.2f) \\\\" % (yields[sr]["t"][i], yields[sr]["t_unc"][i], yields[sr]["tf"][i], yields[sr]["tf_unc"][i])
-    print(row)
+    row_loose += "\\\\"
+    row_tight += "\\\\"
+    row_fr += "\\\\"
+    print(row_loose)
+    print(row_tight)
+    print(row_fr)
+    print("\\hline \\\\")
 
   print("\\end{tabular}")
   print("\\end{center}")
@@ -121,10 +129,12 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
     h_loose_pt = f.Get("loose_lep3pt").Clone("h_loose_pt_%s" % SR)
     h_tight_pt = f.Get("tight_lep3pt").Clone("h_tight_pt_%s" % SR)
     h_tight_fake_pt = f.Get("tight_fake_lep3pt").Clone("h_tight_fake_pt_%s" % SR)
+    h_loose_fake_pt = f.Get("loose_lep3pt").Clone("h_loose_fake_pt_%s" % SR)
   else:
     h_loose_pt = f.Get("loose_lep2pt").Clone("h_loose_pt_%s" % SR)
     h_tight_pt = f.Get("tight_lep2pt").Clone("h_tight_pt_%s" % SR)
     h_tight_fake_pt = f.Get("tight_fake_lep2pt").Clone("h_tight_fake_pt_%s" % SR)
+    h_loose_fake_pt = f.Get("loose_lep2pt").Clone("h_loose_fake_pt_%s" % SR)
 
   t = []
   t_unc = []
@@ -132,20 +142,25 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
   l_unc = []
   tf = []
   tf_unc = []
+  lf = []
+  lf_unc = []
 
   #loop over all pt intervals
   for i in xrange(len(pt_bins) - 1):
-    low = h_tight_real_pt.FindBin(pt_bins[i])
-    high = h_tight_real_pt.FindBin(pt_bins[i+1])
+    low = h_tight_pt.FindBin(pt_bins[i])
+    high = h_tight_pt.FindBin(pt_bins[i+1])
 
     t_unc_=r.Double()
-    t_=h_tight_real_pt.IntegralAndError(low, high, rt_unc_)
+    t_=h_tight_pt.IntegralAndError(low, high, t_unc_)
 
     l_unc_=r.Double()
-    l_=h_loose_real_pt.IntegralAndError(low, high, rl_unc_)
+    l_=h_loose_pt.IntegralAndError(low, high, l_unc_)
 
     tf_unc_=r.Double()
-    tf_=h_tight_fake_pt.IntegralAndError(low, high, rl_unc_)
+    tf_=h_tight_fake_pt.IntegralAndError(low, high, tf_unc_)
+
+    lf_unc_=r.Double()
+    lf_=h_loose_fake_pt.IntegralAndError(low, high, lf_unc_)
 
     t.append(t_)
     t_unc.append(t_unc_)
@@ -153,8 +168,10 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
     l_unc.append(l_unc_)
     tf.append(tf_)
     tf_unc.append(tf_unc_)
+    lf.append(lf_)
+    lf_unc.append(lf_unc_)
 
-  return (t, l, tf, t_unc, l_unc, tf_unc)
+  return (t, l, tf, lf, t_unc, l_unc, tf_unc, lf_unc)
 
 def getCombinedYields(samples, study_dir, pt_bins):
   """Constructs and returns the yields dictionary used in PrintTable. Goes through each SR and adds the yields for each sample in that SR and organizes them in the dict."""
@@ -166,33 +183,40 @@ def getCombinedYields(samples, study_dir, pt_bins):
     t = []
     l = []
     tf = []
+    lf = []
     t_unc = []
     l_unc = []
     tf_unc = []
+    lf_unc = []
     for i in xrange(len(pt_bins) - 1):
       t.append(0)
       l.append(0)
       tf.append(0)
+      lf.append(0)
       t_unc.append(0)
       l_unc.append(0)
       tf_unc.append(0)
+      lf_unc.append(0)
 
     for s in samples:
-      t_, l_, tf_, t_unc_, l_unc_, tf_unc_ = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr, pt_bins)
+      t_, l_, tf_, lf_, t_unc_, l_unc_, tf_unc_, lf_unc_ = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr, pt_bins)
       for i in xrange(len(pt_bins) - 1):
         t[i] += t_[i]
         l[i] += l_[i]
         tf[i] += tf_[i]
+        lf[i] += lf_[i]
         t_unc[i] += t_unc_[i]*t_unc_[i]
         l_unc[i] += l_unc_[i]*l_unc_[i]
         tf_unc[i] += tf_unc_[i]*tf_unc_[i]
+        lf_unc[i] += lf_unc_[i]*lf_unc_[i]
 
     for i in xrange(len(pt_bins) - 1):
       t_unc[i] = math.sqrt(t_unc[i])
       l_unc[i] = math.sqrt(l_unc[i])
       tf_unc[i] = math.sqrt(tf_unc[i])
+      lf_unc[i] = math.sqrt(lf_unc[i])
 
-    yields[sr] = {"t": t, "l": l, "tf": tf, "t_unc": t_unc, "l_unc": l_unc, "tf_unc": tf_unc}
+    yields[sr] = {"t": t, "l": l, "tf": tf, "lf": lf, "t_unc": t_unc, "l_unc": l_unc, "tf_unc": tf_unc, "lf_unc": lf_unc}
 
   return yields
 
@@ -203,6 +227,9 @@ def main():
   #Signal
   if (args.www or args.all or args.signal):
     samples.append("WWW")
+
+  if (args.wh or args.all or args.signal):
+    samples.append("Wh")
 
   #BG
   if (args.ttbar_dilep or args.all or args.bg):

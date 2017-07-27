@@ -2529,6 +2529,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   TH1D *loose_lep_reliso03EA, *loose_lep_pt, *loose_lep_eta, *loose_lep_abseta, *loose_lep_phi, *loose_lep_absphi, *fake_pt, *real_pt; 
   TH1D *nomatch_pt, *tight_fake_pt, *tight_real_pt, *tight_nomatch_pt, *loose_fake_pt, *loose_real_pt, *loose_nomatch_pt, *tight_fake_lep1pt;
   TH1D *tight_fake_lep2pt, *tight_fake_lep3pt, *loose_lep1pt, *loose_lep2pt, *loose_lep3pt, *tight_lep1pt, *tight_lep2pt, *tight_lep3pt;
+  TH1D *loose_fake_lep1pt, *loose_fake_lep2pt, *loose_fake_lep3pt;
 
   if (conf->get("fakerate_study") == "true"){ 
     loose_lep_reliso03EA = new TH1D("loose_lep_reliso03EA", "Loose Lepton Relative Isolation (03EA cone) for "+g_sample_name, 6000,0,6);
@@ -2602,6 +2603,18 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     tight_fake_lep3pt = new TH1D("tight_fake_lep3pt", "Trailing lepton p_{T} for tight events with a fake", 6000, 0, 6000 );
     tight_fake_lep3pt->SetDirectory(rootdir);
     tight_fake_lep3pt->Sumw2();
+
+    loose_fake_lep1pt = new TH1D("loose_fake_lep1pt", "Leading lepton p_{T} for loose events with a fake", 6000, 0, 6000 );
+    loose_fake_lep1pt->SetDirectory(rootdir);
+    loose_fake_lep1pt->Sumw2();
+
+    loose_fake_lep2pt = new TH1D("loose_fake_lep2pt", "Subleading lepton p_{T} for loose events with a fake", 6000, 0, 6000 );
+    loose_fake_lep2pt->SetDirectory(rootdir);
+    loose_fake_lep2pt->Sumw2();
+
+    loose_fake_lep3pt = new TH1D("loose_fake_lep3pt", "Trailing lepton p_{T} for loose events with a fake", 6000, 0, 6000 );
+    loose_fake_lep3pt->SetDirectory(rootdir);
+    loose_fake_lep3pt->Sumw2();
 
     loose_lep1pt = new TH1D("loose_lep1pt", "Leading lepton p_{T} for loose events", 6000, 0, 6000 );
     loose_lep1pt->SetDirectory(rootdir);
@@ -3134,7 +3147,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       }
       //cout<<__LINE__<<endl;
       if (conf->get("fakerate_study") == "true"){ 
-        //FR_cat cat = getFRCategory();
+        FR_cat c = getFRCategory();
         //cout<<"Filling FR hist with category: "<<FR_cats_str[cat]<<endl;
         //fr_counts->Fill(cat, weight);
         fr_counts->Fill(getFRCategory(), weight);
@@ -3179,14 +3192,17 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           else{
             loose_nomatch_pt->Fill(phys.lep_pt().at(loose_lep_index), weight);
           }
-
+          if (c == TT_fake || c == T_fake || c == L_fake){
+            loose_fake_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[0]),weight);
+            loose_fake_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[1]),weight);
+            if (g_nlep > 2) loose_fake_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);  
+          }
           loose_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[0]),weight);
           loose_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[1]),weight);
           if (g_nlep > 2) loose_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
         }
         else{
           //cout<<__LINE__<<endl;
-          FR_cat c = getFRCategory();
           if ( c == TTT_fake ){
             tight_fake_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[0]), weight);
             tight_fake_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[1]), weight);
@@ -3409,9 +3425,13 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     loose_fake_pt->Write();
     loose_real_pt->Write();
     loose_nomatch_pt->Write();
+    
     tight_fake_lep1pt->Write();
     tight_fake_lep2pt->Write();
     tight_fake_lep3pt->Write();
+    loose_fake_lep1pt->Write();
+    loose_fake_lep2pt->Write();
+    loose_fake_lep3pt->Write();
 
     loose_lep1pt->Write();
     loose_lep2pt->Write();
