@@ -5,6 +5,7 @@ parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument("-s", "--study_dir", help="The config directory name in FRStudy, e.g. LooseIso", type=str, default="LooseIso")
 parser.add_argument("-b", "--bins", help="Choose Pt bins for the study, ex: [0,10,20,30]", type=str, default="[0,25,50,75,100,150]")
 parser.add_argument("--txt", help="Print table in txt format", action="store_true")
+parser.add_argument("-f", "--fake_rate", help="give fake rate either as a single number or list, ex: 0.1 or [0.1,0.2,0.3,0.2] ", type="string", default="0.1")
 
 parser.add_argument("--all", help="Use all histograms", action="store_true")
 parser.add_argument("--frbg", help="Use standard FR BG samples", action="store_true")
@@ -63,7 +64,27 @@ def parsePtBins(bin_string):
     bins.append(6001.0)
   return bins
 
-def PrintSRTable(yields, study_dir, pt_bins, latex):
+def parseFRBins(fr_string, pt_bins):
+  """Takes in the pt_bins list and the string given on the command line for the fake rates. Checks whether FR is a single number or PT dependent and ensures the proper number of FRs are given if it's a list."""
+  l = []
+  
+  try: #Check for single number
+    single = float(fr_string)
+    for a in xrange(len(pt_bins) - 1):
+      l.append(single)
+  except ValueError: #The string must be a list
+    fr_bins = fr_string[1:-1].split(',')
+    l = []
+    for fr in fr_bins:
+      l.append(float(fr))
+  
+  if (len(l) != (len(pt_bins) - 1) ): #Check the length of the FR list is equal to the number of pt_bin intervals.
+    print("The length of the fake rate list is not equal to the number of fake rates needed. FR list: %s, pt_bins: %s" % (l, pt_bins))
+    exit(1)
+
+  return l
+
+def PrintSRTable(yields, study_dir, pt_bins, fr_bins, latex):
   """Prints the yeilds tables for tight_fake/loose_fake and tight/loose (inclusive)"""
   print("Using Config: %s" % study_dir)
   print("\\begin{table}[ht!]")
@@ -73,17 +94,20 @@ def PrintSRTable(yields, study_dir, pt_bins, latex):
   for i in xrange(len(pt_bins) - 1):
     title+=" & %0.0f - %0.0f " % (pt_bins[i], pt_bins[i+1])
     head+="|c"
-  title+= " \\\\ \\hline"
-  head+="}"
+  title+= " %s-%s (FRx2.5) \\\\ \\hline" % (pt_bins[-2], pt_bins[-1])
+  head+="|c}"
   print(head)
   print(title)
   
   for sr in SRs:
-    row = "%s (fakes)         " % pretty_SR_names[sr]
+    row_loose = "%s (loose)         " % pretty_SR_names[sr]
+    row_loose = "%s (tight)         " % pretty_SR_names[sr]
     for i in xrange(len(pt_bins) - 1):
-      FR
-      row += " & %0.2f $\pm$ %0.2f " % (getCell(yields[sr]["t"][i], yields[sr]["l"][i], yields[sr]["t_unc"][i], yields[sr]["l_unc"][i]))
-    row+= " \\\\"
+      row_loose += " & %0.2f $\pm$ %0.2f (%0.2f $\pm$ %0.2f)" % (yields[sr]["l"][i], yields[sr]["l_unc"][i], yields[sr]["l"][i]*fr_bins[i], yields[sr]["l_unc"][i]*fr_bins[i]*.5)
+      row_tight += " & %0.2f $\pm$ %0.2f (%0.2f $\pm$ %0.2f)" % (yields[sr]["t"][i], yields[sr]["t_unc"][i], yields[sr]["tf"][i], yields[sr]["tf_unc"][i])
+
+    row_loose += " & %0.2f $\pm$ %0.2f (%0.2f $\pm$ %0.2f) \\\\" % (yields[sr]["l"][i], yields[sr]["l_unc"][i], yields[sr]["l"][i]*fr_bins[i]*2.5, yields[sr]["l_unc"][i]*fr_bins[i]*2.5*.5)
+    row_tight += " & %0.2f $\pm$ %0.2f (%0.2f $\pm$ %0.2f) \\\\" % (yields[sr]["t"][i], yields[sr]["t_unc"][i], yields[sr]["tf"][i], yields[sr]["tf_unc"][i])
     print(row)
 
   print("\\end{tabular}")
@@ -96,16 +120,18 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
   if (SR == "3lep_0SFOS" or SR == "3lep_1SFOS" or SR == "3lep_2SFOS"):
     h_loose_pt = f.Get("loose_lep3pt").Clone("h_loose_pt_%s" % SR)
     h_tight_pt = f.Get("tight_lep3pt").Clone("h_tight_pt_%s" % SR)
+    h_tight_fake_pt = f.Get("tight_fake_lep3pt").Clone("h_tight_fake_pt_%s" % SR)
   else:
     h_loose_pt = f.Get("loose_lep2pt").Clone("h_loose_pt_%s" % SR)
     h_tight_pt = f.Get("tight_lep2pt").Clone("h_tight_pt_%s" % SR)
+    h_tight_fake_pt = f.Get("tight_fake_lep2pt").Clone("h_tight_fake_pt_%s" % SR)
 
   t = []
   t_unc = []
   l = []
   l_unc = []
-  fr = []
-  fr_unc = []
+  tf = []
+  tf_unc = []
 
   #loop over all pt intervals
   for i in xrange(len(pt_bins) - 1):
@@ -118,12 +144,17 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
     l_unc_=r.Double()
     l_=h_loose_real_pt.IntegralAndError(low, high, rl_unc_)
 
+    tf_unc_=r.Double()
+    tf_=h_tight_fake_pt.IntegralAndError(low, high, rl_unc_)
+
     t.append(t_)
     t_unc.append(t_unc_)
     l.append(l_)
     l_unc.append(l_unc_)
+    tf.append(tf_)
+    tf_unc.append(tf_unc_)
 
-  return (t, l, t_unc, l_unc)
+  return (t, l, tf, t_unc, l_unc, tf_unc)
 
 def getCombinedYields(samples, study_dir, pt_bins):
   """Constructs and returns the yields dictionary used in PrintTable. Goes through each SR and adds the yields for each sample in that SR and organizes them in the dict."""
@@ -134,27 +165,34 @@ def getCombinedYields(samples, study_dir, pt_bins):
   for sr in SRs:
     t = []
     l = []
+    tf = []
     t_unc = []
     l_unc = []
+    tf_unc = []
     for i in xrange(len(pt_bins) - 1):
       t.append(0)
       l.append(0)
+      tf.append(0)
       t_unc.append(0)
       l_unc.append(0)
+      tf_unc.append(0)
 
     for s in samples:
-      t_, l_, t_unc_, l_unc_ = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr, pt_bins)
+      t_, l_, tf_, t_unc_, l_unc_, tf_unc_ = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr, pt_bins)
       for i in xrange(len(pt_bins) - 1):
         t[i] += t_[i]
         l[i] += l_[i]
+        tf[i] += tf_[i]
         t_unc[i] += t_unc_[i]*t_unc_[i]
         l_unc[i] += l_unc_[i]*l_unc_[i]
+        tf_unc[i] += tf_unc_[i]*tf_unc_[i]
 
     for i in xrange(len(pt_bins) - 1):
       t_unc[i] = math.sqrt(t_unc[i])
       l_unc[i] = math.sqrt(l_unc[i])
+      tf_unc[i] = math.sqrt(tf_unc[i])
 
-    yields[sr] = {"t": t, "l": l, "t_unc": t_unc, "l_unc": l_unc}
+    yields[sr] = {"t": t, "l": l, "tf": tf, "t_unc": t_unc, "l_unc": l_unc, "tf_unc": tf_unc}
 
   return yields
 
@@ -199,10 +237,11 @@ def main():
   print("Going to use %s to make table..." %samples)
   
   pt_bins = parsePtBins(args.bins)
+  fr_bins = parseFRBins(args.fake_rate, pt_bins)
 
   yields = getCombinedYields(samples, args.study_dir, pt_bins)
   #print(yields)
-  PrintSRTable(yields, args.study_dir, pt_bins, latex)
+  PrintSRTable(yields, args.study_dir, pt_bins, fr_bins, latex)
 
 if __name__ == "__main__":
   main()
