@@ -129,12 +129,12 @@ def getYieldsFromSample(hist_loc, SR, pt_bins):
     h_loose_pt = f.Get("loose_lep3pt").Clone("h_loose_pt_%s" % SR)
     h_tight_pt = f.Get("tight_lep3pt").Clone("h_tight_pt_%s" % SR)
     h_tight_fake_pt = f.Get("tight_fake_lep3pt").Clone("h_tight_fake_pt_%s" % SR)
-    h_loose_fake_pt = f.Get("loose_lep3pt").Clone("h_loose_fake_pt_%s" % SR)
+    h_loose_fake_pt = f.Get("loose_fake_lep3pt").Clone("h_loose_fake_pt_%s" % SR)
   else:
     h_loose_pt = f.Get("loose_lep2pt").Clone("h_loose_pt_%s" % SR)
     h_tight_pt = f.Get("tight_lep2pt").Clone("h_tight_pt_%s" % SR)
     h_tight_fake_pt = f.Get("tight_fake_lep2pt").Clone("h_tight_fake_pt_%s" % SR)
-    h_loose_fake_pt = f.Get("loose_lep2pt").Clone("h_loose_fake_pt_%s" % SR)
+    h_loose_fake_pt = f.Get("loose_fake_lep2pt").Clone("h_loose_fake_pt_%s" % SR)
 
   t = []
   t_unc = []
