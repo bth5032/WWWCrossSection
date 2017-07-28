@@ -23,6 +23,7 @@ parser.add_argument("--ttv", help="Use TTV sample", action="store_true")
 parser.add_argument("--singletop", help="Use TTV sample", action="store_true")
 parser.add_argument("--other", help="Use Other (VH) sample", action="store_true")
 parser.add_argument("--www", help="Use WWW sample", action="store_true")
+parser.add_argument("--wh", help="Use WH sample", action="store_true")
 
 parser.add_argument("-h", "--help", help="Print help message and quit", action="store_true")
 
@@ -215,6 +216,8 @@ def main():
   #Signal
   if (args.www or args.all or args.signal):
     samples.append("WWW")
+  if (args.wh or args.all or args.signal):
+    samples.append("Wh")
 
   #BG
   if (args.ttbar_dilep or args.all or args.bg):
