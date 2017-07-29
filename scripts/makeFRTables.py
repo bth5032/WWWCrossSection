@@ -35,6 +35,9 @@ if (args.help):
 
 import ROOT as r
 
+signals = ["WWW", "Wh"]
+bgs = ["TTBar2l", "WZ", "ZZ", "WW", "TTV", "VVV", "TTBar1l", "SingleTop", "WJets", "DY", "Other"]
+
 FR_enum = {"T_real": 0, "T_fake": 1, "TT_real": 2, "TT_fake": 3, "TTT_real": 4, "TTT_fake": 5, "L_real": 6, "L_fake": 7, "CATERR": 8};
 
 real_tight_bins = {
@@ -112,6 +115,7 @@ def PrintSRTable(yields, study_dir, latex):
 def PrintSampleTable(yields, study_dir, latex):
   print("Using Config: %s" % study_dir)
   SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
+
   for sr in SRs:
     if (latex):
       print("")
@@ -123,8 +127,18 @@ def PrintSampleTable(yields, study_dir, latex):
       print("\\begin{tabular}{l|c|c|c|c}")
       print("Sample Name & Real/Tight & Real/Loose & Fake/Tight & Fake/Loose \\\\ \\hline")
    
-      for s in yields[sr]: #for each sample
-        print("%s          & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (s, yields[sr][s]["rt"],yields[sr][s]["rt_unc"],yields[sr][s]["rl"],yields[sr][s]["rl_unc"],yields[sr][s]["ft"],yields[sr][s]["ft_unc"],yields[sr][s]["fl"],yields[sr][s]["fl_unc"]) )
+      for s in bgs: #for each BG sample
+        if s in yields[sr]:
+          print("%s          & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (s, yields[sr][s]["rt"],yields[sr][s]["rt_unc"],yields[sr][s]["rl"],yields[sr][s]["rl_unc"],yields[sr][s]["ft"],yields[sr][s]["ft_unc"],yields[sr][s]["fl"],yields[sr][s]["fl_unc"]) )
+      print("\\hline")
+      for s in signals: #for each signal sample
+        if s in yields[sr]:
+          print("%s          & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (s, yields[sr][s]["rt"],yields[sr][s]["rt_unc"],yields[sr][s]["rl"],yields[sr][s]["rl_unc"],yields[sr][s]["ft"],yields[sr][s]["ft_unc"],yields[sr][s]["fl"],yields[sr][s]["fl_unc"]) )
+      print("\\hline")
+      s="signal"
+      print("%s          & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (s, yields[sr][s]["rt"],yields[sr][s]["rt_unc"],yields[sr][s]["rl"],yields[sr][s]["rl_unc"],yields[sr][s]["ft"],yields[sr][s]["ft_unc"],yields[sr][s]["fl"],yields[sr][s]["fl_unc"]) )
+      s="bg"
+      print("%s          & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f & %0.2f $\pm$ %0.2f \\\\" % (s, yields[sr][s]["rt"],yields[sr][s]["rt_unc"],yields[sr][s]["rl"],yields[sr][s]["rl_unc"],yields[sr][s]["ft"],yields[sr][s]["ft_unc"],yields[sr][s]["fl"],yields[sr][s]["fl_unc"]) )
    
       print("\\end{tabular}")
       print("\\end{center}")
@@ -203,9 +217,41 @@ def getSampleYields(samples, study_dir):
 
   for sr in SRs:
     yields[sr] = {}
+    yields[sr]["signal"] = {"rt": 0, "rl": 0, "ft": 0, "fl": 0, "rt_unc": 0, "rl_unc": 0, "ft_unc": 0, "fl_unc": 0}
+    yields[sr]["bg"] = {"rt": 0, "rl": 0, "ft": 0, "fl": 0, "rt_unc": 0, "rl_unc": 0, "ft_unc": 0, "fl_unc": 0}
     for s in samples:
       rt, rl, ft, fl, rt_unc, rl_unc, ft_unc, fl_unc = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr)
       yields[sr][s] = {"rt": rt, "rl": rl, "ft": ft, "fl": fl, "rt_unc": rt_unc, "rl_unc": rl_unc, "ft_unc": ft_unc, "fl_unc": fl_unc}
+      if s in signals:
+        yields[sr]["signal"]["rt"] += rt
+        yields[sr]["signal"]["rl"] += rl
+        yields[sr]["signal"]["ft"] += ft
+        yields[sr]["signal"]["fl"] += fl
+        yields[sr]["signal"]["rt_unc"] += rt_unc*rt_unc
+        yields[sr]["signal"]["rl_unc"] += rl_unc*rl_unc
+        yields[sr]["signal"]["ft_unc"] += ft_unc*ft_unc
+        yields[sr]["signal"]["fl_unc"] += fl_unc*fl_unc
+      if s in bgs:
+        yields[sr]["bg"]["rt"] += rt
+        yields[sr]["bg"]["rl"] += rl
+        yields[sr]["bg"]["ft"] += ft
+        yields[sr]["bg"]["fl"] += fl
+        yields[sr]["bg"]["rt_unc"] += rt_unc*rt_unc
+        yields[sr]["bg"]["rl_unc"] += rl_unc*rl_unc
+        yields[sr]["bg"]["ft_unc"] += ft_unc*ft_unc
+        yields[sr]["bg"]["fl_unc"] += fl_unc*fl_unc
+
+    yields[sr]["signal"]["rt_unc"] = math.sqrt(yields[sr]["signal"]["rt_unc"])
+    yields[sr]["signal"]["rl_unc"] = math.sqrt(yields[sr]["signal"]["rl_unc"])
+    yields[sr]["signal"]["ft_unc"] = math.sqrt(yields[sr]["signal"]["ft_unc"])
+    yields[sr]["signal"]["fl_unc"] = math.sqrt(yields[sr]["signal"]["fl_unc"])
+    yields[sr]["bg"]["rt_unc"] = math.sqrt(yields[sr]["signal"]["rt_unc"])
+    yields[sr]["bg"]["rl_unc"] = math.sqrt(yields[sr]["signal"]["rl_unc"])
+    yields[sr]["bg"]["ft_unc"] = math.sqrt(yields[sr]["signal"]["ft_unc"])
+    yields[sr]["bg"]["fl_unc"] = math.sqrt(yields[sr]["signal"]["fl_unc"])
+
+
+
 
   return yields
 
