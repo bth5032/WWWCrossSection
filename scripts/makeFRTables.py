@@ -245,10 +245,10 @@ def getSampleYields(samples, study_dir):
     yields[sr]["signal"]["rl_unc"] = math.sqrt(yields[sr]["signal"]["rl_unc"])
     yields[sr]["signal"]["ft_unc"] = math.sqrt(yields[sr]["signal"]["ft_unc"])
     yields[sr]["signal"]["fl_unc"] = math.sqrt(yields[sr]["signal"]["fl_unc"])
-    yields[sr]["bg"]["rt_unc"] = math.sqrt(yields[sr]["signal"]["rt_unc"])
-    yields[sr]["bg"]["rl_unc"] = math.sqrt(yields[sr]["signal"]["rl_unc"])
-    yields[sr]["bg"]["ft_unc"] = math.sqrt(yields[sr]["signal"]["ft_unc"])
-    yields[sr]["bg"]["fl_unc"] = math.sqrt(yields[sr]["signal"]["fl_unc"])
+    yields[sr]["bg"]["rt_unc"] = math.sqrt(yields[sr]["bg"]["rt_unc"])
+    yields[sr]["bg"]["rl_unc"] = math.sqrt(yields[sr]["bg"]["rl_unc"])
+    yields[sr]["bg"]["ft_unc"] = math.sqrt(yields[sr]["bg"]["ft_unc"])
+    yields[sr]["bg"]["fl_unc"] = math.sqrt(yields[sr]["bg"]["fl_unc"])
 
 
 
