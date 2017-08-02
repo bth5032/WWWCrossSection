@@ -471,8 +471,8 @@ BG_cat getBGCategory(){
     int l2 = g_lep_inds[1];
     int l3 = g_lep_inds[2];
 
-    if     (nW==3&&(lep_mc_Id()[l1]>0&&lep_mc_Id()[l2]>0&&lep_mc_Id()[l3]>0)) return chargeFlip;//W+W+W+ - it could be +++ final state, but at the end this final state will be vetoed, so if reco is ++- (e.g.), then this is a chargeflip
-    else if(nW==3&&(lep_mc_Id()[l1]<0&&lep_mc_Id()[l2]<0&&lep_mc_Id()[l3]<0)) return chargeFlip;//W-W-W- - it could be --- final state, but at the end this final state will be vetoed, so if reco is ++- (e.g.), then this is a chargeflip
+    if     (nW==3&&(phys.lep_mc_Id()[l1]>0&&phys.lep_mc_Id()[l2]>0&&phys.lep_mc_Id()[l3]>0)) return chargeFlip;//W+W+W+ - it could be +++ final state, but at the end this final state will be vetoed, so if reco is ++- (e.g.), then this is a chargeflip
+    else if(nW==3&&(phys.lep_mc_Id()[l1]<0&&phys.lep_mc_Id()[l2]<0&&phys.lep_mc_Id()[l3]<0)) return chargeFlip;//W-W-W- - it could be --- final state, but at the end this final state will be vetoed, so if reco is ++- (e.g.), then this is a chargeflip
     else if(nW==3)                                                            return trueWWW;
     else if(nW==2&&nZ==1)                                                     return LL3l;//ttZ w/ LL
     else if(nW==1&&nZ==2)                                                     return true3l;//WZ, neglect WZZ as LL
