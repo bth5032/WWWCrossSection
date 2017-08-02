@@ -433,6 +433,74 @@ FR_cat getFRCategory(){
   }
 }
 
+BG_cat getBGCategory(){  
+  /* Returns background category for the event */
+  int nW(0), nZ(0), nG(0), nF(0);
+
+  //Count out how many leps are from W/Z/Fakes/Photons
+  for (int i = 0; i<g_nlep; i++){
+    int l = g_lep_inds[i];
+    if(phys.lep_isFromW()[l])                                                                            ++nW;
+    else if(phys.lep_isFromZ()[l])                                                                       ++nZ;
+    else if(phys.lep_isFromB()[l]||phys.lep_isFromC()[l]||phys.lep_isFromL()[l]||phys.lep_isFromLF()[l]) ++nF;
+    else if(phys.lep_motherIdSS()[l] == -3)                                                              ++nG;
+  }
+
+  
+  if(g_nlep == 2){
+    int l1 = g_lep_inds[0];
+    int l2 = g_lep_inds[1];
+    
+    if      (nW==2 && ( (phys.lep_mc_Id()[l1]*phys.lep_mc_Id()[l2]) > 0) )   return trueSS; //W+W+
+    else if (nW==2)                                                          return chargeFlip; //W+W- 
+    else if (nZ==2 && ( (phys.lep_mc_Id()[l1]*phys.lep_mc_Id()[l2]) <= 0) )  return chargeFlip; //Z
+    else if (nZ==2)                                                          return LLSS; //ZZ both with a lost lepton (or offshell Z)
+    else if (nW==1&&nZ==1)                                                   return LLSS; //WZ with a lost lepton
+    else if ((nW+nZ)==1&&nG==1)                                              return photonFake; 
+    else if ((nW+nZ)==1)                                                     return fake;
+    else if ((nW+nZ)==0&&nG==2)                                              return photonDoubleFake;
+    else if ((nW+nZ)==0&&nG==1)                                              return fake_photonFake;
+    else if ((nW+nZ)==0)                                                     return doubleFake;
+    else { 
+      if(nG>=1)                                                              return otherPhotonFake;
+      else                                                                   return other;
+    }
+  }
+  else if(g_nlep == 3){
+    int l1 = g_lep_inds[0];
+    int l2 = g_lep_inds[1];
+    int l3 = g_lep_inds[2];
+
+    if     (nW==3&&(lep_mc_Id()[l1]>0&&lep_mc_Id()[l2]>0&&lep_mc_Id()[l3]>0)) return chargeFlip;//W+W+W+ - it could be +++ final state, but at the end this final state will be vetoed, so if reco is ++- (e.g.), then this is a chargeflip
+    else if(nW==3&&(lep_mc_Id()[l1]<0&&lep_mc_Id()[l2]<0&&lep_mc_Id()[l3]<0)) return chargeFlip;//W-W-W- - it could be --- final state, but at the end this final state will be vetoed, so if reco is ++- (e.g.), then this is a chargeflip
+    else if(nW==3)                                                            return trueWWW;
+    else if(nW==2&&nZ==1)                                                     return LL3l;//ttZ w/ LL
+    else if(nW==1&&nZ==2)                                                     return true3l;//WZ, neglect WZZ as LL
+    else if(nZ==3)                                                            return LL3l;//ZZ
+    else if((nW+nZ)==2) {
+      if                 (nG==1)                                              return photonFake;
+      else                                                                    return fake;
+    }
+    else if((nW+nZ)==1) {
+      if                 (nG==2)                                              return photonDoubleFake;
+      else if            (nG==1)                                              return fake_photonFake;
+      else                                                                    return doubleFake;
+    }
+    else {
+      if                 (nG==3)                                              return photonTripleFake;
+      else if            (nG>=1)                                              return otherPhotonFake;
+      else                                                                    return other; //could be triple fakes
+    }
+  }
+  else{
+    cout<<"Throwing error, can not make BG category, not 2 or 3 lepton..."<<endl;
+    std::stringstream message;
+    message<<"Lepton count for event: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" is not 2 or 3, got "<<g_nlep<<", cannot choose BG type with that many leptons";
+    throw std::invalid_argument(message.str());
+    return other;
+  }
+}
+
 bool passGenLevelWHWWW(){
   /* Checks whether the higgs decayed to WW in VH MC */
   int nW = 0;
@@ -903,6 +971,9 @@ bool hasGood2l(){
       if (printFail) cout<<phys.evt()<<" :Failed leading dijet mass >= 400 GeV: "<< leading_dijet_mass <<endl;
       return false; // require at at least 2 Jets within the W mass window.
     }
+  }
+  else if (conf->get("ignore_jet_cuts") == "true"){
+    //pass
   }
   else{
     numEvents->Fill(34); 

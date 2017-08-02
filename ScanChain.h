@@ -147,6 +147,10 @@ const TString charge_type_str[] = {"SS", "OS", "0SFOS", "1SFOS", "2SFOS", "NA"};
 enum FR_cat {T_real = 0, T_fake = 1, TT_real = 2, TT_fake = 3, TTT_real = 4, TTT_fake = 5, L_real = 6, L_fake = 7, CATERR = 8}; 
 const TString FR_cats_str[] = {"T_real", "T_fake", "TT_real", "TT_fake", "TTT_real", "TTT_fake", "L_real", "L_fake", "CATERR"};
 
+//Categories for different background samples
+enum BG_cat {trueSS = 0, chargeFlip = 1, LLSS = 2, photonFake = 3, fake = 4, photonDoubleFake = 5, fake_photonFake = 6,  doubleFake = 7, otherPhotonFake = 8, trueWWW = 9, LL3l = 10, true3l = 11, photonTripleFake = 12, other = 13}; 
+const TString BG_cats_str[] = {"trueSS", "chargeFlip", "LLSS", "photonFake", "fake", "photonDoubleFake", "fake_photonFake",  "doubleFake", "otherPhotonFake", "trueWWW", "LL3l", "true3l", "photonTripleFake", "other"};
+
 flavor_type FT;
 charge_type CT;
 
@@ -223,6 +227,9 @@ charge_type getChargeType();
 
 /* Returns the category for the event in the fake rate study. Loops through leps, counts reals and how many pass the tight ID, returns appropriate category.*/
 FR_cat getFRCategory();
+
+/* Returns background category for the event */
+BG_cat getBGCategory();
 
 /* Checks whether the higgs decayed to WW in VH MC */
 bool passGenLevelWHWWW();
