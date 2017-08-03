@@ -213,6 +213,7 @@ plot_name=njets_nolog
 title=Number of jets
 xmin=0
 xmax=10
+logy=false
 xlabel=Number of Jets
 ylabel=Count
 bin_size=1
