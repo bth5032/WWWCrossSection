@@ -954,7 +954,10 @@ bool hasGood2l(){
 
   //cout<<__LINE__<<endl;
 
-  if (g_njets >= 2){
+  if (conf->get("ignore_jet_cuts") == "true"){
+    //pass
+  }
+  else if (g_njets >= 2){
     // MJJ for closest jets in eta
     pair<int,int> jets_dR = getClosestJetsInDR();
     double dijet_mass = ( g_jets_p4.at(jets_dR.first) + g_jets_p4.at(jets_dR.second) ).M();
@@ -971,9 +974,6 @@ bool hasGood2l(){
       if (printFail) cout<<phys.evt()<<" :Failed leading dijet mass >= 400 GeV: "<< leading_dijet_mass <<endl;
       return false; // require at at least 2 Jets within the W mass window.
     }
-  }
-  else if (conf->get("ignore_jet_cuts") == "true"){
-    //pass
   }
   else{
     numEvents->Fill(34); 
