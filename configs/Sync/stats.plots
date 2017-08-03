@@ -208,6 +208,27 @@ stats_2_high_val=2
 stats_3_low_val=0
 stats_3_high_val=3
 
+Name=njets_nolog
+plot_name=njets_nolog
+title=Number of jets
+xmin=0
+xmax=10
+xlabel=Number of Jets
+ylabel=Count
+bin_size=1
+hist_0_name=njets
+print_stats=true
+simple_errors=true
+stats_0_low_val=0
+stats_0_high_val=10
+stats_1_low_val=0
+stats_1_high_val=1
+stats_2_low_val=0
+stats_2_high_val=2
+stats_3_low_val=0
+stats_3_high_val=3
+
+
 Name=Wleps_ip
 plot_name=Wleps_ip
 title=IP for leptons from W Bosons
