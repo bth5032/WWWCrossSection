@@ -15,7 +15,7 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     base_path="/nfs-7/userdata/bhashemi/WWW_babies/";
   }
 
-  TString version="WWW_v0.1.9";
+  TString version="WWW_v0.1.11";
 
   TString dir;
   if (skimmed){
@@ -225,50 +225,50 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
   if (set == "Data-EE"){
     cout<<"Adding EE Trigger Data"<<endl;
 
-    ch->Add(dir+"data_Run2016B_03feb2017rereco_ee_v2_skim*");
-    ch->Add(dir+"data_Run2016C_03feb2017rereco_ee_v1_skim*");
-    ch->Add(dir+"data_Run2016D_03feb2017rereco_ee_v1_skim*");
-    ch->Add(dir+"data_Run2016E_03feb2017rereco_ee_v1_skim*");
-    ch->Add(dir+"data_Run2016F_03feb2017rereco_ee_v1_skim*");
-    ch->Add(dir+"data_Run2016G_03feb2017rereco_ee_v1_skim*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_ee_v2_skim*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_ee_v3_skim*");
+    ch->Add(dir+"data_Run2016B_03feb2017rereco_ee_v2*");
+    ch->Add(dir+"data_Run2016C_03feb2017rereco_ee_v1*");
+    ch->Add(dir+"data_Run2016D_03feb2017rereco_ee_v1*");
+    ch->Add(dir+"data_Run2016E_03feb2017rereco_ee_v1*");
+    ch->Add(dir+"data_Run2016F_03feb2017rereco_ee_v1*");
+    ch->Add(dir+"data_Run2016G_03feb2017rereco_ee_v1*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_ee_v2*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_ee_v3*");
   }
   else if (set == "Data-EMu"){  
     cout<<"Adding EMu Trigger Data"<<endl;
     
-    ch->Add(dir+"data_Run2016B_03feb2017rereco_em_v2_skim*");
-    ch->Add(dir+"data_Run2016C_03feb2017rereco_em_v1_skim*");
-    ch->Add(dir+"data_Run2016D_03feb2017rereco_em_v1_skim*");
-    ch->Add(dir+"data_Run2016E_03feb2017rereco_em_v1_skim*");
-    ch->Add(dir+"data_Run2016F_03feb2017rereco_em_v1_skim*");
-    ch->Add(dir+"data_Run2016G_03feb2017rereco_em_v1_skim*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_em_v2_skim*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_em_v3_skim*");
+    ch->Add(dir+"data_Run2016B_03feb2017rereco_em_v2*");
+    ch->Add(dir+"data_Run2016C_03feb2017rereco_em_v1*");
+    ch->Add(dir+"data_Run2016D_03feb2017rereco_em_v1*");
+    ch->Add(dir+"data_Run2016E_03feb2017rereco_em_v1*");
+    ch->Add(dir+"data_Run2016F_03feb2017rereco_em_v1*");
+    ch->Add(dir+"data_Run2016G_03feb2017rereco_em_v1*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_em_v2*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_em_v3*");
   }
   else if (set == "Data-MuMu"){
     cout<<"Adding MuMu Trigger Data"<<endl;
     
-    ch->Add(dir+"data_Run2016B_03feb2017rereco_mm_v2_skim*");
-    ch->Add(dir+"data_Run2016C_03feb2017rereco_mm_v1_skim*");
-    ch->Add(dir+"data_Run2016D_03feb2017rereco_mm_v1_skim*");
-    ch->Add(dir+"data_Run2016E_03feb2017rereco_mm_v1_skim*");
-    ch->Add(dir+"data_Run2016F_03feb2017rereco_mm_v1_skim*");
-    ch->Add(dir+"data_Run2016G_03feb2017rereco_mm_v1_skim*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_mm_v2_skim*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_mm_v3_skim*");
+    ch->Add(dir+"data_Run2016B_03feb2017rereco_mm_v2*");
+    ch->Add(dir+"data_Run2016C_03feb2017rereco_mm_v1*");
+    ch->Add(dir+"data_Run2016D_03feb2017rereco_mm_v1*");
+    ch->Add(dir+"data_Run2016E_03feb2017rereco_mm_v1*");
+    ch->Add(dir+"data_Run2016F_03feb2017rereco_mm_v1*");
+    ch->Add(dir+"data_Run2016G_03feb2017rereco_mm_v1*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_mm_v2*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_mm_v3*");
   }
   else if (set == "Data-Mu"){
     cout<<"Adding Single Muon Trigger Data"<<endl;
     
-    ch->Add(dir+"data_Run2016B_03feb2017rereco_sm_v2_skim*");
-    ch->Add(dir+"data_Run2016C_03feb2017rereco_sm_v1_skim*");
-    ch->Add(dir+"data_Run2016D_03feb2017rereco_sm_v1_skim*");
-    ch->Add(dir+"data_Run2016E_03feb2017rereco_sm_v1_skim*");
-    ch->Add(dir+"data_Run2016F_03feb2017rereco_sm_v1_skim*");
-    ch->Add(dir+"data_Run2016G_03feb2017rereco_sm_v1_skim*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_sm_v2_skim*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_sm_v3_skim*");
+    ch->Add(dir+"data_Run2016B_03feb2017rereco_sm_v2*");
+    ch->Add(dir+"data_Run2016C_03feb2017rereco_sm_v1*");
+    ch->Add(dir+"data_Run2016D_03feb2017rereco_sm_v1*");
+    ch->Add(dir+"data_Run2016E_03feb2017rereco_sm_v1*");
+    ch->Add(dir+"data_Run2016F_03feb2017rereco_sm_v1*");
+    ch->Add(dir+"data_Run2016G_03feb2017rereco_sm_v1*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_sm_v2*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_sm_v3*");
   }
 
 //====================================
