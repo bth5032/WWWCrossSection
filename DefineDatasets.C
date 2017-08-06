@@ -211,6 +211,37 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
   }
 
 //====================================
+// QCD
+//====================================
+  else if (set == "QCD"){
+    cout<<"Adding QCD (non-ext samples)"<<endl; 
+
+    dir="/hadoop/cms/store/user/bhashemi/AutoTwopler_babies/merged/VVV/WWW_v0.1.11/"
+
+    ch->Add(dir+"qcdht100_nonext*");
+    ch->Add(dir+"qcdht200_nonext*");
+    ch->Add(dir+"qcdht300_nonext*");
+    ch->Add(dir+"qcdht500_nonext*");
+    ch->Add(dir+"qcdht700_nonext*");
+    ch->Add(dir+"qcdht1000_nonext*");
+    ch->Add(dir+"qcdht1500_nonext*");
+    ch->Add(dir+"qcdht2000_nonext*");
+  }
+
+  else if (set == "QCD-ext"){
+    cout<<"Adding QCD (ext samples)"<<endl; 
+
+    ch->Add(dir+"qcdht100_nonext*");
+    ch->Add(dir+"qcdht200_ext1*");
+    ch->Add(dir+"qcdht300_ext1*");
+    ch->Add(dir+"qcdht500_ext1*");
+    ch->Add(dir+"qcdht700_ext1*");
+    ch->Add(dir+"qcdht1000_ext1*");
+    ch->Add(dir+"qcdht1500_ext1*");
+    ch->Add(dir+"qcdht2000_ext1*");
+  }
+
+//====================================
 // Leptonic Data
 //====================================
   
