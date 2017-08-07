@@ -216,7 +216,7 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
   else if (set == "QCD"){
     cout<<"Adding QCD (non-ext samples)"<<endl; 
 
-    dir="/hadoop/cms/store/user/bhashemi/AutoTwopler_babies/merged/VVV/WWW_v0.1.11/"
+    dir="/hadoop/cms/store/user/bhashemi/AutoTwopler_babies/merged/VVV/WWW_v0.1.11/";
 
     ch->Add(dir+"qcdht100_nonext*");
     ch->Add(dir+"qcdht200_nonext*");
