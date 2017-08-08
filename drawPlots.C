@@ -2178,6 +2178,7 @@ void drawPlots(TString config_file, bool draw_debugs = true){
   s_colors[TString("Wh")]         =  46;
   s_colors[TString("VVV")]        =  kMagenta;
   s_colors[TString("WWW")]        =  kRed;
+  s_colors[TString("QCD")]        =  8;
   
   TGaxis::SetExponentOffset(-0.07, 0, "y"); // X and Y offset for Y axis
   TGaxis::SetExponentOffset(-.8, -0.07, "x"); // X and Y offset for X axis
