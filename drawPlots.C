@@ -14,7 +14,7 @@
 #include "TColor.h"
 #include "TString.h"
 
-#include "External/CTable.cpp"
+//#include "External/CTable.cpp"
 #include "External/tdrstyle_SUSY.C"
 
 #include "ConfigParser.C"
@@ -166,27 +166,34 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   TString errors="";
   TGraphAsymmErrors *prediction_errors;
 
-  int num_hists=stoi(conf->get("num_hists"));
+  int num_hists=0;
   int BG_sum_from=(conf->get("BG_sum_from") != "") ? stoi(conf->get("BG_sum_from")) : 1;
+
+  //Add files from which to obtain histos
+  TString default_hist_dir = getDefaultHistDir(conf);
+  vector<TFile*> hist_files;
+  //cout<<"num_hists: "<<num_hists<<endl;
+  //cout<<"file_"<<num_hists<<"_path: "<<conf->get("file_"+to_string(num_hists)+"_path")<<endl;
+  //cout<<"sample_"<<num_hists<<": "<<conf->get("sample_"+to_string(num_hists))<<endl;
+  while ((conf->get("file_"+to_string(num_hists)+"_path") != "") || (conf->get("sample_"+to_string(num_hists)) != "")){
+    //cout<<"Getting hist "<<num_hists<<endl;
+    TString sample_loc = "";
+    if (conf->get("file_"+to_string(num_hists)+"_path") != ""){
+      sample_loc = TString(conf->get("file_"+to_string(num_hists)+"_path"));
+    }
+    else{
+      sample_loc = default_hist_dir+conf->get("sample_"+to_string(num_hists))+".root";
+    }
+    hist_files.push_back(new TFile(sample_loc));
+    num_hists++;
+  }
+
+  num_hists = (conf->get("num_hists") != "") ? stoi(conf->get("num_hists")) : num_hists;
 
   if (num_hists < 2){
     return TString("Less than Two hists can not be turned into a residual plot, please call drawSingleTH1");
   } 
-
-  //Add files from which to obtain histos
-  TString default_hist_dir = getDefaultHistDir(conf);
-  vector<TFile*> hist_files (num_hists);
-  for (int i = 0; i<num_hists; i++){
-    TString sample_loc = "";
-    if (conf->get("file_"+to_string(i)+"_path") != ""){
-      sample_loc = TString(conf->get("file_"+to_string(i)+"_path"));
-    }
-    else{
-      sample_loc = default_hist_dir+conf->get("sample_"+to_string(i))+".root";
-      hist_files[i]=new TFile(sample_loc);
-    }
-  }
-  cout << "Found files "<<endl;
+  cout << "Found files for "<<num_hists<<" hists"<<endl;
 
   TString plot_name = conf->get("plot_name");
   double bin_size;
@@ -246,7 +253,10 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
       exit(1);
     }
     else{
+      cout<<__LINE__<<endl;
+      cout<<"Hist name: "<<hist_names[i]<<endl;
       hists[i] = (TH1D*) ((TH1D*) hist_files[i]->Get(hist_names[i]))->Clone("hist_"+to_string(i)+"_"+plot_name);
+      cout<<__LINE__<<endl;
       cout<<hist_names[i]<<" found in "<<hist_files[i]->GetName()<<endl;
     }
     cout<<hist_labels[i]<<" Integral bin 0 to bin 100 Content: "<<hists[i]->Integral(0,100)<<endl;
@@ -547,7 +557,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     cout<<hist_labels[i]<<" Integral bin 0 to bin 100 Content: "<<hists[i]->Integral(hists[i]->FindBin(0),hists[i]->FindBin(100))<<endl;
   } 
 
-  if (conf->get("print_stats") == "true"){
+  /*if (conf->get("print_stats") == "true"){
     vector<pair<double,double>> stats_bins;
     int j = 0;
     
@@ -658,7 +668,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
       table.saveTex(Form("outputs/efficiency_table_%s.tex", conf_id.Data()));
 
     }
-  }
+  }*/
   
 
   cout<<"===========================================\nUpdate Overflow\n===========================================\n";
@@ -702,6 +712,62 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   //cout<<__LINE__<<endl;
   cout<<"Drawing histograms"<<endl;
   h_axes->Draw();
+
+   //==========================
+  // Hist Groups
+  //==========================
+
+  //cout<<"---------------"<<endl;
+  //for (int i = 0; i<num_hists; i++){
+  //  cout<<"hist "<<i<<" "<<hist_labels[i]<<endl;
+  //}
+  //cout<<"---------------"<<endl;
+
+  //Hold list of hists to be removed from list since they will be added to the first hist
+  //in the group.
+  vector<int> remove_after_groups;
+
+  //loop through the conf group_i's
+  int num_group = 0;
+  while (conf->get("group_"+to_string(num_group)) != ""){
+    //get list of samples in the group
+    vector<int> hnums = iparseVector(conf->get("group_"+to_string(num_group)));
+
+    cout<<"Making Group "<<num_group<<" elements are:"<<hist_labels[hnums[0]];
+
+    //change the label of the first hist to the name of the group
+    hist_labels[hnums[0]] = TString(conf->get("group_"+to_string(num_group)+"_label"));
+    for (vector<int>::iterator n = hnums.begin()+1; n != hnums.end(); n++){
+      //Add other hists in the group to the first one
+      hists[hnums[0]]->Add(hists[*n]);
+      //Store a list of the hists added so they can be removed.
+      remove_after_groups.push_back(*n);
+      cout<<", "<<hist_labels[*n];
+    }
+    cout<<"."<<endl;
+    num_group++;
+  }
+
+  //Sort the list of hists to be removed so that they can be traversed backwards and we don't need to keep track of 
+  //hist numbers changing
+  sort(remove_after_groups.begin(), remove_after_groups.end());
+
+  //Remove hists from the list of hists that have been grouped into another spot. Going through backwards ensures the 
+  //indexes don't change.
+  for (int i = remove_after_groups.size()-1; i>=0; i--){
+    cout<<"Removing "<<hist_labels[remove_after_groups[i]]<<" since it was part of a group"<<endl;
+    hists.erase(hists.begin()+remove_after_groups[i]);
+    hist_labels.erase(hist_labels.begin()+remove_after_groups[i]);
+    num_hists--;
+  }
+
+
+  //cout<<"---------------"<<endl;
+  //for (int i = 0; i<num_hists; i++){
+  //  cout<<"hist "<<i<<" "<<hist_labels[i]<<endl;
+  //}
+  //cout<<"---------------"<<endl;
+
   //===========================
   // MAKE STACK
   //===========================
@@ -709,6 +775,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   THStack * stack = new THStack(("stack_"+conf->get("Name")).c_str(), conf->get("title").c_str());
   //cout<<__LINE__<<endl;
 
+  
   vector<pair<TH1D*, TString>> hists_labeled; 
 
   for (int i=1; i<num_hists; i++)
@@ -1169,7 +1236,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   //===========================
 
 
-  if (conf->get("print_stats") == "true"){
+  /*if (conf->get("print_stats") == "true"){
     vector<pair<double,double>> stats_bins;
     int j = 0;
     
@@ -1241,7 +1308,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
       table.saveTex(Form("outputs/efficiency_table_%s.tex", conf_id.Data()));
 
     }
-  }
+  }*/
   
   cout<<"===========================================\n3\n===========================================\n";
   for (int i = 0; i<num_hists; i++){
@@ -1283,6 +1350,62 @@ TString drawArbitraryNumber(ConfigParser *conf){
   //cout<<__LINE__<<endl;
   cout<<"Drawing histograms"<<endl;
   h_axes->Draw();
+
+  //==========================
+  // Hist Groups
+  //==========================
+
+  //cout<<"---------------"<<endl;
+  //for (int i = 0; i<num_hists; i++){
+  //  cout<<"hist "<<i<<" "<<hist_labels[i]<<endl;
+  //}
+  //cout<<"---------------"<<endl;
+
+  //Hold list of hists to be removed from list since they will be added to the first hist
+  //in the group.
+  vector<int> remove_after_groups;
+
+  //loop through the conf group_i's
+  int num_group = 0;
+  while (conf->get("group_"+to_string(num_group)) != ""){
+    //get list of samples in the group
+    vector<int> hnums = iparseVector(conf->get("group_"+to_string(num_group)));
+
+    cout<<"Making Group "<<num_group<<" elements are:"<<hist_labels[hnums[0]];
+
+    //change the label of the first hist to the name of the group
+    hist_labels[hnums[0]] = TString(conf->get("group_"+to_string(num_group)+"_label"));
+    for (vector<int>::iterator n = hnums.begin()+1; n != hnums.end(); n++){
+      //Add other hists in the group to the first one
+      hists[hnums[0]]->Add(hists[*n]);
+      //Store a list of the hists added so they can be removed.
+      remove_after_groups.push_back(*n);
+      cout<<", "<<hist_labels[*n];
+    }
+    cout<<"."<<endl;
+    num_group++;
+  }
+
+  //Sort the list of hists to be removed so that they can be traversed backwards and we don't need to keep track of 
+  //hist numbers changing
+  sort(remove_after_groups.begin(), remove_after_groups.end());
+
+  //Remove hists from the list of hists that have been grouped into another spot. Going through backwards ensures the 
+  //indexes don't change.
+  for (int i = remove_after_groups.size()-1; i>=0; i--){
+    cout<<"Removing "<<hist_labels[remove_after_groups[i]]<<" since it was part of a group"<<endl;
+    hists.erase(hists.begin()+remove_after_groups[i]);
+    hist_labels.erase(hist_labels.begin()+remove_after_groups[i]);
+    num_hists--;
+  }
+
+
+  //cout<<"---------------"<<endl;
+  //for (int i = 0; i<num_hists; i++){
+  //  cout<<"hist "<<i<<" "<<hist_labels[i]<<endl;
+  //}
+  //cout<<"---------------"<<endl;
+
   //===========================
   // MAKE STACK
   //===========================
@@ -2178,7 +2301,7 @@ void drawPlots(TString config_file, bool draw_debugs = true){
   s_colors[TString("Wh")]         =  46;
   s_colors[TString("VVV")]        =  kMagenta;
   s_colors[TString("WWW")]        =  kRed;
-  s_colors[TString("QCD")]        =  8;
+  s_colors[TString("QCD")]        =  11;
   
   TGaxis::SetExponentOffset(-0.07, 0, "y"); // X and Y offset for Y axis
   TGaxis::SetExponentOffset(-.8, -0.07, "x"); // X and Y offset for X axis
