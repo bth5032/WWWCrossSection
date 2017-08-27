@@ -1,0 +1,37 @@
+DEFAULT::signal_region=2lepSS
+
+#================================
+# 2Lep SS EE Region
+#================================
+#Baseline--------------------
+DEFAULT::event_type=dilepton
+DEFAULT::MCTriggerEmulation=true
+DEFAULT::do_met_filters=false #MET filters off for now
+
+#DEFAULT::tau_veto=true
+DEFAULT::NBjets_max=0
+DEFAULT::NBjets_loose_max=0
+DEFAULT::no_btag_sf=true
+#---------------------------
+
+DEFAULT::lep1_pt_min=30
+DEFAULT::lep2_pt_min=30
+
+#DEFAULT::MET_min=40
+#DEFAULT::3chargeagree=true
+
+#DEFAULT::ip3d_max=0.015
+
+DEFAULT::jet_pt_min=30
+DEFAULT::Mll_min=30
+DEFAULT::isotrack_veto=true
+DEFAULT::use_veto_leps=true
+#DEFAULT::dEta_jj_max=1.5
+
+#DEFAULT::dilmass_Z_veto=true
+
+#DEFAULT::dil_flavor=ee
+DEFAULT::dil_sign=same
+DEFAULT::num_leptons=2
+
+#DEFAULT::MT_LepMET_min=90
