@@ -184,10 +184,10 @@ double getFRConeCorrPt(int lep_index){
   float coneptcorr = 0;
 
   if ( id == 11 ){
-    if ( etaSC <= 1.479 ) coneptcorr = std::max( 0., relIso - 0.0588 );
-    else                  coneptcorr = std::max( 0., relIso - 0.0571 );
+    if ( etaSC <= 1.479 ) coneptcorr = std::max( 0., reliso - 0.0588 );
+    else                  coneptcorr = std::max( 0., reliso - 0.0571 );
   }
-  else if ( etaSC == 13 ) coneptcorr = std::max( 0., relIso - 0.06   );
+  else if ( etaSC == 13 ) coneptcorr = std::max( 0., reliso - 0.06   );
 
   return pt(1+coneptcorr);
 }
