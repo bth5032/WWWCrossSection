@@ -184,14 +184,17 @@ double getMT2HiggsZ(bool select_highest_closest_higgs_mass=false);
 /*Returns boson Pt, determines whether sample is gjets or zjets first*/
 double bosonPt();
 
-/* Builds the MT from the lepton at index id and the MET vector (assumes massless particles)*/
+/* Builds the MT from the lepton at index id and the MET vector (assumes massless particles) */
 double getMTLepMET(short id=0);
 
 /* Loops through lepton collection and finds the lep that has the max MT when combined with the MET */
 double getMaxMTLepMET(bool verbose=false);
 
-/* Builds the delta R (sqrt(dPhi^2 + dEta^2)) between the lepton at index id and the leading photon*/
+/* Builds the delta R (sqrt(dPhi^2 + dEta^2)) between the lepton at index id and the leading photon */
 double getdRGammaLep(short id=0);
+
+/* Returns the Cone Corrected pt for the FR Closure study */
+double getFRConeCorrPt(int lep_index);
 
 /*Searches the vector of lorentz vectors for the pair with mass nearest (furthest) from the target mass if 'close' is true (false)*/
 pair<int, int> getPairWithMass(const vector<LorentzVector> &vecs, double target_mass, bool close);

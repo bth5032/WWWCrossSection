@@ -174,6 +174,24 @@ double getdRGammaLep(short id/*=0*/){
   return sqrt(pow(dPhi, 2) + pow(dEta, 2));
 }
 
+double getFRConeCorrPt(int lep_index){
+ /*Returns the Cone Corrected pt for the FR Closure study*/
+  int    id     = abs(phys.lep_pdgId().at(lep_index));
+  double etaSC  = abs(phys.lep_etaSC().at(lep_index));
+  double pt     = abs(phys.lep_pt().at(lep_index));
+  double reliso = abs(phys.lep_relIso03EA().at(lep_index));
+
+  float coneptcorr = 0;
+
+  if ( id == 11 ){
+    if ( etaSC <= 1.479 ) coneptcorr = std::max( 0., relIso - 0.0588 );
+    else                  coneptcorr = std::max( 0., relIso - 0.0571 );
+  }
+  else if ( etaSC == 13 ) coneptcorr = std::max( 0., relIso - 0.06   );
+
+  return pt(1+coneptcorr);
+}
+
 pair<int, int> getPairWithMass(const vector<LorentzVector> &vecs, double target_mass, bool close){
   /*Searches the vector of lorentz vectors for the pair with mass nearest (furthest) from the target mass if 'close' is true (false)*/
   
@@ -2755,6 +2773,37 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   otherleps_ptRatio->SetDirectory(rootdir);
   otherleps_ptRatio->Sumw2();
 
+  TH2D *tight_l1pteta, *loose_l1pteta, *tight_l2pteta, *loose_l2pteta, *tight_l3pteta, *loose_l3pteta, *loose_loose_pteta;
+
+  if (conf->get("FR_closure_study") == "true"){
+    tight_l1pteta = new TH2D("tight_l1pteta", "Event count vs. (x,y) = Pt and Eta for leading lepton in events with only tight leptons", 20, 0, 120, 30, 0, 3);
+    tight_l1pteta->SetDirectory(rootdir);
+    tight_l1pteta->Sumw2();
+
+    loose_l1pteta = new TH2D("loose_l1pteta", "Event count vs. (x,y) = Pt and Eta for leading lepton in events with a loose lepton", 20, 0, 120, 30, 0, 3);
+    loose_l1pteta->SetDirectory(rootdir);
+    loose_l1pteta->Sumw2();
+
+    tight_l2pteta = new TH2D("tight_l2pteta", "Event count vs. (x,y) = Pt and Eta for subleading lepton in events with only tight leptons", 20, 0, 120, 30, 0, 3);
+    tight_l2pteta->SetDirectory(rootdir);
+    tight_l2pteta->Sumw2();
+
+    loose_l2pteta = new TH2D("loose_l2pteta", "Event count vs. (x,y) = Pt and Eta for subleading lepton in events with a loose lepton", 20, 0, 120, 30, 0, 3);
+    loose_l2pteta->SetDirectory(rootdir);
+    loose_l2pteta->Sumw2();
+
+    tight_l3pteta = new TH2D("tight_l3pteta", "Event count vs. (x,y) = Pt and Eta for trailing lepton in events with only tight leptons", 20, 0, 120, 30, 0, 3);
+    tight_l3pteta->SetDirectory(rootdir);
+    tight_l3pteta->Sumw2();
+
+    loose_l3pteta = new TH2D("loose_l3pteta", "Event count vs. (x,y) = Pt and Eta for trailing lepton in events with a loose lepton", 20, 0, 120, 30, 0, 3);
+    loose_l3pteta->SetDirectory(rootdir);
+    loose_l3pteta->Sumw2();
+
+    loose_loose_pteta = new TH2D("loose_loose_pteta", "Event count vs. (x,y) = Pt and Eta for the loose lepton in events with a loose lepton", 20, 0, 120, 30, 0, 3);
+    loose_loose_pteta->SetDirectory(rootdir);
+    loose_loose_pteta->Sumw2();
+  }
 
   cout<<"Histograms initialized"<<endl;
   //cout<<__LINE__<<endl;
@@ -3247,7 +3296,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
 
         //cout<<__LINE__<<endl;
 
+        //There was a loose lep in this event
         if (loose_lep_index != -1){
+          if (conf->get("FR_closure_study") == "true"){
+            loose_l1pteta->Fill(getFRConeCorrPt(g_lep_inds[0]), phys.lep_etaSC().at(g_lep_inds[0]),weight);
+            loose_l2pteta->Fill(getFRConeCorrPt(g_lep_inds[1]), phys.lep_etaSC().at(g_lep_inds[1]),weight);
+            if (g_nlep > 2) loose_l3pteta->Fill(getFRConeCorrPt(g_lep_inds[2]), phys.lep_etaSC().at(g_lep_inds[2]),weight);
+            loose_loose_pteta->Fill(getFRConeCorrPt(loose_lep_index), phys.lep_etaSC().at(loose_lep_index),weight);
+          }
+
           loose_lep_reliso03EA->Fill(phys.lep_relIso03EA().at(loose_lep_index), weight);
           loose_lep_pt->Fill(phys.lep_p4().at(loose_lep_index).pt(), weight);
           loose_lep_eta->Fill(phys.lep_p4().at(loose_lep_index).eta(), weight);
@@ -3273,6 +3330,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           if (g_nlep > 2) loose_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
         }
         else{
+
           //cout<<__LINE__<<endl;
           if ( c == TTT_fake ){
             tight_fake_lep1pt->Fill(phys.lep_pt().at(g_lep_inds[0]), weight);
@@ -3287,6 +3345,11 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           tight_lep2pt->Fill(phys.lep_pt().at(g_lep_inds[1]),weight);
           if (g_nlep > 2) tight_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
           //cout<<__LINE__<<endl;
+          if (conf->get("FR_closure_study") == "true"){
+              loose_l1pteta->Fill(getFRConeCorrPt(g_lep_inds[0]), phys.lep_etaSC().at(g_lep_inds[0]),weight);
+              loose_l2pteta->Fill(getFRConeCorrPt(g_lep_inds[1]), phys.lep_etaSC().at(g_lep_inds[1]),weight);
+              if (g_nlep > 2) loose_l3pteta->Fill(getFRConeCorrPt(g_lep_inds[2]), phys.lep_etaSC().at(g_lep_inds[2]),weight);
+            }
         }
         //cout<<__LINE__<<endl;
       }
@@ -3510,6 +3573,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     tight_lep1pt->Write();
     tight_lep2pt->Write();
     tight_lep3pt->Write();
+  }
+  if (conf->get("FR_closure_study") == "true"){
+    tight_l1pteta->Write();
+    loose_l1pteta->Write();
+    tight_l2pteta->Write();
+    loose_l2pteta->Write();
+    tight_l3pteta->Write();
+    loose_l3pteta->Write();
+    loose_loose_pteta->Write();
   }
 
   //close output file
