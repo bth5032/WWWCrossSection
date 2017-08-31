@@ -189,7 +189,7 @@ double getFRConeCorrPt(int lep_index){
   }
   else if ( etaSC == 13 ) coneptcorr = std::max( 0., reliso - 0.06   );
 
-  return pt(1+coneptcorr);
+  return pt*(1+coneptcorr);
 }
 
 pair<int, int> getPairWithMass(const vector<LorentzVector> &vecs, double target_mass, bool close){
