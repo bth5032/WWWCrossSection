@@ -61,7 +61,7 @@ def getCell(nTight, nLoose, DnTight, DnLoose):
     return (nTight, DnTight, nLoose, DnLoose,float(nTight)/nLoose, err_ratio(nTight, nLoose, DnTight, DnLoose))
   except Exception as e:
     #print(e)
-    return (-1, -1, -1, -1, -1, -1)
+    return (nTight, DnTight, nLoose, DnLoose, -1, -1)
 
 def parsePtBins(bin_string):
   """Makes a list of ints from a string of the form [x0,x1,x2,...xN]"""
@@ -71,6 +71,21 @@ def parsePtBins(bin_string):
     bins.append(float(s))
   if (bins[-1] < 6000):
     bins.append(6001.0)
+  return bins
+
+def parseEtaBins(bin_string):
+  """Makes a list of ints from a string of the form [x0,x1,x2,...xN]"""
+  if bin_string == "muon":
+    return [0, 1.2, 2.1, 2.4]
+  elif bin_string == "electron":
+    return [0, 0.8, 1.479, 2.5]
+
+  s_bins = bin_string[1:-1].split(',')
+  bins = []
+  for s in s_bins:
+    bins.append(float(s))
+  if (bins[-1] < 2.4):
+    bins.append(2.4)
   return bins
 
 def makePlots(bg_t, bg_l, qcd_t, qcd_l, pt_bins, sr):
@@ -114,11 +129,11 @@ def PrintSRTable(yields, pt_bins, eta_bins, latex):
   
   for sr in SRs:
     for j in xrange(len(eta_bins) - 1):
-      row = "%s $eta \\in [%f,%f)$ &  BGs " % (pretty_SR_names[sr], eta_bins[j], eta_bins[j+1])
+      row = "%s $(\eta \\in [%f,%f))$ &  BGs " % (pretty_SR_names[sr], eta_bins[j], eta_bins[j+1])
       for i in xrange(len(pt_bins) - 1):
         row += " & $\\frac{%0.2f \pm %0.2f}{%0.2f \pm %0.2f} (%0.2f \pm %0.2f)$ " % getCell(yields[sr]["bg_t"]["%f_%f" % (pt_bins[i], eta_bins[j])], yields[sr]["bg_l"]["%f_%f" % (pt_bins[i], eta_bins[j])], yields[sr]["bg_t_unc"]["%f_%f" % (pt_bins[i], eta_bins[j])], yields[sr]["bg_l_unc"]["%f_%f" % (pt_bins[i], eta_bins[j])])
-    row+= " \\\\"
-    print(row)
+      row+= " \\\\"
+      print(row)
 
     #makePlots(yields[sr]["bg_sum_t"], yields[sr]["bg_sum_l"], yields[sr]["h_qcd_t"], yields[sr]["h_qcd_l"], pt_bins, sr)
 
@@ -165,7 +180,7 @@ def getYieldsFromSample(hist_loc, SR, pt_bins, eta_bins, sample):
       t_=h_tight_pteta.IntegralAndError(pt_low, pt_high, eta_low, eta_high, t_unc_)
 
       l_unc_=r.Double()
-      l_=h_loose_pteta.IntegralAndError(pt_low, pt_high, eta_low, eta_high, t_unc_)
+      l_=h_loose_pteta.IntegralAndError(pt_low, pt_high, eta_low, eta_high, l_unc_)
       
       t[bin_string] = t_
       t_unc[bin_string] = t_unc_
@@ -180,8 +195,8 @@ def getCombinedYields(samples, pt_bins, eta_bins):
   """Constructs and returns the yields dictionary used in PrintTable. Goes through each SR and adds the yields for each sample in that SR and organizes them in the dict."""
 
   yields = {}
-#  bg_stack_t = r.THStack("bg_stack_tight", "Background Stack for Tight Events")
-#  bg_stack_l = r.THStack("bg_stack_loose", "Background Stack for Loose Events")
+  #bg_stack_t = r.THStack("bg_stack_tight", "Background Stack for Tight Events")
+  #bg_stack_l = r.THStack("bg_stack_loose", "Background Stack for Loose Events")
 
   for sr in SRs:
     t = {}
@@ -206,16 +221,16 @@ def getCombinedYields(samples, pt_bins, eta_bins):
           l[bin_string] += l_[bin_string]
           t_unc[bin_string] += t_unc_[bin_string]*t_unc_[bin_string]
           l_unc[bin_string] += l_unc_[bin_string]*l_unc_[bin_string]
-#        bg_stack_t.Add(h_tight_pt)
-#        bg_stack_l.Add(h_loose_pt)
-#        if "bg_sum_t" in locals():
-#          bg_sum_t.Add(h_tight_pt)
-#          bg_sum_l.Add(h_loose_pt)
-#        else:
-#          bg_sum_t = h_tight_pt.Clone("bg_sum_t_%s" % sr)
-#          bg_sum_t.SetDirectory(0)
-#          bg_sum_l = h_loose_pt.Clone("bg_sum_l_%s" % sr)
-#          bg_sum_l.SetDirectory(0)
+          #bg_stack_t.Add(h_tight_pt)
+          #bg_stack_l.Add(h_loose_pt)
+          #if "bg_sum_t" in locals():
+          #  bg_sum_t.Add(h_tight_pt)
+          #  bg_sum_l.Add(h_loose_pt)
+          #else:
+          #  bg_sum_t = h_tight_pt.Clone("bg_sum_t_%s" % sr)
+          #  bg_sum_t.SetDirectory(0)
+          #  bg_sum_l = h_loose_pt.Clone("bg_sum_l_%s" % sr)
+          #  bg_sum_l.SetDirectory(0)
 
       for i in xrange(len(pt_bins) - 1):
         for j in xrange(len(eta_bins) -1):
@@ -281,7 +296,7 @@ def main():
   print("Going to use %s to make table from %s..." % (samples, args.study_dir))
   
   pt_bins = parsePtBins(args.pt_bins)
-  eta_bins = parsePtBins(args.eta_bins)
+  eta_bins = parseEtaBins(args.eta_bins)
   lepton=args.lepton
   base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRClosure/%s/" % args.study_dir
   base_plot_path = "/home/users/bhashemi/public_html/WWWCrossSection/FRClosure/%s/" % args.study_dir
