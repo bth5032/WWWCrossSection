@@ -2,14 +2,15 @@
 
 """Plots and outputs the rate of predicting BG samples from Loose/Tight into Tight/Tight vs. QCD"""
 
-import argparse, os, sys, math, array, ctypes
+import argparse, os, sys, math, array, ctypes, itertools
 import ROOT as r
 r.gROOT.SetBatch(True)
 
 parser = argparse.ArgumentParser(add_help=False)
 
 parser.add_argument("-s", "--study_dir", help="The config directory name in FRClosure, e.g. LooseIso", type=str, default="LooseIso")
-parser.add_argument("-b", "--bins", help="Choose Pt bins for the study, ex: [0,10,20,30]", type=str, default="[0,25,50,75,100,150]")
+parser.add_argument("-p", "--pt_bins", help="Choose Pt bins for the study, ex: [10, 15, 20, 25, 30, 35, 50, 120]", type=str, default="[10, 15, 20, 25, 30, 35, 50, 120]")
+parser.add_argument("-e", "--eta_bins", help="Choose Eta bins for the study, ex: [0, 1.2, 2.1, 2.4]", type=str, default="[0, 0.8, 1.479, 2.5]")
 parser.add_argument("--txt", help="Print table in txt format", action="store_true")
 
 parser.add_argument("--ttbar_dilep", help="Use TTBar to dilepton sample", action="store_true")
@@ -95,7 +96,7 @@ def makePlots(bg_t, bg_l, qcd_t, qcd_l, pt_bins, sr):
   canvas.SaveAs("%s/%s.png" % (base_plot_path, sr))
   canvas.SaveAs("%s/%s.pdf" % (base_plot_path, sr)) 
 
-def PrintSRTable(yields, pt_bins, latex):
+def PrintSRTable(yields, pt_bins, eta_bins, latex):
   """Prints the yeilds tables and make plots"""
   print(yields)
   print("Using Config: %s" % args.study_dir)
@@ -112,125 +113,121 @@ def PrintSRTable(yields, pt_bins, latex):
   print(title)
   
   for sr in SRs:
-    row = "%s &  BGs " % pretty_SR_names[sr]
-    for i in xrange(len(pt_bins) - 1):
-      row += " & $\\frac{%0.2f \pm %0.2f}{%0.2f \pm %0.2f} (%0.2f \pm %0.2f)$ " % getCell(yields[sr]["bg_t"][i], yields[sr]["bg_l"][i], yields[sr]["bg_t_unc"][i], yields[sr]["bg_l_unc"][i])
+    for j in xrange(len(eta_bins) - 1):
+      row = "%s $eta \\in [%f,%f)$ &  BGs " % (pretty_SR_names[sr], eta_bins[j], eta_bins[j+1])
+      for i in xrange(len(pt_bins) - 1):
+        row += " & $\\frac{%0.2f \pm %0.2f}{%0.2f \pm %0.2f} (%0.2f \pm %0.2f)$ " % getCell(yields[sr]["bg_t"]["%f_%f" % (pt_bins[i], eta_bins[j])], yields[sr]["bg_l"]["%f_%f" % (pt_bins[i], eta_bins[j])], yields[sr]["bg_t_unc"]["%f_%f" % (pt_bins[i], eta_bins[j])], yields[sr]["bg_l_unc"]["%f_%f" % (pt_bins[i], eta_bins[j])])
     row+= " \\\\"
     print(row)
-    row = "& QCD "
-    for i in xrange(len(pt_bins) - 1):
-      row += " & $\\frac{%0.2f \pm %0.2f}{%0.2f \pm %0.2f} (%0.2f \pm %0.2f)$ " % getCell(yields[sr]["qcd_t"][i], yields[sr]["qcd_l"][i], yields[sr]["qcd_t_unc"][i], yields[sr]["qcd_l_unc"][i])
-    row+= " \\\\ \\hline"
-    print(row)
 
-    makePlots(yields[sr]["bg_sum_t"], yields[sr]["bg_sum_l"], yields[sr]["h_qcd_t"], yields[sr]["h_qcd_l"], pt_bins, sr)
+    #makePlots(yields[sr]["bg_sum_t"], yields[sr]["bg_sum_l"], yields[sr]["h_qcd_t"], yields[sr]["h_qcd_l"], pt_bins, sr)
 
   print("\\end{tabular}")
   print("\\end{center}")
   print("\\end{table}")
 
-
-def getYieldsFromSample(hist_loc, SR, pt_bins, sample):
+def getYieldsFromSample(hist_loc, SR, pt_bins, eta_bins, sample):
   """returns a tuple of lists ([Tight_bin1, ..., Tight_binN], [Loose_bin1, ..., Loose_binN]) for the number of events in"""
   f = r.TFile(hist_loc)
 
   if lepton == 1:
-    h_tight_pt = f.Get("tight_lep1pt").Clone("tight_pt_%s_%s" % (SR, sample))
-    h_loose_pt = f.Get("loose_lep1pt").Clone("tight_pt_%s_%s" % (SR, sample))
+    h_tight_pteta = f.Get("tight_l1pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
+    h_loose_pteta = f.Get("loose_l1pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
   elif lepton == 2:
-    h_tight_pt = f.Get("tight_lep2pt").Clone("tight_pt_%s_%s" % (SR, sample))
-    h_loose_pt = f.Get("loose_lep2pt").Clone("tight_pt_%s_%s" % (SR, sample))
+    h_tight_pteta = f.Get("tight_l2pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
+    h_loose_pteta = f.Get("loose_l2pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
   else:
     if("2lep" in SR):
-      h_tight_pt = f.Get("tight_lep2pt").Clone("tight_pt_%s_%s" % (SR, sample))
-      h_loose_pt = f.Get("loose_lep2pt").Clone("tight_pt_%s_%s" % (SR, sample))
+      h_tight_pteta = f.Get("tight_l2pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
+      h_loose_pteta = f.Get("loose_l2pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
     else:
-      h_tight_pt = f.Get("tight_lep3pt").Clone("tight_pt_%s_%s" % (SR, sample))
-      h_loose_pt = f.Get("loose_lep3pt").Clone("tight_pt_%s_%s" % (SR, sample))
+      h_tight_pteta = f.Get("tight_l3pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
+      h_loose_pteta = f.Get("loose_l3pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
 
-  h_tight_pt.SetDirectory(0)
-  h_loose_pt.SetDirectory(0)
+  h_tight_pteta.SetDirectory(0)
+  h_loose_pteta.SetDirectory(0)
 
-  t = []
-  t_unc = []
-  l = []
-  l_unc = []
+  t = {}
+  t_unc = {}
+  l = {}
+  l_unc = {}
 
   #loop over all pt intervals
   for i in xrange(len(pt_bins) - 1):
-    low = h_tight_pt.FindBin(pt_bins[i])
-    high = h_tight_pt.FindBin(pt_bins[i+1])
+    for j in xrange(len(eta_bins) - 1):
+      pt_low = h_tight_pteta.GetXaxis().FindBin(pt_bins[i])
+      pt_high = h_tight_pteta.GetXaxis().FindBin(pt_bins[i+1]-0.0001)
+      eta_low = h_tight_pteta.GetYaxis().FindBin(eta_bins[j])
+      eta_high = h_tight_pteta.GetYaxis().FindBin(eta_bins[j+1]-.00001)
+      bin_string = "%f_%f" % (pt_bins[i], eta_bins[j])
 
-    t_unc_=r.Double()
-    t_=h_tight_pt.IntegralAndError(low, high, t_unc_)
+      t_unc_=r.Double()
+      t_=h_tight_pteta.IntegralAndError(pt_low, pt_high, eta_low, eta_high, t_unc_)
 
-    l_unc_=r.Double()
-    l_=h_loose_pt.IntegralAndError(low, high, l_unc_)
-    
-    t.append(t_)
-    t_unc.append(t_unc_)
-    l.append(l_)
-    l_unc.append(l_unc_)
+      l_unc_=r.Double()
+      l_=h_loose_pteta.IntegralAndError(pt_low, pt_high, eta_low, eta_high, t_unc_)
+      
+      t[bin_string] = t_
+      t_unc[bin_string] = t_unc_
+      l[bin_string] = l_
+      l_unc[bin_string] = l_unc_
 
   print("Returning for %s from %s: tight=%s+/-%s, loose=%s+/-%s" % (sample, hist_loc, t, t_unc, l, l_unc))
 
-  return (t, l, t_unc, l_unc, h_tight_pt, h_loose_pt)
+  return (t, l, t_unc, l_unc, h_tight_pteta, h_loose_pteta)
 
-def getCombinedYields(samples, pt_bins):
+def getCombinedYields(samples, pt_bins, eta_bins):
   """Constructs and returns the yields dictionary used in PrintTable. Goes through each SR and adds the yields for each sample in that SR and organizes them in the dict."""
 
   yields = {}
-  bg_stack_t = r.THStack("bg_stack_tight", "Background Stack for Tight Events")
-  bg_stack_l = r.THStack("bg_stack_loose", "Background Stack for Loose Events")
+#  bg_stack_t = r.THStack("bg_stack_tight", "Background Stack for Tight Events")
+#  bg_stack_l = r.THStack("bg_stack_loose", "Background Stack for Loose Events")
 
   for sr in SRs:
-    t = []
-    l = []
-    t_unc = []
-    l_unc = []
-    
-    qcd_t = []
-    qcd_l = []
-    qcd_t_unc = []
-    qcd_l_unc = []
+    t = {}
+    l = {}
+    t_unc = {}
+    l_unc = {}
     
     for i in xrange(len(pt_bins) - 1):
-      t.append(0)
-      l.append(0)
-      t_unc.append(0)
-      l_unc.append(0)
-      qcd_t.append(0)
-      qcd_l.append(0)
-      qcd_t_unc.append(0)
-      qcd_l_unc.append(0)
+      for j in xrange(len(eta_bins) -1):
+        t["%f_%f" % (pt_bins[i], eta_bins[j])] = 0
+        l["%f_%f" % (pt_bins[i], eta_bins[j])] = 0
+        t_unc["%f_%f" % (pt_bins[i], eta_bins[j])] = 0
+        l_unc["%f_%f" % (pt_bins[i], eta_bins[j])] = 0
       
     for s in samples:
-      t_, l_, t_unc_, l_unc_, h_tight_pt, h_loose_pt = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr, pt_bins, s)
+      t_, l_, t_unc_, l_unc_, h_tight_pt, h_loose_pt = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr, pt_bins, eta_bins, s)
       #print("integral of thing %f" % h_tight_pt.Integral())
       for i in xrange(len(pt_bins) - 1):
-        t[i] += t_[i]
-        l[i] += l_[i]
-        t_unc[i] += t_unc_[i]*t_unc_[i]
-        l_unc[i] += l_unc_[i]*l_unc_[i]
-      bg_stack_t.Add(h_tight_pt)
-      bg_stack_l.Add(h_loose_pt)
-      if "bg_sum_t" in locals():
-        bg_sum_t.Add(h_tight_pt)
-        bg_sum_l.Add(h_loose_pt)
-      else:
-        bg_sum_t = h_tight_pt.Clone("bg_sum_t_%s" % sr)
-        bg_sum_t.SetDirectory(0)
-        bg_sum_l = h_loose_pt.Clone("bg_sum_l_%s" % sr)
-        bg_sum_l.SetDirectory(0)
+        for j in xrange(len(eta_bins) -1):
+          bin_string = "%f_%f" % (pt_bins[i], eta_bins[j])
+          t[bin_string] += t_[bin_string]
+          l[bin_string] += l_[bin_string]
+          t_unc[bin_string] += t_unc_[bin_string]*t_unc_[bin_string]
+          l_unc[bin_string] += l_unc_[bin_string]*l_unc_[bin_string]
+#        bg_stack_t.Add(h_tight_pt)
+#        bg_stack_l.Add(h_loose_pt)
+#        if "bg_sum_t" in locals():
+#          bg_sum_t.Add(h_tight_pt)
+#          bg_sum_l.Add(h_loose_pt)
+#        else:
+#          bg_sum_t = h_tight_pt.Clone("bg_sum_t_%s" % sr)
+#          bg_sum_t.SetDirectory(0)
+#          bg_sum_l = h_loose_pt.Clone("bg_sum_l_%s" % sr)
+#          bg_sum_l.SetDirectory(0)
 
-    for i in xrange(len(pt_bins) - 1):
-      t_unc[i] = math.sqrt(t_unc[i])
-      l_unc[i] = math.sqrt(l_unc[i])
+      for i in xrange(len(pt_bins) - 1):
+        for j in xrange(len(eta_bins) -1):
+          bin_string = "%f_%f" % (pt_bins[i], eta_bins[j])
+          t_unc[bin_string] = math.sqrt(t_unc[bin_string])
+          l_unc[bin_string] = math.sqrt(l_unc[bin_string])
 
     #Get numbers for QCD as well
-    qcd_t, qcd_l, qcd_t_unc, qcd_l_unc, h_qcd_t, h_qcd_l = getYieldsFromSample(base_hists_path+sr+"/QCD.root", sr, pt_bins, "QCD")
+    #qcd_t, qcd_l, qcd_t_unc, qcd_l_unc, h_qcd_t, h_qcd_l = getYieldsFromSample(base_hists_path+sr+"/QCD.root", sr, pt_bins, "QCD")
 
-    yields[sr] = {"bg_t": t, "bg_l": l, "bg_t_unc": t_unc, "bg_l_unc": l_unc, "qcd_t": qcd_t, "qcd_l": qcd_l, "qcd_t_unc": qcd_t_unc, "qcd_l_unc": qcd_l_unc, "bg_stack_t": bg_stack_t, "bg_stack_l": bg_stack_l, "bg_sum_t": bg_sum_t, "bg_sum_l": bg_sum_l, "h_qcd_t": h_qcd_t, "h_qcd_l": h_qcd_l}
+    #yields[sr] = {"bg_t": t, "bg_l": l, "bg_t_unc": t_unc, "bg_l_unc": l_unc, "qcd_t": qcd_t, "qcd_l": qcd_l, "qcd_t_unc": qcd_t_unc, "qcd_l_unc": qcd_l_unc, "bg_stack_t": bg_stack_t, "bg_stack_l": bg_stack_l, "bg_sum_t": bg_sum_t, "bg_sum_l": bg_sum_l, "h_qcd_t": h_qcd_t, "h_qcd_l": h_qcd_l}
+    yields[sr] = {"bg_t": t, "bg_l": l, "bg_t_unc": t_unc, "bg_l_unc": l_unc}
 
   return yields
 
@@ -283,14 +280,15 @@ def main():
 
   print("Going to use %s to make table from %s..." % (samples, args.study_dir))
   
-  pt_bins = parsePtBins(args.bins)
+  pt_bins = parsePtBins(args.pt_bins)
+  eta_bins = parsePtBins(args.eta_bins)
   lepton=args.lepton
   base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRClosure/%s/" % args.study_dir
   base_plot_path = "/home/users/bhashemi/public_html/WWWCrossSection/FRClosure/%s/" % args.study_dir
 
-  yields = getCombinedYields(samples, pt_bins)
+  yields = getCombinedYields(samples, pt_bins, eta_bins)
   #print(yields)
-  #PrintSRTable(yields, pt_bins, latex)
+  PrintSRTable(yields, pt_bins, eta_bins, latex)
 
 if __name__ == "__main__":
   main()

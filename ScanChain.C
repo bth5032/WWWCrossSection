@@ -3346,9 +3346,9 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           if (g_nlep > 2) tight_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
           //cout<<__LINE__<<endl;
           if (conf->get("FR_closure_study") == "true"){
-              loose_l1pteta->Fill(getFRConeCorrPt(g_lep_inds[0]), phys.lep_etaSC().at(g_lep_inds[0]),weight);
-              loose_l2pteta->Fill(getFRConeCorrPt(g_lep_inds[1]), phys.lep_etaSC().at(g_lep_inds[1]),weight);
-              if (g_nlep > 2) loose_l3pteta->Fill(getFRConeCorrPt(g_lep_inds[2]), phys.lep_etaSC().at(g_lep_inds[2]),weight);
+              tight_l1pteta->Fill(getFRConeCorrPt(g_lep_inds[0]), phys.lep_etaSC().at(g_lep_inds[0]), weight);
+              tight_l2pteta->Fill(getFRConeCorrPt(g_lep_inds[1]), phys.lep_etaSC().at(g_lep_inds[1]), weight);
+              if (g_nlep > 2) tight_l3pteta->Fill(getFRConeCorrPt(g_lep_inds[2]), phys.lep_etaSC().at(g_lep_inds[2]), weight);
             }
         }
         //cout<<__LINE__<<endl;
