@@ -1,6 +1,6 @@
 # Config for Stack Plots in FRClosure Btag
 
-DEFAULT::PLOT_TYPE=ratio
+DEFAULT::PLOT_TYPE=stack
 
 # Basic defaults
 DEFAULT::overflow=true
