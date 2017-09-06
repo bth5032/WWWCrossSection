@@ -200,7 +200,7 @@ function pullHists {
 }
 
 function killjobs {
-	kill -9 `ps aux | grep "^bhashemi" | grep "root" | head -n-1 | cut -d' ' -f2 | xargs`
+	kill -9 `ps aux | grep "^bhashemi" | grep "root" | head -n-1 | awk '{print $2}' | xargs`
 }
 
 function addHists {
