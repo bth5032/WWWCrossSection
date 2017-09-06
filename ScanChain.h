@@ -118,6 +118,7 @@ vector<LorentzVector> g_jets_medb_p4;
 vector<short> g_lep_inds; //Holds poition of "analysis leptons"
 short g_nlep;
 vector<bool> g_looseIDs;
+vector<bool> g_tightIDs;
 
 
 const double Z_MASS = 91.1876;

@@ -1593,16 +1593,6 @@ bool passSignalRegionCuts(){
 
   //cout<<__LINE__<<endl;
 
-  if (conf->get("3chargeagree") == "true"){
-    for (int i = 0; i < stoi(conf->get("num_leptons")); i++){
-      if ( ! phys.lep_3ch_agree().at(g_lep_inds.at(i)) ){
-        numEvents->Fill(65);
-        if (printFail) cout<<phys.evt()<<" :Failed Three Charge Agree cut at lepton "<<i<<endl;
-        return false;
-      }
-    }
-  }
-
   if (conf->get("dEta_jj_max") != ""){
       if ( fabs(g_jets_p4.at(0).eta() - g_jets_p4.at(1).eta()) >  stod(conf->get("dEta_jj_max"))){
         numEvents->Fill(74);
@@ -1634,16 +1624,6 @@ bool passSignalRegionCuts(){
       if ( phys.lep_relIso03EA().at(g_lep_inds.at(i)) > stod(conf->get("reliso03_max")) ){
         numEvents->Fill(66);
         if (printFail) cout<<phys.evt()<<" :Failed reliso03 max: "<<stod(conf->get("reliso03_max"))<<" at lepton "<<i<<endl;
-        return false;
-      }
-    }
-  }
-
-  if (conf->get("ip3d_max") != ""){
-    for (int i = 0; i < stoi(conf->get("num_leptons")); i++){
-      if ( fabs(phys.lep_ip3d().at(g_lep_inds.at(i))) > stod(conf->get("ip3d_max")) ){
-        numEvents->Fill(66);
-        if (printFail) cout<<phys.evt()<<" :Failed ip3d_max max: "<<stod(conf->get("ip3d_max"))<<" at lepton "<<i<<endl;
         return false;
       }
     }
@@ -2009,7 +1989,12 @@ bool passFileSelections(){
 //=============================
 
 void setLepIndexes(){
-  /* Loops through lepton objects and adds indexed to g_lep_inds if they pass the tight selection (or fakable object when we are doing fake rate study) */
+  /* Loops through lepton objects and adds indexed to g_lep_inds if they pass the tight selection (or fakeable object when we are doing fake rate study) */
+  
+  //----------------------------------
+  //SETUP BASELINE ID:
+  //----------------------------------
+  g_tightIDs = phys.lep_pass_VVV_cutbased_tight();
   if (FRS){
     if (FRS_use_veto && LooseIso){
       g_looseIDs = phys.lep_pass_VVV_cutbased_veto_noiso();
@@ -2024,6 +2009,58 @@ void setLepIndexes(){
       g_looseIDs = phys.lep_pass_VVV_cutbased_fo();
     }
   }
+
+  //------------------------
+  // TIGHT AND LOOSE CUTS:
+  //------------------------
+  if (conf->get("3chargeagree") == "true"){
+    for (int i = 0; i < g_nlep; i++){
+      g_tightIDs[i] = g_tightIDs[i] && phys.lep_3ch_agree().at(i);
+      g_looseIDs[i] = g_looseIDs[i] && phys.lep_3ch_agree().at(i);
+    }
+  }
+
+  if (conf->get("3chargeagree_el") == "true"){
+    for (int i = 0; i < g_nlep; i++){
+      if (abs(phys.lep_pdgID().at(i)) == 11){
+        g_tightIDs[i] = g_tightIDs[i] && phys.lep_3ch_agree().at(i);
+        g_looseIDs[i] = g_looseIDs[i] && phys.lep_3ch_agree().at(i);
+      }
+    }
+  }
+
+  if (conf->get("3chargeagree_mu") == "true"){
+    for (int i = 0; i < g_nlep; i++){
+      if (abs(phys.lep_pdgID().at(i)) == 13){
+        g_tightIDs[i] = g_tightIDs[i] && phys.lep_3ch_agree().at(i);
+        g_looseIDs[i] = g_looseIDs[i] && phys.lep_3ch_agree().at(i);
+      }
+    }
+  }
+
+  if (conf->get("ip3d_max") != ""){
+    bool pass_ip3d = false;
+    double ip3dmax = stod(conf->get("ip3d_max"));
+    for (int i = 0; i < g_nlep; i++){
+      pass_ip3d = ( phys.lep_ip3d().at(i) <=  ip3d_max);
+      g_tightIDs[i] = (g_tightIDs[i] && pass_ip3d);
+      g_looseIDs[i] = (g_looseIDs[i] && pass_ip3d);
+    }
+  }
+
+  if (conf->get("lost_hits_max") != ""){
+    bool pass_max_hits = false;
+    int max_hits = stoi(conf->get("lost_hits_max"));
+    for (int i = 0; i < g_nlep; i++){
+      pass_max_hits = (phys.lep_lostHits().at(i) <= max_hits);
+      g_tightIDs[i] = (g_tightIDs[i] && pass_max_hits);
+      g_looseIDs[i] = (g_looseIDs[i] && pass_max_hits);
+    }
+  }
+
+  //----------------------------------
+  //LOOSE ONLY CUTS:
+  //----------------------------------
 
   //cout<<__LINE__<<endl;
 
@@ -2090,39 +2127,8 @@ void setLepIndexes(){
   //cout<<__LINE__<<endl;
 
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
-    if(phys.lep_pass_VVV_cutbased_tight().at(i))    g_lep_inds.push_back(i);
-    else if (FRS && g_looseIDs.at(i))               g_lep_inds.push_back(i);
-
-    /*if (fabs(phys.lep_pdgId().at(i)) == 13){
-      cout<<"Electron ";
-      if (phys.lep_pass_VVV_cutbased_tight().at(i)) cout<<" ct pass ";
-      else                                          cout<<" ct fail ";
-
-      if (phys.lep_pass_VVV_cutbased_tight_noiso().at(i)) cout<<" ctni pass ";
-      else                                                cout<<" ctni fail ";
-
-      if (phys.lep_pass_VVV_cutbased_veto().at(i)) cout<<" cv pass ";
-      else                                         cout<<" cv fail ";
-
-      if (phys.lep_pass_VVV_cutbased_veto_noiso().at(i)) cout<<" cvni pass ";
-      else                                               cout<<" cvni fail ";
-      cout<<endl;
-    } 
-    else if (fabs(phys.lep_pdgId().at(i)) == 11){
-      cout<<"Muon ";
-      if (phys.lep_pass_VVV_cutbased_tight().at(i)) cout<<" ct pass ";
-      else                                          cout<<" ct fail ";
-
-      if (phys.lep_pass_VVV_cutbased_tight_noiso().at(i)) cout<<" ctni pass ";
-      else                                                cout<<" ctni fail ";
-
-      if (phys.lep_pass_VVV_cutbased_veto().at(i)) cout<<" cv pass ";
-      else                                         cout<<" cv fail ";
-
-      if (phys.lep_pass_VVV_cutbased_veto_noiso().at(i)) cout<<" cvni pass ";
-      else                                               cout<<" cvni fail ";
-      cout<<endl;
-    }*/
+    if (g_tightIDs.at(i))              g_lep_inds.push_back(i);
+    else if (FRS && g_looseIDs.at(i))  g_lep_inds.push_back(i);
   } 
 
   //cout<<__LINE__<<endl;

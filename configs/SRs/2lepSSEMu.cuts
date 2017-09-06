@@ -20,7 +20,7 @@ DEFAULT::lep2_pt_min=30
 DEFAULT::MET_min=40
 DEFAULT::3chargeagree=true
 
-#DEFAULT::ip3d_max=0.015
+DEFAULT::ip3d_max=0.015
 
 DEFAULT::jet_pt_min=30
 DEFAULT::Mll_min=30
