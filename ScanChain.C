@@ -2779,7 +2779,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   otherleps_ptRatio->SetDirectory(rootdir);
   otherleps_ptRatio->Sumw2();
 
-  TH2D *tight_l1pteta, *loose_l1pteta, *tight_l2pteta, *loose_l2pteta, *tight_l3pteta, *loose_l3pteta, *loose_loose_pteta;
+  TH2D *tight_l1pteta, *loose_l1pteta, *tight_l2pteta, *loose_l2pteta, *tight_l3pteta, *loose_l3pteta, *loose_loose_pteta, *loose_loose_pteta_e, *loose_loose_pteta_m;
 
   if (conf->get("FR_closure_study") == "true"){
     tight_l1pteta = new TH2D("tight_l1pteta", "Event count vs. (x,y) = Pt and Eta for leading lepton in events with only tight leptons", 20, 0, 120, 30, 0, 3);
