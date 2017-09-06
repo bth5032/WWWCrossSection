@@ -1141,7 +1141,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   bg_sum->SetTitle("Sum of background samples");
   
   //cout<<__LINE__<<endl;
-  for (int i=BG_sum_from+1; i<num_hists; i++){
+  for (int i=BG_sum_from; i<num_hists; i++){
     bg_sum->Add(hists[i]);
   }
   //cout<<__LINE__<<endl;
@@ -1424,7 +1424,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   
   for (int i=0; i<num_hists; i++)
   {
-    stack->Add(hists[i]);
+    stack->Add(hists_labeled[i].first);
   } 
   stack->Draw("HIST");
   
@@ -1473,7 +1473,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   //cout<<__LINE__<<endl;
   //Put objects in legend in the order they are written in the config
   for (int i = hists.size(); i>=0; i--){
-    l1->AddEntry(hists[i], hist_labels[i], "f");
+    l1->AddEntry(hists_labeled[i].first, hists_labeled[i].second, "f");
   }
 
   l1->Draw("same");
