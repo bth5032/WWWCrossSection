@@ -2022,7 +2022,7 @@ void setLepIndexes(){
 
   if (conf->get("3chargeagree_el") == "true"){
     for (int i = 0; i < g_nlep; i++){
-      if (abs(phys.lep_pdgID().at(i)) == 11){
+      if (abs(phys.lep_pdgId().at(i)) == 11){
         g_tightIDs[i] = g_tightIDs[i] && phys.lep_3ch_agree().at(i);
         g_looseIDs[i] = g_looseIDs[i] && phys.lep_3ch_agree().at(i);
       }
@@ -2031,7 +2031,7 @@ void setLepIndexes(){
 
   if (conf->get("3chargeagree_mu") == "true"){
     for (int i = 0; i < g_nlep; i++){
-      if (abs(phys.lep_pdgID().at(i)) == 13){
+      if (abs(phys.lep_pdgId().at(i)) == 13){
         g_tightIDs[i] = g_tightIDs[i] && phys.lep_3ch_agree().at(i);
         g_looseIDs[i] = g_looseIDs[i] && phys.lep_3ch_agree().at(i);
       }
@@ -2040,7 +2040,7 @@ void setLepIndexes(){
 
   if (conf->get("ip3d_max") != ""){
     bool pass_ip3d = false;
-    double ip3dmax = stod(conf->get("ip3d_max"));
+    double ip3d_max = stod(conf->get("ip3d_max"));
     for (int i = 0; i < g_nlep; i++){
       pass_ip3d = ( phys.lep_ip3d().at(i) <=  ip3d_max);
       g_tightIDs[i] = (g_tightIDs[i] && pass_ip3d);
