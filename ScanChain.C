@@ -2809,6 +2809,14 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     loose_loose_pteta = new TH2D("loose_loose_pteta", "Event count vs. (x,y) = Pt and Eta for the loose lepton in events with a loose lepton", 20, 0, 120, 30, 0, 3);
     loose_loose_pteta->SetDirectory(rootdir);
     loose_loose_pteta->Sumw2();
+
+    loose_loose_pteta_e = new TH2D("loose_loose_pteta_e", "Event count vs. (x,y) = Pt and Eta for the loose electrons in events with a loose lepton", 20, 0, 120, 30, 0, 3);
+    loose_loose_pteta_e->SetDirectory(rootdir);
+    loose_loose_pteta_e->Sumw2();
+
+    loose_loose_pteta_m = new TH2D("loose_loose_pteta_m", "Event count vs. (x,y) = Pt and Eta for the loose muons in events with a loose lepton", 20, 0, 120, 30, 0, 3);
+    loose_loose_pteta_m->SetDirectory(rootdir);
+    loose_loose_pteta_m->Sumw2();
   }
 
   cout<<"Histograms initialized"<<endl;
@@ -3309,6 +3317,8 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
             loose_l2pteta->Fill(getFRConeCorrPt(g_lep_inds[1]), phys.lep_etaSC().at(g_lep_inds[1]),weight);
             if (g_nlep > 2) loose_l3pteta->Fill(getFRConeCorrPt(g_lep_inds[2]), phys.lep_etaSC().at(g_lep_inds[2]),weight);
             loose_loose_pteta->Fill(getFRConeCorrPt(loose_lep_index), phys.lep_etaSC().at(loose_lep_index),weight);
+            if (abs(phys.lep_pdgId().at(loose_lep_index)) == 11) loose_loose_pteta_e->Fill(getFRConeCorrPt(loose_lep_index), phys.lep_etaSC().at(loose_lep_index),weight);
+            else if (abs(phys.lep_pdgId().at(loose_lep_index)) == 13) loose_loose_pteta_m->Fill(getFRConeCorrPt(loose_lep_index), phys.lep_etaSC().at(loose_lep_index),weight);
           }
 
           loose_lep_reliso03EA->Fill(phys.lep_relIso03EA().at(loose_lep_index), weight);
@@ -3588,6 +3598,8 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     tight_l3pteta->Write();
     loose_l3pteta->Write();
     loose_loose_pteta->Write();
+    loose_loose_pteta_e->Write();
+    loose_loose_pteta_m->Write();
   }
 
   //close output file
