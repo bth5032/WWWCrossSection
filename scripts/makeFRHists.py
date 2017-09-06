@@ -30,18 +30,36 @@ def buildIntervals(pt_bins, eta_bins):
 def getYield(hist, pt_bins, eta_bins, h_fr):
   """Computes the number of objects in the pt/eta bins and applies the FR given with the error."""
 
+  cv = 0
+  dev = 0
+
   err = r.Double()
   for pt_low, pt_high, eta_low, eta_high in buildIntervals(pt_bins, eta_bins):
     x1=hist.GetXaxis().FindBin(pt_low)
     x2=hist.GetXaxis().FindBin(pt_high)
     y1=hist.GetYaxis().FindBin(eta_low)
     y2=hist.GetYaxis().FindBin(eta_high)
-    print(x1,x2,y1,y2)
-    print(pt_low, pt_high, eta_low, eta_high)
+    #print(x1,x2,y1,y2)
+    #print(pt_low, pt_high, eta_low, eta_high)
     y = hist.IntegralAndError(x1, x2, y1, y2, err)
-    print("Count in (pt, eta) in (%0.2f, %0.2f, %0.2f, %0.2f) = %0.2f +/- %0.2f" % (pt_low, pt_high, eta_low, eta_high, y, err) )
+    #print("Count in (pt, eta) in (%0.2f, %0.2f, %0.2f, %0.2f) = %0.2f +/- %0.2f" % (pt_low, pt_high, eta_low, eta_high, y, err) )
+    
+    #Get FR from Histogram
+    fr_x = h_fr.GetXaxis().FindBin(pt_low)
+    fr_y = h_fr.GetYaxis().FindBin(eta_low)
+    fr = h_fr.GetBinContent(fr_x, fr_y)
+    fr_err = h_fr.GetBinError(fr_x, fr_y)
 
-  return (0,0)
+    #print("Got fake rate: %0.2f +/ %0.2f" % (fr, fr_err))
+
+    #print("Bin count is: %0.2f +/- %0.2f" % (fr*y, math.sqrt( (fr*err)**2 + (y*fr_err)**2 ) ) )
+    yield_bin = fr*y
+    err_bin = (fr*err)**2 + (y*fr_err)**2
+    cv+=yield_bin
+    dev += err_bin
+
+  return (cv, math.sqrt(dev))
+  
 
 def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path):
   """Writes out the completed histogram for a list of sample files for the Fake Rate in that region."""
@@ -63,6 +81,8 @@ def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path):
     num_e, err_e = getYield(h_loose_e, pt_bins, eta_bins_m, h_e_FRs)
     num_m, err_m = getYield(h_loose_m, pt_bins, eta_bins_m, h_m_FRs)
 
+    print("count for %s: %0.2f +/- %0.2f " % (s, num_e+num_m, math.sqrt(err_e**2 + err_m**2)) )
+
 def main():
   samples = ["TTBar1l", "WJets"]
   #SRs = ["2lepSS", "2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
@@ -79,6 +99,7 @@ def main():
 
   for signal_region in SRs:
     hist_paths= [ "%s/%s/%s.root" % (base_hists_path, signal_region, s) for s in samples]
+    print("Signal Region: %s: " % signal_region)
     makeHistos(pt_bins, eta_bins_e, eta_bins_m, hist_paths, FR_Hist_path)
 
 if __name__ == "__main__":
