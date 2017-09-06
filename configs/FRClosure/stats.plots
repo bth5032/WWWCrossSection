@@ -1,3 +1,24 @@
+# Config for Stats Plots in FRClosure Btag
+
+DEFAULT::PLOT_TYPE=ratio
+
+# Basic defaults
+DEFAULT::overflow=true
+DEFAULT::luminosity_fb=35.9
+
+DEFAULT::num_hists=3
+DEFAULT::ymin=0.001
+DEFAULT::logy=true
+DEFAULT::WWW_colors=true
+
+DEFAULT::sample_0=WJets
+DEFAULT::sample_1=TTBar1l
+DEFAULT::sample_2=DY
+
+#Histogram labels
+DEFAULT::hist_0_label=WJets
+DEFAULT::hist_1_label=T\bar{T} to 1l
+DEFAULT::hist_2_label=Drell Yan
 
 Name=lep1_ip
 plot_name=lep1_ip

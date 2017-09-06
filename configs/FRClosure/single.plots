@@ -1,3 +1,21 @@
+# Config for Individual Plots
+#
+# This config file holds all the neccesary information to make the single plots for this study.
+#
+#
+
+DEFAULT::PLOT_TYPE=single
+
+# Basic defaults
+DEFAULT::overflow=true
+DEFAULT::luminosity_fb=70
+
+DEFAULT::ymin=0.001
+
+#====================
+# Plots:
+#====================
+
 Name=t1met_tail
 plot_name=Type1MET_tail
 title=Type 1 MET
