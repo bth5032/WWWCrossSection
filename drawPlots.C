@@ -1473,11 +1473,11 @@ TString drawArbitraryNumber(ConfigParser *conf){
   l1->SetTextSize(.03);
   //cout<<__LINE__<<endl;
   //Put objects in legend in the order they are written in the config
-  for (int i = hists.size(); i>=0; i--){
+  for (int i = hists.size()-1; i>=0; i--){
     l1->AddEntry(hists[i], hist_labels[i], "f");
   }
 
-  l1->Draw("same");
+  l1->Draw("SAME");
   cout<<"Drawing Latex String"<<endl;
  
   fullpad->cd();
@@ -1492,24 +1492,16 @@ TString drawArbitraryNumber(ConfigParser *conf){
   c->SaveAs(save_dir+plot_name+TString(".png"));
   //c->SaveAs(save_dir+plot_name+TString(".root"));
   //c->SaveAs(save_dir+plot_name+TString(".C"));
-  cout<<__LINE__<<endl;
+  //cout<<__LINE__<<endl;
   cout<<"Cleaning up plot variables"<<endl;
   delete l1;
-  cout<<__LINE__<<endl;
   hists_labeled.clear();
-  cout<<__LINE__<<endl;
   hists.clear();
-  cout<<__LINE__<<endl;
   hist_names.clear();
-  cout<<__LINE__<<endl;
   hist_labels.clear();
-  cout<<__LINE__<<endl;
   delete bg_err;
-  cout<<__LINE__<<endl;
   delete fullpad;
-  cout<<__LINE__<<endl;
   delete c;
-  cout<<__LINE__<<endl;
   //cout<<__LINE__<<endl;
   for (int i = 0; i<num_hists; i++){
     hist_files[i]->Close();
