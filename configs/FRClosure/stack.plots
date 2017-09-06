@@ -6,6 +6,8 @@ DEFAULT::PLOT_TYPE=stack
 DEFAULT::overflow=true
 DEFAULT::luminosity_fb=35.9
 
+DEFAULT::small_legend=true
+
 DEFAULT::num_hists=3
 DEFAULT::ymin=0.001
 DEFAULT::logy=true
