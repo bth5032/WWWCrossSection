@@ -1160,14 +1160,14 @@ TString drawArbitraryNumber(ConfigParser *conf){
   //===========================
   //cout<<__LINE__<<endl;
   if(conf->get("WWW_colors") == "true"){
-    for (int i = 1; i<num_hists; i++){
+    for (int i = 0; i<num_hists; i++){
       hists[i]->SetFillColor(s_colors[sample_names[i]]);
       //cout<<__LINE__<<endl;
       hists[i]->SetFillStyle(1001);
     }
   }
   else{
-    for (int i = 1; i<num_hists; i++){
+    for (int i = 0; i<num_hists; i++){
       //cout<<__LINE__<<endl;
       hists[i]->SetFillColor(ROOT_COLOR_PALATE[(i-1) % ROOT_COLOR_PALATE.size()]);
       //cout<<__LINE__<<endl;
@@ -1426,7 +1426,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   {
     stack->Add(hists[i]);
   } 
-  stack->Draw("HIST SAME");
+  stack->Draw("HIST");
   
   TGraphAsymmErrors *bg_err = new TGraphAsymmErrors(bg_sum);
   
@@ -1444,7 +1444,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   // BUILD LEGEND
   //===========================
 
-    TLegend *l1;
+  TLegend *l1;
   if (conf->get("small_legend") == "true"){
     l1 = new TLegend(0.78, 0.78, 0.93, 0.93);
   }
