@@ -60,7 +60,6 @@ def getYield(hist, pt_bins, eta_bins, h_fr):
 
   return (cv, math.sqrt(dev))
   
-
 def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path, signal_region):
   """Writes out the completed histogram for a list of sample files for the Fake Rate in that region."""
   fr_file = r.TFile(FR_Hist_path)
@@ -99,6 +98,23 @@ def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path, sign
   print("Wrote Total Fake Count: %0.2f +/- %0.2f" % (total_count, total_error) )
   outfile.Close()
 
+def moveIntoCombined(base_hists_path, SRs):
+  """Reads the files in all the signal regions sent over, copies the weighted_count hists over to Combined directory such that """
+  samples = ["WZ", "WW", "ZZ", "TTBar2l", "DY", "WWW", "Wh", "VVV", "TTV", "SingleTop", "Other"]
+  pretty_SR_names = {"2lepSSEE": "ee", "2lepSSEMu":  "e #mu", "2lepSSMuMu": "#mu #mu", "3lep_0SFOS": "0SFOS", "3lep_1SFOS": "1SFOS", "3lep_2SFOS": "2SFOS"}
+  for sample in samples:
+    outfile = r.TFile("%s/Combined/%s.root" % (base_hists_path, sample))
+    outfile.cd()
+    h_signal_count = r.TH1D("weighted_count", "Weighted Count of Events", 0, 0, 0)
+    for sr in SRs:
+      #Fill in an entry in the h_signal_count histogram for each signal region, label the x axis with the name of the SR.
+      sample_count = r.TFile("%s/%s/%s.root", (base_hists_path, sr, sample)).Get("weighted_count").Clone("weighted_count_%s_%s" % (sr, sample) )
+      bin_num = h_signal_count.Fill(pretty_SR_names[sr], sample_count.GetBinContent(1))
+      h_signal_count.SetBinError(bin_num, sample_count.GetBinError(1))
+    h_signal_count.Write()
+    outfile.Close()
+
+
 def main():
   samples = ["TTBar1l", "WJets"]
   #SRs = ["2lepSS", "2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
@@ -117,6 +133,8 @@ def main():
     hist_paths= [ "%s/%s/%s.root" % (base_hists_path, signal_region, s) for s in samples]
     print("Signal Region: %s: " % signal_region)
     makeHistos(pt_bins, eta_bins_e, eta_bins_m, hist_paths, FR_Hist_path, signal_region)
+
+  moveIntoCombined(base_hists_path, SRs)
 
 if __name__ == "__main__":
   main()
