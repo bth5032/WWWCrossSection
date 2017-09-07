@@ -31,6 +31,7 @@ plot_name=weighted_count
 title=Num Events in Region (weighted)
 xmin=0
 xmax=1
+logy=false
 xlabel=Events
 ylabel=Count
 bin_size=1
