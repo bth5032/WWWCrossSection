@@ -26,6 +26,16 @@ DEFAULT::hist_2_label=Drell Yan
 # Plots:
 #====================
 
+Name=weighted_count
+plot_name=weighted_count
+title=Num Events in Region (weighted)
+xmin=0
+xmax=1
+xlabel=Events
+ylabel=Count
+bin_size=1
+hist_0_name=weighted_count
+
 Name=t1met_tail
 plot_name=Type1MET_tail
 title=Type 1 MET
