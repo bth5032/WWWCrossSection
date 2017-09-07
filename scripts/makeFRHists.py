@@ -61,7 +61,7 @@ def getYield(hist, pt_bins, eta_bins, h_fr):
   return (cv, math.sqrt(dev))
   
 
-def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path):
+def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path, signal_region):
   """Writes out the completed histogram for a list of sample files for the Fake Rate in that region."""
   fr_file = r.TFile(FR_Hist_path)
   h_m_FRs = fr_file.Get("muon_fakerate_conecorrpt_v_eta").Clone("h_m_FRs")
@@ -69,12 +69,14 @@ def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path):
 
   output_dir = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/Prediction/%s" % args.study_dir
 
+  total_count = 0
+  total_error = 0
+
+  #Loop over samples in a particlar signal region
   for s_file in sample_files:
     tfile = r.TFile(s_file)
     s = s_file[s_file.rfind('/')+1:s_file.index(".root")] #extract sample name from filename
     
-    print(s_file)
-
     h_loose_e = tfile.Get("loose_loose_pteta_e").Clone("h_loose_e_%s" % s)
     h_loose_m = tfile.Get("loose_loose_pteta_m").Clone("h_loose_m_%s" % s)
 
@@ -82,6 +84,20 @@ def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path):
     num_m, err_m = getYield(h_loose_m, pt_bins, eta_bins_m, h_m_FRs)
 
     print("count for %s: %0.2f +/- %0.2f " % (s, num_e+num_m, math.sqrt(err_e**2 + err_m**2)) )
+    total_count += num_e+num_m
+    total_error += err_e**2 + err_m**2
+
+  total_error = math.sqrt(total_error)
+
+  outfile = r.TFile("%s/%s/fakes.root" % (output_dir, signal_region), "RECREATE" )
+  outfile.cd()
+  h_fake_count = r.TH1D("weighted_count", "Weighted Count of Events", 1, 0, 1)
+  h_fake_count.SetDirectory(0)
+  h_fake_count.SetBinContent(1, total_count)
+  h_fake_count.SetBinError(1, total_error)
+  h_fake_count.Write()
+  print("Wrote Total Fake Count: %0.2f +/- %0.2f" % (total_count, total_error) )
+  outfile.Close()
 
 def main():
   samples = ["TTBar1l", "WJets"]
@@ -100,7 +116,7 @@ def main():
   for signal_region in SRs:
     hist_paths= [ "%s/%s/%s.root" % (base_hists_path, signal_region, s) for s in samples]
     print("Signal Region: %s: " % signal_region)
-    makeHistos(pt_bins, eta_bins_e, eta_bins_m, hist_paths, FR_Hist_path)
+    makeHistos(pt_bins, eta_bins_e, eta_bins_m, hist_paths, FR_Hist_path, signal_region)
 
 if __name__ == "__main__":
   main()
