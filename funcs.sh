@@ -295,3 +295,4 @@ function backupConfig {
 		echo "Moved Plots"
 	fi
 }
+

@@ -179,7 +179,7 @@ double getFRConeCorrPt(int lep_index){
   int    id     = abs(phys.lep_pdgId().at(lep_index));
   double etaSC  = abs(phys.lep_etaSC().at(lep_index));
   double pt     = abs(phys.lep_pt().at(lep_index));
-  double reliso = abs(phys.lep_relIso03EA().at(lep_index));
+  double reliso = abs(phys.lep_relIso03EAv2().at(lep_index));
 
   float coneptcorr = 0;
 
@@ -1363,7 +1363,6 @@ bool passSignalRegionCuts(){
     }
   }
 
-
   //cout<<__LINE__<<endl;
   //if (printStats) { cout<<"g_dphi_metj1: "<<g_dphi_metj1<<" "; }
   //Leading Jet/MET Phi min
@@ -1621,7 +1620,7 @@ bool passSignalRegionCuts(){
 
   if (conf->get("reliso03_max") != ""){
     for (int i = 0; i < stoi(conf->get("num_leptons")); i++){
-      if ( phys.lep_relIso03EA().at(g_lep_inds.at(i)) > stod(conf->get("reliso03_max")) ){
+      if ( phys.lep_relIso03EAv2().at(g_lep_inds.at(i)) > stod(conf->get("reliso03_max")) ){
         numEvents->Fill(66);
         if (printFail) cout<<phys.evt()<<" :Failed reliso03 max: "<<stod(conf->get("reliso03_max"))<<" at lepton "<<i<<endl;
         return false;
@@ -1646,7 +1645,6 @@ bool passSignalRegionCuts(){
       return false;
     }
   }
-
 
   if (conf->get("isotrack_veto") == "true" ){
     if (conf->get("use_veto_leps") == "true"){
@@ -2048,7 +2046,7 @@ void setLepIndexes(){
     bool pass_ip3d = false;
     double ip3d_max = stod(conf->get("ip3d_max"));
     for (int i = 0; i < phys.nlep(); i++){
-      pass_ip3d = ( phys.lep_ip3d().at(i) <=  ip3d_max);
+      pass_ip3d = ( fabs(phys.lep_ip3d().at(i)) <=  ip3d_max);
       g_tightIDs[i] = (g_tightIDs[i] && pass_ip3d);
       g_looseIDs[i] = (g_looseIDs[i] && pass_ip3d);
     }
@@ -2112,8 +2110,8 @@ void setLepIndexes(){
 
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
       if(fabs(phys.lep_pdgId().at(i)) == 13 ){
-        pass_reliso03_max_mus = (phys.lep_relIso03EA().at(i) <= reliso03_max_mus);
-        //cout<<"Muon at "<<i<<" has reliso03 "<<phys.lep_relIso03EA().at(i)<<" and pass: "<<pass_reliso03_max_mus<<" loose ID was "<<g_looseIDs[i];
+        pass_reliso03_max_mus = (phys.lep_relIso03EAv2().at(i) <= reliso03_max_mus);
+        //cout<<"Muon at "<<i<<" has reliso03 "<<phys.lep_relIso03EAv2().at(i)<<" and pass: "<<pass_reliso03_max_mus<<" loose ID was "<<g_looseIDs[i];
         g_looseIDs[i] = (g_looseIDs[i] && pass_reliso03_max_mus);
         //cout<<" and now is "<<g_looseIDs[i]<<endl;
       }
@@ -2130,8 +2128,8 @@ void setLepIndexes(){
 
     for (int i = 0; i<(int) g_looseIDs.size(); i++){
       if(fabs(phys.lep_pdgId().at(i)) == 11 ){
-        pass_reliso03_max_els = (phys.lep_relIso03EA().at(i) <= reliso03_max_els);
-        //cout<<"Electron at "<<i<<" has reliso03 "<<phys.lep_relIso03EA().at(i)<<" and pass: "<<pass_reliso03_max_els<<" loose ID was "<<g_looseIDs[i];
+        pass_reliso03_max_els = (phys.lep_relIso03EAv2().at(i) <= reliso03_max_els);
+        //cout<<"Electron at "<<i<<" has reliso03 "<<phys.lep_relIso03EAv2().at(i)<<" and pass: "<<pass_reliso03_max_els<<" loose ID was "<<g_looseIDs[i];
         g_looseIDs[i] = (g_looseIDs[i] && pass_reliso03_max_els);
         //cout<<" and now is "<<g_looseIDs[i]<<endl;
       }
@@ -3049,9 +3047,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
 // Debugging And Odd Corrections Before Cuts
 //===========================================
       
-      // ----------------
-      // DEBUG MODE
-      // ----------------
+      
       printStats = false;
       printFail = false;
 
@@ -3062,12 +3058,18 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       }*/
 
       //if (inspection_set.count(phys.evt()) != 0){
-      if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
-        cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<endl;
-        inspection_copy.erase(make_tuple(phys.evt(), phys.run(), phys.lumi()));
-        printStats=true;
-        printFail=true;
-      }
+      // ----------------
+      // DEBUG MODE
+      // ----------------
+      //if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
+      //  cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<endl;
+      //  inspection_copy.erase(make_tuple(phys.evt(), phys.run(), phys.lumi()));
+      //  printStats=true;
+      //  printFail=true;
+      //}
+      // ----------------
+      // DEBUG MODE
+      // ----------------
       /*else{ //Use if you don't want care about events in your list that are not in the other's
         continue;
       }*/
@@ -3126,12 +3128,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         // ----------------
         // DEBUG MODE
         // ----------------
-        if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
-          cout<<"NEW||evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<endl;
-          //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
-        }
+        //if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
+        //  cout<<"NEW||evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<endl;
+        //  //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
+        //}
+        // ----------------
+        // DEBUG MODE
+        // ----------------
         //When Debug mode is off, you can turn this on:
-        //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
+        cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
 //===========================================
 // Analysis Code
 //===========================================
@@ -3341,7 +3346,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
             else if (abs(phys.lep_pdgId().at(loose_lep_index)) == 13) loose_loose_pteta_m->Fill(getFRConeCorrPt(loose_lep_index), phys.lep_etaSC().at(loose_lep_index),weight);
           }
 
-          loose_lep_reliso03EA->Fill(phys.lep_relIso03EA().at(loose_lep_index), weight);
+          loose_lep_reliso03EA->Fill(phys.lep_relIso03EAv2().at(loose_lep_index), weight);
           loose_lep_pt->Fill(phys.lep_p4().at(loose_lep_index).pt(), weight);
           loose_lep_eta->Fill(phys.lep_p4().at(loose_lep_index).eta(), weight);
           loose_lep_abseta->Fill(fabs(phys.lep_p4().at(loose_lep_index).eta()), weight);
@@ -3434,11 +3439,13 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   // ----------------
   // DEBUG MODE
   // ----------------
-  cout<<"Events that weren't in your babies:"<<endl;
-  for (set<tuple<long,long,long>>::iterator it=inspection_copy.begin(); it!=inspection_copy.end(); ++it){
-    cout<<"evt: "<<std::get<0>(*it)<<" run: "<<std::get<1>(*it)<<" lumi: "<<std::get<2>(*it)<<endl;
-  }
-
+  //cout<<"Events that weren't in your babies:"<<endl;
+  //for (set<tuple<long,long,long>>::iterator it=inspection_copy.begin(); it!=inspection_copy.end(); ++it){
+  //  cout<<"evt: "<<std::get<0>(*it)<<" run: "<<std::get<1>(*it)<<" lumi: "<<std::get<2>(*it)<<endl;
+  //}
+  // ----------------
+  // DEBUG MODE
+  // ----------------
   cout<<"Num events passed: "<<eventCount<<endl;
   files_log<<"Num events passed: "<<eventCount<<endl;
   if ( nEventsChain != nEventsTotal ) {
