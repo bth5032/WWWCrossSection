@@ -855,7 +855,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   l1->SetTextSize(.03);
   //cout<<__LINE__<<endl;
   //l1->AddEntry(hists[0], TString::Form("%s [%0.1f]", hist_labels[0], hists[0]->Integral(hists[0]->FindBin(xmin), hists[0]->FindBin(xmax-0.001))), "pe");
-  l1->AddEntry(hists[0], TString::Form("%s", hist_labels[0]), "pe");
+  l1->AddEntry(hists[0], hist_labels[0], "pe");
   /* //Put objects in legend with the same order as the they go into the stack
   for (int i = hists_labeled.size()-1; i>=0; i--){
     l1->AddEntry(hists_labeled[i].first, hists_labeled[i].second, "f");
@@ -863,7 +863,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   //Put objects in legend in the order they are written in the config
   for (int i = hists.size()-1; i>=1; i--){
     //l1->AddEntry(hists[i], TString::Form("%s [%0.1f]", hist_labels[i], hists[i]->Integral(hists[i]->FindBin(xmin), hists[i]->FindBin(xmax-0.001))), "f");
-    l1->AddEntry(hists[i], TString::Form("%s", hist_labels[i]), "f");
+    l1->AddEntry(hists[i], hist_labels[i], "f");
   }
 
   l1->Draw("same");
