@@ -3062,12 +3062,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       }*/
 
       //if (inspection_set.count(phys.evt()) != 0){
-      /*if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
+      if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
         cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<endl;
         inspection_copy.erase(make_tuple(phys.evt(), phys.run(), phys.lumi()));
         printStats=true;
         printFail=true;
-      }*/
+      }
       /*else{ //Use if you don't want care about events in your list that are not in the other's
         continue;
       }*/
@@ -3126,12 +3126,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         // ----------------
         // DEBUG MODE
         // ----------------
-        /*if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
+        if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
           cout<<"NEW||evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<endl;
           //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
-        }*/
+        }
         //When Debug mode is off, you can turn this on:
-        cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
+        //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
 //===========================================
 // Analysis Code
 //===========================================
@@ -3434,10 +3434,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   // ----------------
   // DEBUG MODE
   // ----------------
-  /*cout<<"Events that weren't in your babies:"<<endl;
+  cout<<"Events that weren't in your babies:"<<endl;
   for (set<tuple<long,long,long>>::iterator it=inspection_copy.begin(); it!=inspection_copy.end(); ++it){
     cout<<"evt: "<<std::get<0>(*it)<<" run: "<<std::get<1>(*it)<<" lumi: "<<std::get<2>(*it)<<endl;
-  }*/
+  }
 
   cout<<"Num events passed: "<<eventCount<<endl;
   files_log<<"Num events passed: "<<eventCount<<endl;
