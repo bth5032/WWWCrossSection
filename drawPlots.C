@@ -854,14 +854,14 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   l1->SetFillColor(kWhite);
   l1->SetTextSize(.03);
   cout<<__LINE__<<endl;
-  l1->AddEntry(hists[0], TString(hist_labels[0]+to_string(hists[0]->Integral(hists[0]->FindBin(x_min), hists[0]->FindBin(x_max-0.001)))), "pe");
+  l1->AddEntry(hists[0], TString(hist_labels[0]+" ["+to_string(hists[0]->Integral(hists[0]->FindBin(x_min), hists[0]->FindBin(x_max-0.001)))+"]"), "pe");
   /* //Put objects in legend with the same order as the they go into the stack
   for (int i = hists_labeled.size()-1; i>=0; i--){
     l1->AddEntry(hists_labeled[i].first, hists_labeled[i].second, "f");
   }*/
   //Put objects in legend in the order they are written in the config
   for (int i = hists.size()-1; i>=1; i--){
-    l1->AddEntry(hists[i], TString(hist_labels[i]+to_string(hists[i]->Integral(hists[i]->FindBin(x_min), hists[i]->FindBin(x_max-0.001)))), "f");
+    l1->AddEntry(hists[i], TString(hist_labels[i]+" ["+to_string(hists[i]->Integral(hists[i]->FindBin(x_min), hists[i]->FindBin(x_max-0.001)))+"]"), "f");
   }
 
   l1->Draw("same");
