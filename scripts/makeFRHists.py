@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
-"""Creates Histogram for the Fake Rate Contribution to the Signal Regions using FR Histogram and Output Yields from given region."""
+"""Creates Histogram for the Fake Rate Contribution to the Signal Regions using FR Histogram and Output Yields from given region.
+
+Before this script is run, the configs in FRClosure/Btag/ need to be made...
+Then you can also makde the configs in Prediction/Btag/ in parallel.
+Finally, once those are done, you can run this script and it will move everything into the Prediction/Btag/Combined directory.
+Then you just make those plots and you are done."""
 
 import argparse, os, sys, math, array, ctypes, itertools
 import ROOT as r
@@ -118,7 +123,6 @@ def moveIntoCombined(prediction_hist_path, SRs):
     outfile.cd()
     h_signal_count.Write()
     outfile.Close()
-
 
 def main():
   samples = ["TTBar1l", "WJets"]
