@@ -93,7 +93,7 @@ bool FRS, LooseIso, FRS_use_veto;
 
 //set<long> inspection_set = {99795815,998615983,998751102,999957050};
 
-set<tuple<long,long,long>> inspection_copy = inspection_set_erl;
+//set<tuple<long,long,long>> inspection_copy = inspection_set_erl;
 
 bool printStats = false;
 bool printFail = false;
