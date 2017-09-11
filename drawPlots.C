@@ -557,7 +557,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     cout<<hist_labels[i]<<" Integral bin 0 to bin 100 Content: "<<hists[i]->Integral(hists[i]->FindBin(0),hists[i]->FindBin(100))<<endl;
   } 
 
-  /*if (conf->get("print_stats") == "true"){
+  if (conf->get("print_stats") == "true"){
     vector<pair<double,double>> stats_bins;
     int j = 0;
     
@@ -668,7 +668,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
       table.saveTex(Form("outputs/efficiency_table_%s.tex", conf_id.Data()));
 
     }
-  }*/
+  }
   
 
   cout<<"===========================================\nUpdate Overflow\n===========================================\n";
