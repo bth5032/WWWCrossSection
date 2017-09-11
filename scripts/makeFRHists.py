@@ -60,9 +60,11 @@ def getYield(hist, pt_bins, eta_bins, h_fr):
 
     #print("Bin count is: %0.2f +/- %0.2f" % (fr*y, math.sqrt( (fr*err)**2 + (y*fr_err)**2 ) ) )
     yield_bin = fr*y
-    err_bin = (fr*err)**2 + (y*fr_err)**2 + (y*args.closure_error)**2
+    err_bin = (fr*err)**2 + (y*fr_err)**2
     cv+=yield_bin
     dev += err_bin
+
+  dev+=(cv*args.closure_error)**2
 
   return (cv, math.sqrt(dev))
   
