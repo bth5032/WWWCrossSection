@@ -125,9 +125,9 @@ def moveIntoCombined(prediction_hist_path, SRs):
     h_signal_count.Write()
     outfile.Close()
 
-def runPlotMaker(prediction_hist_path):
-  conf_dir = "configs/%s" % prediction_hist_path[prediction_hist_path.find("WWWCrossSection_Hists")+22:]
-  os.popen("source funcs.sh && makeAllForDir %s plots" % conf_dir)
+def printPlotMakerCommand(prediction_hist_path):
+  conf_dir = "configs/%s/Combined" % prediction_hist_path[prediction_hist_path.find("WWWCrossSection_Hists")+22:]
+  print("makeAllForDir %s plots" % conf_dir)
 
 def main():
   samples = ["TTBar1l", "WJets"]
@@ -151,7 +151,7 @@ def main():
   prediction_hist_path=base_hists_path.replace("FRClosure", "Prediction")
 
   moveIntoCombined(prediction_hist_path, SRs)
-  runPlotMaker(prediction_hist_path)
+  printPlotMakerCommand(prediction_hist_path)
 
 if __name__ == "__main__":
   main()
