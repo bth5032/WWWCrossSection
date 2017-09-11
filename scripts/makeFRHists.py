@@ -64,8 +64,6 @@ def getYield(hist, pt_bins, eta_bins, h_fr):
     cv+=yield_bin
     dev += err_bin
 
-  dev+=(cv*args.closure_error)**2
-
   return (cv, math.sqrt(dev))
   
 def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path, signal_region):
@@ -94,6 +92,7 @@ def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path, sign
     total_count += num_e+num_m
     total_error += err_e**2 + err_m**2
 
+  total_error += (total_count*args.closure_error)**2
   total_error = math.sqrt(total_error)
 
   outfile = r.TFile("%s/%s/Fakes.root" % (output_dir, signal_region), "RECREATE" )
