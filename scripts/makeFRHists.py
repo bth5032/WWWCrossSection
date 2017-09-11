@@ -14,6 +14,7 @@ r.gROOT.SetBatch(True)
 parser = argparse.ArgumentParser(add_help=False)
 
 parser.add_argument("-s", "--study_dir", help="The config directory name in FRClosure, e.g. Btag", type=str, default="Btag")
+parser.add_argument("-c", "--closure_error", help="Set the closure error on the fakerate method", type=float, default=0.3)
 parser.add_argument("-u", "--usage", help="Print help message and quit", action="store_true")
 
 args=parser.parse_args()
@@ -59,7 +60,7 @@ def getYield(hist, pt_bins, eta_bins, h_fr):
 
     #print("Bin count is: %0.2f +/- %0.2f" % (fr*y, math.sqrt( (fr*err)**2 + (y*fr_err)**2 ) ) )
     yield_bin = fr*y
-    err_bin = (fr*err)**2 + (y*fr_err)**2
+    err_bin = (fr*err)**2 + (y*fr_err)**2 + (y*args.closure_error)**2
     cv+=yield_bin
     dev += err_bin
 
@@ -124,6 +125,10 @@ def moveIntoCombined(prediction_hist_path, SRs):
     h_signal_count.Write()
     outfile.Close()
 
+def runPlotMaker(prediction_hist_path):
+  conf_dir = "configs/%s" % prediction_hist_path[prediction_hist_path.find("WWWCrossSection_Hists")+22:]
+  os.popen("source funcs.sh && makeAllForDir %s plots" % conf_dir)
+
 def main():
   samples = ["TTBar1l", "WJets"]
   #SRs = ["2lepSS", "2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
@@ -143,7 +148,10 @@ def main():
     print("Signal Region: %s: " % signal_region)
     makeHistos(pt_bins, eta_bins_e, eta_bins_m, hist_paths, FR_Hist_path, signal_region)
 
-  moveIntoCombined(base_hists_path.replace("FRClosure", "Prediction"), SRs)
+  prediction_hist_path=base_hists_path.replace("FRClosure", "Prediction")
+
+  moveIntoCombined(prediction_hist_path, SRs)
+  runPlotMaker(prediction_hist_path)
 
 if __name__ == "__main__":
   main()
