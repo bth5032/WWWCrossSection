@@ -528,7 +528,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   
   if (conf->get("relabel_x_axis") == "true"){
     TString bin_label;
-    for (int i = (int) xmin; i <= (int) xmax; i++)
+    for (int i = (int) xmin; i < (int) xmax; i++)
     {
       bin_label=hists[0]->GetXaxis()->GetBinLabel(hists[0]->FindBin(i));
       h_axes->GetXaxis()->SetBinLabel(h_axes->FindBin(i), bin_label);
@@ -885,7 +885,12 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   //cout<<__LINE__<<endl;
   
   TH1D* residual = (TH1D*) hists[0]->Clone("residual");
+  
+  if (conf->get("relabel_x_axis") == "true"){
+    bg_sum->LabelsDeflate();
+  }
   residual->Divide(bg_sum);
+
   //cout<<__LINE__<<endl;
   //cout<<"Fixing error bars"<<endl;
   //for (int count=1; count<=mc_sum->GetNbinsX(); count++){ 
@@ -1212,7 +1217,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   
   if (conf->get("relabel_x_axis") == "true"){
     TString bin_label;
-    for (int i = (int) xmin; i <= (int) xmax; i++)
+    for (int i = (int) xmin; i < (int) xmax; i++)
     {
       bin_label=hists[0]->GetXaxis()->GetBinLabel(hists[0]->FindBin(i));
       h_axes->GetXaxis()->SetBinLabel(h_axes->FindBin(i), bin_label);
