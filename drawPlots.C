@@ -14,7 +14,7 @@
 #include "TColor.h"
 #include "TString.h"
 
-//#include "External/CTable.cpp"
+#include "External/CTable.cpp"
 #include "External/tdrstyle_SUSY.C"
 
 #include "ConfigParser.C"
