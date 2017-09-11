@@ -908,11 +908,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   h_axis_ratio->GetYaxis()->SetLabelSize(0.15);
   //h_axis_ratio->GetYaxis()->SetRangeUser(0.5,1.5);
   
-  /*if (conf->get("relabel_x_axis") == "true"){
-    residual->GetXasis()->SetRange(xmin, xmax)
-  }
-  else{*/
-    residual->GetXaxis()->SetRange(residual->FindBin(xmin), residual->FindBin(xmax))
+  residual->GetXaxis()->SetRange(residual->FindBin(xmin), residual->FindBin(xmax));
 
   if(residual->GetMaximum() > 3 && residual->GetMaximum() <= 4 ){
     h_axis_ratio->GetYaxis()->SetRangeUser(0.001,4.0);
