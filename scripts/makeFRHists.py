@@ -206,7 +206,7 @@ def main():
   elif args.signal_regions == "3lep":
     SRs = ["3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
   else:
-    SRs = ["2lepSS", "2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
+    SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
 
   base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRClosure/"
 
