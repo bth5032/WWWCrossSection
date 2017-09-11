@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(add_help=False)
 
 parser.add_argument("-s", "--study_dir", help="The config directory name in FRClosure, e.g. Btag", type=str, default="Btag")
 parser.add_argument("-c", "--closure_error", help="Set the closure error on the fakerate method", type=float, default=0.3)
+parser.add_argument("-r", "--signal_regions", help="Choose SS, 3lep, or all signal regions", type=str, default="SS")
 parser.add_argument("-u", "--usage", help="Print help message and quit", action="store_true")
 
 args=parser.parse_args()
@@ -32,7 +33,7 @@ def buildIntervals(pt_bins, eta_bins):
   pt_intervals = [(pt_bins[i], pt_bins[i+1] - 0.001) for i in xrange(0, len(pt_bins) - 1) ]
   eta_intervals = [(eta_bins[i], eta_bins[i+1] - 0.001) for i in xrange(0, len(eta_bins) - 1) ]
   return [(i[0][0], i[0][1], i[1][0], i[1][1]) for i in itertools.product(pt_intervals, eta_intervals)]
-
+  
 def getYield(hist, pt_bins, eta_bins, h_fr):
   """Computes the number of objects in the pt/eta bins and applies the FR given with the error."""
 
@@ -111,11 +112,14 @@ def moveIntoCombined(prediction_hist_path, SRs):
   """Reads the files in all the signal regions sent over, copies the weighted_count hists over to Combined directory such that """
   samples = ["WZ", "WW", "ZZ", "TTBar2l", "DY", "WWW", "Wh", "VVV", "TTV", "SingleTop", "Other", "Data", "Fakes"]
   pretty_SR_names = {"2lepSSEE": "ee", "2lepSSEMu":  "e #mu", "2lepSSMuMu": "#mu #mu", "3lep_0SFOS": "0SFOS", "3lep_1SFOS": "1SFOS", "3lep_2SFOS": "2SFOS"}
+  latex_SR_names = {"2lepSSEE": "$ee$", "2lepSSEMu":  "$e \mu$", "2lepSSMuMu": "$\mu \mu$", "3lep_0SFOS": "0SFOS", "3lep_1SFOS": "1SFOS", "3lep_2SFOS": "2SFOS"}
+  tex_dict = {}
   for sample in samples:
     outfile = r.TFile("%s/Combined/%s.root" % (prediction_hist_path, sample), "RECREATE")
     outfile.cd()
     h_signal_count = r.TH1D("weighted_count", "Weighted Count of Events", 0, 0, 0)
     h_signal_count.SetDirectory(0)
+    tex_dict[sample] = {}
     
     for sr in SRs:
       #Fill in an entry in the h_signal_count histogram for each signal region, label the x axis with the name of the SR.
@@ -123,10 +127,72 @@ def moveIntoCombined(prediction_hist_path, SRs):
       sample_count = sample_file_in_sr.Get("weighted_count").Clone("weighted_count_%s_%s" % (sr, sample) )
       bin_num = h_signal_count.Fill(pretty_SR_names[sr], sample_count.GetBinContent(1))
       h_signal_count.SetBinError(bin_num, sample_count.GetBinError(1))
+      tex_dict[sample][latex_SR_names[sr]] = {"cv": sample_count.GetBinContent(1), "unc": sample_count.GetBinError(1)}
     
     outfile.cd()
     h_signal_count.Write()
     outfile.Close()
+
+  printLatexTable(tex_dict)
+
+def printLatexTable(tex_dict):
+  outfile = open("outputs/frhists_%s.tex" % args.study_dir, "w+")
+  pretty_sample_names = {"WZ":"WZ", "WW":"WW", "ZZ":"ZZ", "TTBar2l":"TTBar $\\to$ 2lep", "DY":"DY", "WWW":"WWW", "Wh":"WH", "VVV":"VVV", "TTV":"TTV", "SingleTop":"SingleTop", "Other":"ZH", "Data":"Data", "Fakes":"Fakes"}
+
+  line1 = tex_dict[tex_dict.keys()[0]]
+  pred_count = {}
+
+  outfile.write("\\begin{table}[ht!]\n")
+  outfile.write("\\begin{center}\n")
+  outfile.write("\\begin{tabular}{l"+"|c"*len(line1.keys())+"}\n")
+  
+  header="Sample  "
+  for sr in line1.keys():
+    header+="& %s " % sr
+    pred_count[sr] = {"cv": 0, "unc": 0}
+  header+="\\\\ \\hline\n"
+
+  outfile.write(header)
+
+  ##==============
+  ## Predictions
+  ##==============
+  for sample in tex_dict.keys():
+    if sample == "Data":
+      continue
+    line = "%s" % pretty_sample_names[sample]
+    for sr in line1.keys():
+      line+=" & $%0.2f \\pm %0.2f$" % (tex_dict[sample][sr]["cv"], tex_dict[sample][sr]["unc"])
+      pred_count[sr]["cv"]+=tex_dict[sample][sr]["cv"]
+      pred_count[sr]["unc"]+=tex_dict[sample][sr]["unc"]**2
+    line+= "\\\\ \n"
+    outfile.write(line)
+  
+  outfile.write("\\hline \n")
+
+  ##==============
+  ## Prediction Sum
+  ##==============
+  line = "Sum "
+  for sr in line1.keys():
+    line+=" & $%0.2f \\pm %0.2f$" % (pred_count[sr]["cv"], math.sqrt(pred_count[sr]["unc"]))
+  line+= "\\\\ \n"
+  outfile.write(line)
+
+  ##==============
+  ## Predictions
+  ##==============
+  sample="Data"
+  line = "%s" % sample
+  for sr in line1.keys():
+    line+=" & $%0.2f \\pm %0.2f$" % (tex_dict[sample][sr]["cv"], tex_dict[sample][sr]["unc"])
+  line+= "\\\\ \n"
+  
+  outfile.write(line)
+
+  outfile.write("\\end{tabular} \n")
+  outfile.write("\\end{center} \n")
+  outfile.write("\\end{table} \n")
 
 def printPlotMakerCommand(prediction_hist_path):
   conf_dir = "configs/%s/Combined" % prediction_hist_path[prediction_hist_path.find("WWWCrossSection_Hists")+22:]
@@ -134,8 +200,14 @@ def printPlotMakerCommand(prediction_hist_path):
 
 def main():
   samples = ["TTBar1l", "WJets"]
-  #SRs = ["2lepSS", "2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
-  SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu"]
+  
+  if args.signal_regions == "SS":
+    SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu"]
+  elif args.signal_regions == "3lep":
+    SRs = ["3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
+  else:
+    SRs = ["2lepSS", "2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
+
   base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRClosure/"
 
   FR_Hist_path = "auxFiles/fakerate_pt_v_eta.root" 
