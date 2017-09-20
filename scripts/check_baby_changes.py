@@ -178,7 +178,6 @@ def compareForSample(sample_name, v1, v2, baby_path=hadoop_baby_path):
 
   makePlotsFromTrees(plotdir,t1,t2,v1,v2)
 
-
 def main():
   parser = argparse.ArgumentParser(add_help=False)
 

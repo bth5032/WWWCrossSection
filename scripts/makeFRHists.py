@@ -139,6 +139,13 @@ def printLatexTable(tex_dict):
   outfile = open("outputs/frhists_%s.tex" % args.study_dir, "w+")
   pretty_sample_names = {"WZ":"WZ", "WW":"WW", "ZZ":"ZZ", "TTBar2l":"TTBar $\\to$ 2lep", "DY":"DY", "WWW":"WWW", "Wh":"WH", "VVV":"VVV", "TTV":"TTV", "SingleTop":"SingleTop", "Other":"ZH", "Data":"Data", "Fakes":"Fakes"}
 
+  if args.signal_regions == "SS":
+    SRs = ["$ee$", "$e \mu$", "$\mu \mu$"]
+  elif args.signal_regions == "3lep":
+    SRs = ["0SFOS", "1SFOS", "2SFOS"]
+  else:
+    SRs = ["$ee$", "$e \mu$", "$\mu \mu$", "0SFOS", "1SFOS", "2SFOS"]
+
   line1 = tex_dict[tex_dict.keys()[0]]
   pred_count = {}
 
@@ -147,7 +154,7 @@ def printLatexTable(tex_dict):
   outfile.write("\\begin{tabular}{l"+"|c"*len(line1.keys())+"}\n")
   
   header="Sample  "
-  for sr in line1.keys():
+  for sr in SRs:
     header+="& %s " % sr
     pred_count[sr] = {"cv": 0, "unc": 0}
   header+="\\\\ \\hline\n"
@@ -161,7 +168,7 @@ def printLatexTable(tex_dict):
     if sample == "Data":
       continue
     line = "%s" % pretty_sample_names[sample]
-    for sr in line1.keys():
+    for sr in SRs:
       line+=" & $%0.2f \\pm %0.2f$" % (tex_dict[sample][sr]["cv"], tex_dict[sample][sr]["unc"])
       pred_count[sr]["cv"]+=tex_dict[sample][sr]["cv"]
       pred_count[sr]["unc"]+=tex_dict[sample][sr]["unc"]**2
@@ -174,7 +181,7 @@ def printLatexTable(tex_dict):
   ## Prediction Sum
   ##==============
   line = "Sum "
-  for sr in line1.keys():
+  for sr in SRs:
     line+=" & $%0.2f \\pm %0.2f$" % (pred_count[sr]["cv"], math.sqrt(pred_count[sr]["unc"]))
   line+= "\\\\ \n"
   outfile.write(line)
@@ -184,7 +191,7 @@ def printLatexTable(tex_dict):
   ##==============
   sample="Data"
   line = "%s" % sample
-  for sr in line1.keys():
+  for sr in SRs:
     line+=" & $%0.2f \\pm %0.2f$" % (tex_dict[sample][sr]["cv"], tex_dict[sample][sr]["unc"])
   line+= "\\\\ \n"
   
