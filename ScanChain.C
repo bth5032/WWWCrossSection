@@ -979,6 +979,7 @@ bool hasGood2l(){
     if (g_njets >= 2){
       // MJJ for closest jets in eta
       pair<int,int> jets_dR = getClosestJetsInDR();
+      double dijet_mass = ( g_jets_p4.at(jets_dR.first) + g_jets_p4.at(jets_dR.second) ).M();
       if( (dijet_mass >= W_JET_WINDOW_LOW) && (dijet_mass <= W_JET_WINDOW_HIGH) ) {
         numEvents->Fill(61); 
         if (printFail) cout<<phys.evt()<<" :Failed W dijet mass invert cut with mass: "<< dijet_mass <<endl;
