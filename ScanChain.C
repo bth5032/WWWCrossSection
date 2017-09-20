@@ -975,6 +975,18 @@ bool hasGood2l(){
   if (conf->get("ignore_jet_cuts") == "true"){
     //pass
   }
+  if (conf->get("ignore_jet_cuts") == "invert_W_mass"){
+    if (g_njets >= 2){
+      // MJJ for closest jets in eta
+      pair<int,int> jets_dR = getClosestJetsInDR();
+      if( (dijet_mass >= W_JET_WINDOW_LOW) && (dijet_mass <= W_JET_WINDOW_HIGH) ) {
+        numEvents->Fill(61); 
+        if (printFail) cout<<phys.evt()<<" :Failed W dijet mass invert cut with mass: "<< dijet_mass <<endl;
+        //WWWUtils::printJetP4s(g_jets_p4);
+        return false; // require at at least 2 Jets within the W mass window.
+      }
+    }
+  }
   else if (g_njets >= 2){
     // MJJ for closest jets in eta
     pair<int,int> jets_dR = getClosestJetsInDR();
