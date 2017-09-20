@@ -1,3 +1,5 @@
+DEFAULT::Horizontal_legend=true
+
 Name=lep1_ip
 plot_name=lep1_ip
 title=IP for lep 1
