@@ -500,17 +500,19 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     ymax = stod(conf->get("ymax"));
   }
   else{
-    if (clonedBG->GetMaximum() < clonedPrimary->GetMaximum()){
-        ymax = 1.2*clonedPrimary->GetMaximum();
-    }
-    else {
-        ymax = 1.2*clonedBG->GetMaximum();   
-    }
+      ymax = 1.2*clonedBG->GetMaximum();
+      if (conf->get("horizontal_legend") == "true"){
+        ymax = 1.2*ymax;
+      }
   }
-
   if (conf->get("logy") == "true"){
-    ymax *= 10;
-    ymin = 0.1;
+      ymin = 0.1;
+      if (conf->get("horizontal_legend") == "true"){
+        ymax *= 100;
+      }
+      else{
+        ymax *= 10;
+      }
   }
 
   if (conf->get("ymin") != ""){
@@ -1199,11 +1201,19 @@ TString drawArbitraryNumber(ConfigParser *conf){
     ymax = stod(conf->get("ymax"));
   }
   else{
-      ymax = 1.2*clonedBG->GetMaximum();   
+      ymax = 1.2*clonedBG->GetMaximum();
+      if (conf->get("horizontal_legend") == "true"){
+        ymax = 1.2*ymax;
+      }
   }
   if (conf->get("logy") == "true"){
-      ymax *= 10;
       ymin = 0.1;
+      if (conf->get("horizontal_legend") == "true"){
+        ymax *= 100;
+      }
+      else{
+        ymax *= 10;
+      }
   }
 
   if (conf->get("ymin") != ""){
