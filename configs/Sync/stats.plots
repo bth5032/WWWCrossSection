@@ -209,7 +209,7 @@ stats_3_low_val=0
 stats_3_high_val=3
 
 Name=nbtags_l_nolog
-plot_name=NBtags_loose
+plot_name=NBtags_loose_nolog
 title=Number of B-tagged (Loose ID) jets
 xmin=0
 xmax=5
