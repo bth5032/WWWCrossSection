@@ -237,6 +237,15 @@ BG_cat getBGCategory();
 
 /* Checks whether the higgs decayed to WW in VH MC */
 bool passGenLevelWHWWW();
+
+/* Searches through gen record for the first photon which has 4 momentum within (Delta pt, Delta eta, Delta phi) = (5 GeV, 0.2, 0.2) of the sum of the two gen leptons. Return -1 if none can be found. */
+int findPhotonMother(int genlep_1, int genlep_2);
+
+/* Counts up the pt for all gen particles within a code of dR. Returns pair (Iso, relIso) */
+std::pair<double, double> getGenPhotonGenIso(int gen_index, double dR/*=0.4*/);
+
+/* Takes in a reco lepton index, looks through the gen collections to try and find a pair of OSSF leptons in the gen record whose mother is photon. If it can find one, then it computes the 'gen isolation' for that photon within a code of dR. Returns pair (Iso, relIso) */
+std::pair<double, double> GetPhotonIsolationForLeptonMother(int index, double dR/*=0.4*/);
 //=============================
 // Triggers
 //=============================

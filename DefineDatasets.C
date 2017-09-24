@@ -179,6 +179,12 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
 
     ch->Add(dir+"vh_nonbb_amcnlo*");
   }
+  else if (set == "WG"){
+    cout<<"Adding WGamma Sample"<<endl; 
+
+    ch->Add(dir+"wgjets_incl_mgmlm*");
+  }
+
   //=============
   // VVV
   //=============
@@ -208,6 +214,11 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     cout<<"Adding ZZZ"<<endl; 
     
     ch->Add(dir+"zzz_incl_amcnlo*"); 
+  }
+  else if (set == "WZG"){
+    cout<<"Adding WZGamma"<<endl; 
+    
+    ch->Add(dir+"wzg_incl_amcnlo*"); 
   }
 
 //====================================

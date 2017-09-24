@@ -560,6 +560,55 @@ bool passGenLevelWHWWW(){
   }
   return true;
 }
+
+int findPhotonMother(int genlep_1, int genlep_2){
+  /* Searches through gen record for a photon which has 4 momentum within (Delta pt, Delta eta, Delta phi) = (5 GeV, 0.2, 0.2) of the sum of the two gen leptons.*/
+  LorentzVector gen_sum;
+  for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
+    if (phys.genPart_pdgId().at(i) == 22){
+      gen_sum = (phys.genPart_p4().at(genlep_1) + phys.genPart_p4().at(genlep_1));
+      if (fabs(gen_sum.pt() - phys.genPart_p4().at(i).pt()) > 5) { continue; }
+      if (fabs(gen_sum.eta() - phys.genPart_p4().at(i).eta()) > 0.2) { continue; }
+      if (fabs(gen_sum.phi() - phys.genPart_p4().at(i).phi()) > 0.2) { continue; }
+      return i;
+    }
+  }
+  return -1;
+}
+
+std::pair<double, double> getGenPhotonGenIso(int gen_index, double dR=0.4){
+  /* Counts up the pt for all gen particles within a code of dR. Returns pair (Iso, relIso) */
+  if (gen_index == -1) { return make_pair(-1,-1); }
+  double iso = 0;
+  for (int i = 0; i < (int) phys.genPart_p4().size(); i++){ 
+    if (DeltaR(phys.genPart_p4().at(i), phys.genPart_p4().at(gen_index)) < dR){ iso += phys.genPart_p4().at(i).pt(); } 
+  }
+  return make_pair(iso, iso/phys.genPart_p4().at(gen_index).pt());
+}
+
+std::pair<double, double> GetPhotonIsolationForLeptonMother(int index, double dR=0.4){
+  /* Takes in a reco lepton index, looks through the gen collections to try and find a pair of OSSF leptons in the gen record whose mother is photon. If it can find one, then it computes the 'gen isolation' for that photon within a code of dR. Returns pair (Iso, relIso) */
+  LorentzVector lp4 = phys.lep_p4().at(index);
+  int lpdgId = phys.lep_pdgId().at(index);
+  int photon_momma_index = -1;
+
+  for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
+    if (phys.genPart_pdgId().at(i) == lpdgId){
+      //cout<<"Found lepton "<<index<<" in evt: "<<phys.evt()<<" Gen Record with (pt, eta, phi) = ("<<phys.genPart_p4().at(i).pt()<<", "<<phys.genPart_p4().at(i).eta()<<", "<<phys.genPart_p4().at(i).phi()<<"). Lep has ("<<phys.lep_p4().at(index).pt()<<", "<<phys.lep_p4().at(index).eta()<<", "<<phys.lep_p4().at(index).phi()<<")."<<endl;
+      if ( (DeltaR(phys.genPart_p4().at(i), lp4) < 0.2) && (fabs(phys.genPart_motherId().at(i)) == 22) ){
+        //Only keep going if you can find a pair..
+        for (int j = i+1; j < (int) phys.genPart_p4().size(); j++){
+          if (phys.genPart_pdgId().at(j) == -lpdgId && (fabs(phys.genPart_motherId().at(i)) == 22) ){
+            photon_momma_index=findPhotonMother(i,j);
+            return getGenPhotonGenIso(photon_momma_index, dR);   
+          }
+        }
+      }
+    }
+  }
+  //cout<<"No Match Found for evt: "<<phys.evt()<<endl;
+  return make_pair(-1, -1);
+}
 //=============================
 // Triggers
 //=============================
@@ -2849,6 +2898,26 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   weighted_count->SetDirectory(rootdir);
   weighted_count->Sumw2();
 
+  TH1D *photon_lep_momma_geniso, *photon_lep_momma_SSID_geniso, *photon_lep_momma_genreliso, *photon_lep_momma_SSID_genreliso;
+  if (conf->get("check_leps_from_photon_iso") == "true"){
+    photon_lep_momma_geniso = new TH1D("photon_lep_momma_geniso", "Relative Isolation of Photons which are identified as lepton mothers", 1000, 0, 1000);
+    photon_lep_momma_geniso->SetDirectory(rootdir);
+    photon_lep_momma_geniso->Sumw2();
+
+    photon_lep_momma_SSID_geniso = new TH1D("photon_lep_momma_SSID_geniso", "Relative Isolation of Photons which are identified as lepton mothers, also passing lep_motherIDSS == -3", 1000, 0, 1000);
+    photon_lep_momma_SSID_geniso->SetDirectory(rootdir);
+    photon_lep_momma_SSID_geniso->Sumw2();
+
+    photon_lep_momma_genreliso = new TH1D("photon_lep_momma_genreliso", "Relative Isolation of Photons which are identified as lepton mothers", 400, 0, 4);
+    photon_lep_momma_genreliso->SetDirectory(rootdir);
+    photon_lep_momma_genreliso->Sumw2();
+
+    photon_lep_momma_SSID_genreliso = new TH1D("photon_lep_momma_SSID_genreliso", "Relative Isolation of Photons which are identified as lepton mothers, also passing lep_motherIDSS == -3", 400, 0, 4);
+    photon_lep_momma_SSID_genreliso->SetDirectory(rootdir);
+    photon_lep_momma_SSID_genreliso->Sumw2();
+
+  }
+
   cout<<"Histograms initialized"<<endl;
   //cout<<__LINE__<<endl;
 //===========================================
@@ -3317,6 +3386,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           otherleps_ptRatio->Fill(fabs(phys.lep_ptRatio().at(g_lep_inds.at(c))), weight);
         }
       }
+    
       //cout<<__LINE__<<endl;
       if (conf->get("fakerate_study") == "true"){ 
         FR_cat c = getFRCategory();
@@ -3408,6 +3478,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         //cout<<__LINE__<<endl;
       }
 
+      //cout<<__LINE__<<endl;
+      
+      if (conf->get("check_leps_from_photon_iso") == "true"){
+        for (auto lepind : g_lep_inds ){
+          std::pair<double, double> IsoRelIso = GetPhotonIsolationForLeptonMother(lepind);
+          if (phys.lep_motherIdSS().at(lepind) == -3){ photon_lep_momma_SSID_geniso->Fill(IsoRelIso.first, weight); photon_lep_momma_SSID_genreliso->Fill(IsoRelIso.second, weight); }
+          else                                       { photon_lep_momma_geniso->Fill(IsoRelIso.first, weight); photon_lep_momma_genreliso->Fill(IsoRelIso.second, weight);      }
+        }
+      }
 
       //cout<<__LINE__<<endl;
 //===========================================
@@ -3642,6 +3721,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     loose_loose_pteta->Write();
     loose_loose_pteta_e->Write();
     loose_loose_pteta_m->Write();
+  }
+  if (conf->get("check_leps_from_photon_iso") == "true"){
+    photon_lep_momma_SSID_geniso->Write();
+    photon_lep_momma_SSID_genreliso->Write();
+    photon_lep_momma_geniso->Write();
+    photon_lep_momma_genreliso->Write();
   }
 
   //close output file
