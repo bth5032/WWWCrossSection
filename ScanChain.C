@@ -567,9 +567,9 @@ int findPhotonMother(int genlep_1, int genlep_2){
   for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
     if (phys.genPart_pdgId().at(i) == 22){
       gen_sum = (phys.genPart_p4().at(genlep_1) + phys.genPart_p4().at(genlep_1));
-      if (fabs(gen_sum.pt() - phys.genPart_p4().at(i).pt()) > 5) { continue; }
-      if (fabs(gen_sum.eta() - phys.genPart_p4().at(i).eta()) > 0.2) { continue; }
-      if (fabs(gen_sum.phi() - phys.genPart_p4().at(i).phi()) > 0.2) { continue; }
+      if (fabs(gen_sum.pt() - phys.genPart_p4().at(i).pt()) > 10) { continue; }
+      if (fabs(gen_sum.eta() - phys.genPart_p4().at(i).eta()) > 0.4) { continue; }
+      if (fabs(gen_sum.phi() - phys.genPart_p4().at(i).phi()) > 0.4) { continue; }
       return i;
     }
   }
