@@ -1,0 +1,574 @@
+# Config for Individual Plots
+#
+# This config file holds all the neccesary information to make the single plots for this study.
+#
+#
+
+DEFAULT::PLOT_TYPE=ratio
+
+# Basic defaults
+DEFAULT::overflow=true
+DEFAULT::normalize=true
+DEFAULT::luminosity_fb=35.9
+
+DEFAULT::num_hists=4
+DEFAULT::ymin=0.001
+DEFAULT::logy=true
+
+DEFAULT::sample_0=TTBar
+DEFAULT::sample_1=WGamma
+DEFAULT::sample_2=WZGamma
+DEFAULT::sample_3=TTGamma
+
+#Histogram labels
+DEFAULT::hist_0_label=T #bar{T} #to 2l
+DEFAULT::hist_1_label=W #gamma
+DEFAULT::hist_2_label=WZ #gamma
+DEFAULT::hist_3_label=TT #gamma
+#====================
+# Plots:
+#====================
+
+Name=weighted_count
+plot_name=weighted_count
+title=Num Events in Region (weighted)
+xmin=0
+xmax=1
+num_hists=11
+sample_10=Fakes
+hist_10_label=Fakes
+logy=false
+xlabel=Events
+ylabel=Count
+bin_size=1
+hist_0_name=weighted_count
+
+Name=t1met_tail
+plot_name=Type1MET_tail
+title=Type 1 MET
+xmin=0
+xmax=6000
+xlabel=E^{miss}_{T} [GeV]
+ylabel=Count / 25 GeV
+bin_size=25
+hist_0_name=type1MET
+
+Name=t1met
+plot_name=Type1MET
+title=Type 1 MET
+xmin=0
+xmax=500
+xlabel=E^{miss}_{T} [GeV]
+ylabel=Count / 5 GeV
+bin_size=5
+hist_0_name=type1MET
+
+Name=t1met_widebin
+plot_name=Type1MET_widebin
+title=Type 1 MET
+xmin=0
+xmax=500
+xlabel=E^{miss}_{T} [GeV]
+ylabel=Count
+binning=[0,50,100,150,200,250,300,400,500]
+logy=true
+hist_0_name=type1MET
+
+Name=ht_tail
+plot_name=HT_tail
+title=H_{T}
+xmin=0
+xmax=6000
+xlabel=H_{T} [GeV]
+ylabel=Count / 50 GeV
+bin_size=50
+hist_0_name=ht
+
+Name=ht
+plot_name=HT
+title=H_{T}
+xmin=0
+xmax=2000
+xlabel=H_{T} [GeV]
+ylabel=Count / 25 GeV
+bin_size=25
+hist_0_name=ht
+
+Name=genht_tail
+plot_name=GenHT_tail
+title=Scalar Generated P_{T} Sum for Hadronic PF Candidates (Gen HT) in OSSF Dilepton Events
+xmin=0
+xmax=6000
+xlabel=H_{T} [GeV]
+ylabel=Count / 25 GeV
+bin_size=25
+hist_0_name=genht
+
+Name=genht
+plot_name=GenHT
+title=H_{T}
+xmin=0
+xmax=1200
+xlabel=H_{T} [GeV]
+ylabel=Count / 25 GeV
+bin_size=25
+hist_0_name=genht
+
+Name=njets
+plot_name=njets
+title=NJets
+xmin=0
+xmax=10
+xlabel=Number of Jets
+ylabel=Count
+bin_size=1
+hist_0_name=njets
+
+Name=nbtags_t
+plot_name=NBtags_tight
+title=Number of B-tagged (Tight ID) jets
+xmin=0
+xmax=5
+xlabel=Number of B Jets
+ylabel=Count
+bin_size=1
+hist_0_name=nbtags_t
+
+Name=nbtags_m
+plot_name=NBtags_medium
+title=Number of B-tagged (Medium ID) jets
+xmin=0
+xmax=5
+xlabel=Number of B Jets
+ylabel=Count
+bin_size=1
+hist_0_name=nbtags_m
+
+Name=nbtags_l
+plot_name=NBtags_loose
+title=Number of B-tagged (Loose ID) jets
+xmin=0
+xmax=5
+xlabel=Number of B Jets
+ylabel=Count
+bin_size=1
+hist_0_name=nbtags_l
+
+Name=nvert
+plot_name=NVert
+title=Number of Verticies
+xmin=0
+xmax=50
+xlabel=Number of Verticies
+ylabel=Count
+bin_size=1
+hist_0_name=nVert
+
+Name=dilmass_zlike
+plot_name=Dilmass_zlike
+title=Dilepton Mass for Most Z-like Pair
+xmin=0
+xmax=250
+xlabel=M_{ll}
+ylabel=Count / 5 GeV 
+bin_size=5
+hist_0_name=dilmass_zlike
+
+Name=dilmass_zless
+plot_name=Dilmass_zless
+title=Dilepton Mass for Less Z-like Pair
+xmin=0
+xmax=250
+xlabel=M_{ll}
+ylabel=Count / 5 GeV 
+bin_size=5
+hist_0_name=dilmass_zless
+
+Name=dilmass_sum
+plot_name=Dilmass_sum
+title=Sum of Dilepton Masses for all Possible Pairs
+xmin=0
+xmax=500
+xlabel=M_{ll}
+ylabel=Count / 15 GeV 
+bin_size=15
+hist_0_name=dilmass_sum
+
+Name=trilep_mass
+plot_name=trilep_mass
+title=3 Lepton Mass
+xmin=0
+xmax=500
+xlabel=M_{ll}
+ylabel=Count / 10 GeV 
+bin_size=10
+hist_0_name=trilep_mass
+
+Name=mjj_zlike
+plot_name=mjj_zlike
+title=Dijet Mass for Most Z-like Pair
+xmin=0
+xmax=500
+xlabel=M_{jj}
+ylabel=Count / 15 GeV 
+bin_size=15
+hist_0_name=mjj_zlike
+
+Name=dEta_jj_zlike
+plot_name=dEta_jj_zlike
+title=Dijet Mass for Most Z-like Pair
+xmin=0
+xmax=5
+xlabel=\Delta \eta_{jj} (most Z-like Pair)
+ylabel=Count
+bin_size=20
+hist_0_name=dEta_jj_zlike
+
+Name=mjj_wlike
+plot_name=mjj_wlike
+title=Dijet Mass for Most W-like Pair
+xmin=0
+xmax=500
+xlabel=M_{jj}
+ylabel=Count / 15 GeV 
+bin_size=15
+hist_0_name=mjj_wlike
+
+Name=dEta_jj_wlike
+plot_name=dEta_jj_wlike
+title=Dijet Mass for Most W-like Pair
+xmin=0
+xmax=5
+xlabel=\Delta \eta_{jj} (most W-like Pair)
+ylabel=Count
+bin_size=20
+hist_0_name=dEta_jj_wlike
+
+Name=dPhi_3l_MET
+plot_name=dPhi_3l_MET
+title=\Delta \phi between 3 lepton system and MET
+xmin=0
+xmax=3.15
+xlabel=\Delta \Phi
+ylabel=Count
+bin_size=10
+hist_0_name=dPhi_3l_MET
+
+Name=lep1_pt
+plot_name=Lep1_pt
+title=p_{T} for leading lepton
+xmin=0
+xmax=500
+xlabel=p_{T} (lep1) [GeV]
+ylabel=Count / 5 GeV 
+bin_size=5
+hist_0_name=lep1_pt
+
+Name=lep2_pt
+plot_name=lep2_pt
+title=p_{T} for subleading lepton
+xmin=0
+xmax=500
+xlabel=p_{T} (lep2) [GeV]
+ylabel=Count / 5 GeV 
+bin_size=5
+hist_0_name=lep2_pt
+
+Name=lep3_pt
+plot_name=lep3_pt
+title=p_{T} for trailing lepton
+xmin=0
+xmax=500
+xlabel=p_{T} (lep3) [GeV]
+ylabel=Count / 5 GeV 
+bin_size=5
+hist_0_name=lep3_pt
+
+Name=lep1_eta
+plot_name=Lep1_eta
+title=\eta for leading lepton
+xmin=0
+xmax=3
+xlabel=\eta (lep1) 
+ylabel=Count
+bin_size=5
+hist_0_name=lep1_eta
+
+Name=lep2_eta
+plot_name=lep2_eta
+title=\eta for subleading lepton
+xmin=0
+xmax=3
+xlabel=\eta (lep2)
+ylabel=Count
+bin_size=5
+hist_0_name=lep2_eta
+
+Name=lep3_eta
+plot_name=lep3_eta
+title=\eta for trailing lepton
+xmin=0
+xmax=3
+xlabel=\eta (lep3)
+ylabel=Count
+bin_size=5
+hist_0_name=lep3_eta
+
+Name=lep_signs
+plot_name=lep_signs
+title=Product of lepton signs
+xmin=-1
+xmax=1
+xlabel=Sign
+ylabel=Count
+bin_size=1
+hist_0_name=lep_signs
+
+Name=lep_flavor
+plot_name=lep_flavor
+title=Lepton flavor composition
+xlabel=Lepton Flavor
+ylabel=Count
+overflow=false
+PLOT_TYPE=stack
+relabel_x_axis=true
+hist_0_name=lep_flavor
+
+Name=lep_flavor_nostack
+plot_name=lep_flavor_nostack
+title=Lepton flavor composition
+xlabel=Lepton Flavor
+ylabel=Count
+overflow=false
+relabel_x_axis=true
+hist_0_name=lep_flavor
+
+Name=jet1_pt
+plot_name=Jet1_pt
+title=p_{T} for leading jet
+xmin=0
+xmax=500
+xlabel=p_{T} (jet1) [GeV]
+ylabel=Count / 5 GeV 
+bin_size=5
+hist_0_name=jet1_pt
+
+Name=jet2_pt
+plot_name=Jet2_pt
+title=p_{T} for subleading jet
+xmin=0
+xmax=500
+xlabel=p_{T} (jet2) [GeV]
+ylabel=Count / 5 GeV 
+bin_size=5
+hist_0_name=jet2_pt
+
+Name=jet3_pt
+plot_name=Jet3_pt
+title=p_{T} for trailing jet
+xmin=0
+xmax=500
+xlabel=p_{T} (jet3) [GeV]
+ylabel=Count / 5 GeV 
+bin_size=5
+hist_0_name=jet3_pt
+
+Name=mt2_jl
+plot_name=MT2_jl
+title=MT2 for lepton-jet pair
+xmin=0
+xmax=1000
+xlabel=MT2 [GeV]
+ylabel=Count / 20 GeV 
+bin_size=20
+hist_0_name=mt2_jl
+
+Name=lep1_ip
+plot_name=lep1_ip
+title=IP for lep 1
+xmin=0
+xmax=0.1
+xlabel=IP3D (lep1)
+ylabel=Count
+bin_size=1
+hist_0_name=lep1_ip3d
+
+Name=lep1_iperr
+plot_name=lep1_iperr
+title=IP for lep 1
+xmin=0
+xmax=0.1
+xlabel=IP3D Error (lep1)
+ylabel=Count
+bin_size=1
+hist_0_name=lep1_ip3derr
+
+Name=lep1_sip
+plot_name=lep1_sip
+title=SIP3D for lep 1
+xmin=0
+xmax=4
+xlabel=SIP3D (lep1)
+ylabel=Count
+bin_size=1
+hist_0_name=lep1_sip3d
+
+Name=lep2_ip
+plot_name=lep2_ip
+title=IP for lep 2
+xmin=0
+xmax=0.1
+xlabel=IP3D (lep2)
+ylabel=Count
+bin_size=1
+hist_0_name=lep2_ip3d
+
+Name=lep2_iperr
+plot_name=lep2_iperr
+title=IP for lep 2
+xmin=0
+xmax=0.1
+xlabel=IP3D Error (lep2)
+ylabel=Count
+bin_size=1
+hist_0_name=lep2_ip3derr
+
+Name=lep2_sip
+plot_name=lep2_sip
+title=SIP3D for lep 2
+xmin=0
+xmax=4
+xlabel=SIP3D (lep2)
+ylabel=Count
+bin_size=1
+hist_0_name=lep2_sip3d
+
+Name=lep3_ip
+plot_name=lep3_ip
+title=IP for lep 3
+xmin=0
+xmax=0.1
+xlabel=IP3D (lep3)
+ylabel=Count
+bin_size=1
+hist_0_name=lep3_ip3d
+
+Name=lep3_iperr
+plot_name=lep3_iperr
+title=IP for lep 3
+xmin=0
+xmax=0.1
+xlabel=IP3D Error (lep3)
+ylabel=Count
+bin_size=1
+hist_0_name=lep3_ip3derr
+
+Name=lep3_sip
+plot_name=lep3_sip
+title=SIP3D for lep 3
+xmin=0
+xmax=4
+xlabel=SIP3D (lep3)
+ylabel=Count
+bin_size=1
+hist_0_name=lep3_sip3d
+
+Name=Wleps_ip
+plot_name=Wleps_ip
+title=IP for leptons from W Bosons
+xmin=0
+xmax=0.1
+xlabel=IP3D (W leps)
+ylabel=Count
+bin_size=1
+hist_0_name=Wleps_ip3d
+
+Name=Wleps_iperr
+plot_name=Wleps_iperr
+title=IP Errors for leptons from W Bosons
+xmin=0
+xmax=0.1
+xlabel=IP3D Error (W leps)
+ylabel=Count
+bin_size=1
+hist_0_name=Wleps_ip3derr
+
+Name=Wleps_sip
+plot_name=Wleps_sip
+title=SIP for leptons from W Bosons
+xmin=0
+xmax=0.1
+xlabel=SIP3D (W leps)
+ylabel=Count
+bin_size=1
+hist_0_name=Wleps_sip3d
+
+Name=Wleps_reliso04
+plot_name=Wleps_reliso04
+title=RelIso04 for leptons from W Bosons
+xmin=0
+xmax=1
+xlabel=reliso04 (W leps)
+ylabel=Count
+bin_size=50
+hist_0_name=Wleps_reliso04
+
+Name=Wleps_ptRatio
+plot_name=Wleps_ptRatio
+title=p_{T} Ratio for leptons from W Bosons
+xmin=0
+xmax=2
+xlabel=p_{T} Ratio (W leps)
+ylabel=Count
+bin_size=100
+hist_0_name=Wleps_ptRatio
+
+Name=otherleps_ip
+plot_name=otherleps_ip
+title=IP for leptons from W Bosons
+xmin=0
+xmax=0.1
+xlabel=IP3D (Not from W)
+ylabel=Count
+bin_size=1
+hist_0_name=otherleps_ip3d
+
+Name=otherleps_iperr
+plot_name=otherleps_iperr
+title=IP Errors for leptons not from W Bosons
+xmin=0
+xmax=0.1
+xlabel=IP3D Error (Not from W)
+ylabel=Count
+bin_size=1
+hist_0_name=otherleps_ip3derr
+
+Name=otherleps_sip
+plot_name=otherleps_sip
+title=SIP for leptons not from W Bosons
+xmin=0
+xmax=0.1
+xlabel=SIP3D (Not from W)
+ylabel=Count
+bin_size=1
+hist_0_name=otherleps_sip3d
+
+Name=otherleps_reliso04
+plot_name=otherleps_reliso04
+title=RelIso04 for leptons not from W Bosons
+xmin=0
+xmax=1
+xlabel=reliso04 (Not from W)
+ylabel=Count
+bin_size=50
+hist_0_name=otherleps_reliso04
+
+Name=otherleps_ptRatio
+plot_name=otherleps_ptRatio
+title=p_{T} Ratio for leptons not from W Bosons
+xmin=0
+xmax=2
+xlabel=p_{T} Ratio (Not from W)
+ylabel=Count
+bin_size=100
+hist_0_name=otherleps_ptRatio

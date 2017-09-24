@@ -1,0 +1,57 @@
+# Single.plots
+# Prediction Btag
+
+Name=lep_flavor_WWW
+sample=WWW
+hist_label=WWW
+plot_name=lep_flavor_WWW
+title=Lepton flavor composition
+xlabel=Lepton Flavor
+ylabel=Count
+overflow=false
+relabel_x_axis=true
+hist_name=lep_flavor
+
+Name=lep_flavor_WGamma
+sample=WGamma
+hist_label=WGamma
+plot_name=lep_flavor_WGamma
+title=Lepton flavor composition
+xlabel=Lepton Flavor
+ylabel=Count
+overflow=false
+relabel_x_axis=true
+hist_name=lep_flavor
+
+Name=lep_flavor_WZGamma
+sample=WZGamma
+hist_label=WZGamma
+plot_name=lep_flavor_WZGamma
+title=Lepton flavor composition
+xlabel=Lepton Flavor
+ylabel=Count
+overflow=false
+relabel_x_axis=true
+hist_name=lep_flavor
+
+Name=lep_flavor_TTBar
+sample=TTBar
+hist_label=TTBar
+plot_name=lep_flavor_TTBar
+title=Lepton flavor composition
+xlabel=Lepton Flavor
+ylabel=Count
+overflow=false
+relabel_x_axis=true
+hist_name=lep_flavor
+
+Name=lep_flavor_TTGamma
+sample=TTGamma
+hist_label=TTGamma
+plot_name=lep_flavor_TTGamma
+title=Lepton flavor composition
+xlabel=Lepton Flavor
+ylabel=Count
+overflow=false
+relabel_x_axis=true
+hist_name=lep_flavor
