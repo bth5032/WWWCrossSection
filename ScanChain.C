@@ -576,7 +576,7 @@ int findPhotonMother(int genlep_1, int genlep_2){
   return -1;
 }
 
-std::pair<double, double> getGenPhotonGenIso(int gen_index, int genlep_1, int genlep_2, int double dR/*=0.4*/){
+std::pair<double, double> getGenPhotonGenIso(int gen_index, int genlep_1, int genlep_2, double dR/*=0.4*/){
   /* Counts up the pt for all gen particles within a code of dR. Returns pair (Iso, relIso) */
   if (gen_index == -1) { return make_pair(-1,-1); }
   double iso = 0;
