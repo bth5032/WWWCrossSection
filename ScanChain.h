@@ -242,10 +242,10 @@ bool passGenLevelWHWWW();
 int findPhotonMother(int genlep_1, int genlep_2);
 
 /* Counts up the pt for all gen particles within a code of dR. Returns pair (Iso, relIso) */
-std::pair<double, double> getGenPhotonGenIso(int gen_index, double dR/*=0.4*/);
+std::pair<double, double> getGenPhotonGenIso(int gen_index, int genlep_1, int genlep_2, double dR=0.4);
 
 /* Takes in a reco lepton index, looks through the gen collections to try and find a pair of OSSF leptons in the gen record whose mother is photon. If it can find one, then it computes the 'gen isolation' for that photon within a code of dR. Returns pair (Iso, relIso) */
-std::pair<double, double> GetPhotonIsolationForLeptonMother(int index, double dR/*=0.4*/);
+std::pair<double, double> GetPhotonIsolationForLeptonMother(int index, double dR=0.4);
 //=============================
 // Triggers
 //=============================

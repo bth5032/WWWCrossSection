@@ -567,7 +567,7 @@ int findPhotonMother(int genlep_1, int genlep_2){
   for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
     if (phys.genPart_pdgId().at(i) == 22){
       gen_sum = (phys.genPart_p4().at(genlep_1) + phys.genPart_p4().at(genlep_1));
-      if (fabs(gen_sum.pt() - phys.genPart_p4().at(i).pt()) > 10) { continue; }
+      //if (fabs(gen_sum.pt() - phys.genPart_p4().at(i).pt()) > 10) { continue; }
       if (fabs(gen_sum.eta() - phys.genPart_p4().at(i).eta()) > 0.4) { continue; }
       if (fabs(gen_sum.phi() - phys.genPart_p4().at(i).phi()) > 0.4) { continue; }
       return i;
@@ -576,17 +576,19 @@ int findPhotonMother(int genlep_1, int genlep_2){
   return -1;
 }
 
-std::pair<double, double> getGenPhotonGenIso(int gen_index, double dR=0.4){
+std::pair<double, double> getGenPhotonGenIso(int gen_index, int genlep_1, int genlep_2, int double dR/*=0.4*/){
   /* Counts up the pt for all gen particles within a code of dR. Returns pair (Iso, relIso) */
   if (gen_index == -1) { return make_pair(-1,-1); }
   double iso = 0;
   for (int i = 0; i < (int) phys.genPart_p4().size(); i++){ 
+    if (phys.genPart_status().at(i) != 1) { continue; } //Don't count decayed particles...
+    if (i == genlep_1 || i == genlep_2) { continue; }   //Don't count electrons that decayed...
     if (DeltaR(phys.genPart_p4().at(i), phys.genPart_p4().at(gen_index)) < dR){ iso += phys.genPart_p4().at(i).pt(); } 
   }
   return make_pair(iso, iso/phys.genPart_p4().at(gen_index).pt());
 }
 
-std::pair<double, double> GetPhotonIsolationForLeptonMother(int index, double dR=0.4){
+std::pair<double, double> GetPhotonIsolationForLeptonMother(int index, double dR/*=0.4*/){
   /* Takes in a reco lepton index, looks through the gen collections to try and find a pair of OSSF leptons in the gen record whose mother is photon. If it can find one, then it computes the 'gen isolation' for that photon within a code of dR. Returns pair (Iso, relIso) */
   LorentzVector lp4 = phys.lep_p4().at(index);
   int lpdgId = phys.lep_pdgId().at(index);
@@ -597,10 +599,11 @@ std::pair<double, double> GetPhotonIsolationForLeptonMother(int index, double dR
       //cout<<"Found lepton "<<index<<" in evt: "<<phys.evt()<<" Gen Record with (pt, eta, phi) = ("<<phys.genPart_p4().at(i).pt()<<", "<<phys.genPart_p4().at(i).eta()<<", "<<phys.genPart_p4().at(i).phi()<<"). Lep has ("<<phys.lep_p4().at(index).pt()<<", "<<phys.lep_p4().at(index).eta()<<", "<<phys.lep_p4().at(index).phi()<<")."<<endl;
       if ( (DeltaR(phys.genPart_p4().at(i), lp4) < 0.2) && (fabs(phys.genPart_motherId().at(i)) == 22) ){
         //Only keep going if you can find a pair..
-        for (int j = i+1; j < (int) phys.genPart_p4().size(); j++){
+        for (int j = 0; j < (int) phys.genPart_p4().size(); j++){
+          if (j == i){ continue; }
           if (phys.genPart_pdgId().at(j) == -lpdgId && (fabs(phys.genPart_motherId().at(i)) == 22) ){
             photon_momma_index=findPhotonMother(i,j);
-            return getGenPhotonGenIso(photon_momma_index, dR);   
+            return getGenPhotonGenIso(photon_momma_index, i, j, dR);   
           }
         }
       }
