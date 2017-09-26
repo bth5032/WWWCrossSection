@@ -21,10 +21,10 @@ DEFAULT::sample_2=WZGamma
 DEFAULT::sample_3=TTGamma
 
 #Histogram labels
-DEFAULT::hist_0_label=T \bar{T} \to 2l
-DEFAULT::hist_1_label=W \gamma
-DEFAULT::hist_2_label=WZ \gamma
-DEFAULT::hist_3_label=TT \gamma
+DEFAULT::hist_0_label=T\bar{T} \rightarrow 2l
+DEFAULT::hist_1_label=W\gamma
+DEFAULT::hist_2_label=WZ\gamma
+DEFAULT::hist_3_label=T\bar{T}\gamma
 #====================
 # Plots:
 #====================

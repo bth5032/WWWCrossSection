@@ -3501,7 +3501,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
             
             cout<<"GENPHOTON MotherID -3 for evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
             if (IsoRelIso.first != -1) { SSID_genmatch->Fill("Both", weight/2);     }
-            else                       { SSID_genmatch->Fill("OnlySSID", weight/2); }
+            else                       { SSID_genmatch->Fill("OnlySSID", weight/2); cout<<"ONLYSSID evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; }
 
             photon_lep_momma_SSID_geniso->Fill(IsoRelIso.first, weight); 
             photon_lep_momma_SSID_genreliso->Fill(IsoRelIso.second, weight); 
