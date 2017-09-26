@@ -603,6 +603,7 @@ std::pair<double, double> GetPhotonIsolationForLeptonMother(int index, double dR
           if (j == i){ continue; }
           if (phys.genPart_pdgId().at(j) == -lpdgId && (fabs(phys.genPart_motherId().at(i)) == 22) ){
             photon_momma_index=findPhotonMother(i,j);
+            cout<<"GENPHOTON evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" GenID(l1,l2,photon) == ("<<i<<", "<<j<<", "<<photon_momma_index<<")"<<endl;
             return getGenPhotonGenIso(photon_momma_index, i, j, dR);   
           }
         }
