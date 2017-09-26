@@ -403,3 +403,14 @@ ylabel=Count
 bin_size=10
 hist_0_name=photon_lep_momma_genreliso
 
+Name=SSID_genmatch
+plot_name=SSID_genmatch
+title=Count of Leptons which passed ID. 
+xmin=0
+xmax=5
+xlabel=Type
+ylabel=Count
+relabel_x_axis=true
+bin_size=1
+hist_0_name=SSID_genmatch
+

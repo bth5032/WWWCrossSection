@@ -2902,7 +2902,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   weighted_count->SetDirectory(rootdir);
   weighted_count->Sumw2();
 
-  TH1D *photon_lep_momma_geniso, *photon_lep_momma_SSID_geniso, *photon_lep_momma_genreliso, *photon_lep_momma_SSID_genreliso;
+  TH1D *photon_lep_momma_geniso, *photon_lep_momma_SSID_geniso, *photon_lep_momma_genreliso, *photon_lep_momma_SSID_genreliso, *SSID_genmatch;
   if (conf->get("check_leps_from_photon_iso") == "true"){
     photon_lep_momma_geniso = new TH1D("photon_lep_momma_geniso", "Relative Isolation of Photons which are identified as lepton mothers", 1000, 0, 1000);
     photon_lep_momma_geniso->SetDirectory(rootdir);
@@ -2920,6 +2920,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     photon_lep_momma_SSID_genreliso->SetDirectory(rootdir);
     photon_lep_momma_SSID_genreliso->Sumw2();
 
+    SSID_genmatch = new TH1D("SSID_genmatch", "Number of Leptons Passing Different Photon Mother IDs", 0, 0, 0);
+    SSID_genmatch->SetDirectory(rootdir);
+    SSID_genmatch->Sumw2();
+
+    SSID_genmatch->Fill("AllLeps", 0);
+    SSID_genmatch->Fill("Both", 0);
+    SSID_genmatch->Fill("OnlySSID", 0);
+    SSID_genmatch->Fill("OnlyGenMatch", 0);
+    SSID_genmatch->Fill("None", 0);
   }
 
   cout<<"Histograms initialized"<<endl;
@@ -3486,9 +3495,23 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       
       if (conf->get("check_leps_from_photon_iso") == "true"){
         for (auto lepind : g_lep_inds ){
+          SSID_genmatch->Fill("AllLeps", weight/2);
           std::pair<double, double> IsoRelIso = GetPhotonIsolationForLeptonMother(lepind);
-          if (phys.lep_motherIdSS().at(lepind) == -3){ cout<<"GENPHOTON MotherID -3 for evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; photon_lep_momma_SSID_geniso->Fill(IsoRelIso.first, weight); photon_lep_momma_SSID_genreliso->Fill(IsoRelIso.second, weight); }
-          else                                       { photon_lep_momma_geniso->Fill(IsoRelIso.first, weight); photon_lep_momma_genreliso->Fill(IsoRelIso.second, weight);      }
+          if (phys.lep_motherIdSS().at(lepind) == -3){ 
+            
+            cout<<"GENPHOTON MotherID -3 for evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
+            if (IsoRelIso.first != -1) { SSID_genmatch->Fill("Both", weight/2);     }
+            else                       { SSID_genmatch->Fill("OnlySSID", weight/2); }
+
+            photon_lep_momma_SSID_geniso->Fill(IsoRelIso.first, weight); 
+            photon_lep_momma_SSID_genreliso->Fill(IsoRelIso.second, weight); 
+          }
+          else { 
+            photon_lep_momma_geniso->Fill(IsoRelIso.first, weight); 
+            photon_lep_momma_genreliso->Fill(IsoRelIso.second, weight);
+            if (IsoRelIso.first != -1) { SSID_genmatch->Fill("OnlyGenMatch", weight/2); }
+            else                       { SSID_genmatch->Fill("None", weight/2);         }
+          }
         }
       }
 
@@ -3731,6 +3754,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     photon_lep_momma_SSID_genreliso->Write();
     photon_lep_momma_geniso->Write();
     photon_lep_momma_genreliso->Write();
+    SSID_genmatch->Write();
   }
 
   //close output file
