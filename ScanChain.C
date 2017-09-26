@@ -3487,7 +3487,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       if (conf->get("check_leps_from_photon_iso") == "true"){
         for (auto lepind : g_lep_inds ){
           std::pair<double, double> IsoRelIso = GetPhotonIsolationForLeptonMother(lepind);
-          if (phys.lep_motherIdSS().at(lepind) == -3){ cout<<"GENPHOTON MotherID -3 for evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; <<photon_lep_momma_SSID_geniso->Fill(IsoRelIso.first, weight); photon_lep_momma_SSID_genreliso->Fill(IsoRelIso.second, weight); }
+          if (phys.lep_motherIdSS().at(lepind) == -3){ cout<<"GENPHOTON MotherID -3 for evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; photon_lep_momma_SSID_geniso->Fill(IsoRelIso.first, weight); photon_lep_momma_SSID_genreliso->Fill(IsoRelIso.second, weight); }
           else                                       { photon_lep_momma_geniso->Fill(IsoRelIso.first, weight); photon_lep_momma_genreliso->Fill(IsoRelIso.second, weight);      }
         }
       }
