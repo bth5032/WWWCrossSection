@@ -613,6 +613,21 @@ std::pair<double, double> GetPhotonIsolationForLeptonMother(int index, double dR
   //cout<<"No Match Found for evt: "<<phys.evt()<<endl;
   return make_pair(-1, -1);
 }
+
+bool isLepGenPhoton(int index, double dR/*=0.2*/){
+  /* Takes in a reco lepton index, looks through the gen collection to try and find a status 1 photon that is closer the object in dR than any other status 1 particle */
+  LorentzVector lp4 = phys.lep_p4().at(index);
+  int best_match = -1;
+
+  for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
+    if ( (DeltaR(phys.genPart_p4().at(i), lp4) < dR) && (fabs(phys.genPart_status().at(i)) == 1) ){
+      best_match = i;
+      dR = DeltaR(phys.genPart_p4().at(i), lp4);
+    }
+  }
+  if (best_match == -1) { return false; }
+  return (phys.genPart_pdgId().at(best_match) == 22) ? true : false;
+}
 //=============================
 // Triggers
 //=============================
@@ -2925,9 +2940,13 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     SSID_genmatch->Sumw2();
 
     SSID_genmatch->Fill("AllLeps", 0);
-    SSID_genmatch->Fill("Both", 0);
     SSID_genmatch->Fill("OnlySSID", 0);
     SSID_genmatch->Fill("OnlyGenMatch", 0);
+    SSID_genmatch->Fill("OnlyPhoton", 0);
+    SSID_genmatch->Fill("SSID_GenMatch", 0);
+    SSID_genmatch->Fill("SSID_Photon", 0);
+    SSID_genmatch->Fill("GenMatch_Photon", 0);
+    SSID_genmatch->Fill("All", 0);
     SSID_genmatch->Fill("None", 0);
   }
 
@@ -3492,16 +3511,42 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       }
 
       //cout<<__LINE__<<endl;
-      
+    /*SSID_genmatch->Fill("AllLeps", 0);
+    SSID_genmatch->Fill("OnlySSID", 0);
+    SSID_genmatch->Fill("OnlyGenMatch", 0);
+    SSID_genmatch->Fill("OnlyPhoton", 0);
+    SSID_genmatch->Fill("SSID_GenMatch", 0);
+    SSID_genmatch->Fill("SSID_Photon", 0);
+    SSID_genmatch->Fill("GenMatch_Photon", 0);
+    SSID_genmatch->Fill("All", 0);
+    SSID_genmatch->Fill("None", 0);*/
+
       if (conf->get("check_leps_from_photon_iso") == "true"){
         for (auto lepind : g_lep_inds ){
-          SSID_genmatch->Fill("AllLeps", weight/2);
+          SSID_genmatch->Fill("AllLeps", weight/g_nlep);
           std::pair<double, double> IsoRelIso = GetPhotonIsolationForLeptonMother(lepind);
+          bool isPhoton = isLepGenPhoton(lepind);
           if (phys.lep_motherIdSS().at(lepind) == -3){ 
             
             cout<<"GENPHOTON MotherID -3 for evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
-            if (IsoRelIso.first != -1) { SSID_genmatch->Fill("Both", weight/2);     }
-            else                       { SSID_genmatch->Fill("OnlySSID", weight/2); cout<<"ONLYSSID evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; }
+            
+            if (IsoRelIso.first != -1) { 
+              if (isPhoton){
+                SSID_genmatch->Fill("All", weight/g_nlep);
+              }
+              else{
+                SSID_genmatch->Fill("SSID_GenMatch", weight/g_nlep);
+              }
+            }
+            else { 
+              if (isPhoton){
+                SSID_genmatch->Fill("SSID_Photon", weight/g_nlep);
+              }
+              else{
+                SSID_genmatch->Fill("OnlySSID", weight/g_nlep); 
+                cout<<"ONLYSSID evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
+              }
+            }
 
             photon_lep_momma_SSID_geniso->Fill(IsoRelIso.first, weight); 
             photon_lep_momma_SSID_genreliso->Fill(IsoRelIso.second, weight); 
@@ -3509,8 +3554,22 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           else { 
             photon_lep_momma_geniso->Fill(IsoRelIso.first, weight); 
             photon_lep_momma_genreliso->Fill(IsoRelIso.second, weight);
-            if (IsoRelIso.first != -1) { SSID_genmatch->Fill("OnlyGenMatch", weight/2); }
-            else                       { SSID_genmatch->Fill("None", weight/2);         }
+            if (IsoRelIso.first != -1) {
+              if (isPhoton){
+                SSID_genmatch->Fill("GenMatch_Photon", weight/g_nlep);
+              }
+              else{
+                SSID_genmatch->Fill("OnlyGenMatch", weight/g_nlep);
+              } 
+            }
+            else { 
+              if (isPhoton){
+                SSID_genmatch->Fill("OnlyPhoton", weight/g_nlep);
+              }
+              else{
+                SSID_genmatch->Fill("None", weight/g_nlep);
+              }
+            }
           }
         }
       }

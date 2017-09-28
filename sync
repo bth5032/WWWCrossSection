@@ -1,4 +1,4 @@
-git ls-files --exclude-standard > transfer_files.tmp
+git ls-files --exclude-standard -m > transfer_files.tmp
 
 rsync -avP --files-from=transfer_files.tmp . uaf-10:/home/users/bhashemi/Projects/GIT/WWWCrossSection
 
