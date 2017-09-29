@@ -37,3 +37,6 @@ efficiency_table*
 scratch/
 tmp*
 *.tmp
+
+#remember these commands
+rcmds.txt

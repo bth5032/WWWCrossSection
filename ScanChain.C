@@ -621,12 +621,30 @@ bool isLepGenPhoton(int index, double dR/*=0.2*/){
 
   for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
     if ( (DeltaR(phys.genPart_p4().at(i), lp4) < dR) && (fabs(phys.genPart_status().at(i)) == 1) ){
-      best_match = i;
-      dR = DeltaR(phys.genPart_p4().at(i), lp4);
+      if (phys.genPart_motherId().at(i) != 111){ //no pions
+        best_match = i;
+        dR = DeltaR(phys.genPart_p4().at(i), lp4);
+      }
     }
   }
   if (best_match == -1) { return false; }
   return (phys.genPart_pdgId().at(best_match) == 22) ? true : false;
+}
+
+bool genMatchWZMomma(int lepind){
+  /* Checks gen table for lepton with same PDG ID within a DR of 0.2 with a W or Z mother. */
+  int lpdgId = phys.genPart_pdgId().at(lepind);
+  LorentzVector lp4 = phys.lep_p4().at(lepind);
+
+  for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
+    if (phys.genPart_pdgId().at(i) == lpdgId){
+      //cout<<"Found lepton "<<index<<" in evt: "<<phys.evt()<<" Gen Record with (pt, eta, phi) = ("<<phys.genPart_p4().at(i).pt()<<", "<<phys.genPart_p4().at(i).eta()<<", "<<phys.genPart_p4().at(i).phi()<<"). Lep has ("<<phys.lep_p4().at(index).pt()<<", "<<phys.lep_p4().at(index).eta()<<", "<<phys.lep_p4().at(index).phi()<<")."<<endl;
+      if ( DeltaR(phys.genPart_p4().at(i), lp4) < 0.2 ) {
+        if ( (fabs(phys.genPart_motherId().at(i)) == 23) || (fabs(phys.genPart_motherId().at(i)) == 24) ) { return true; }
+      }
+    }
+  }
+  return false;
 }
 //=============================
 // Triggers
@@ -2940,14 +2958,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     SSID_genmatch->Sumw2();
 
     SSID_genmatch->Fill("AllLeps", 0);
+    SSID_genmatch->Fill("None-W/Z Mother", 0);
+    SSID_genmatch->Fill("None-Fakes", 0);
     SSID_genmatch->Fill("OnlySSID", 0);
     SSID_genmatch->Fill("OnlyGenMatch", 0);
     SSID_genmatch->Fill("OnlyPhoton", 0);
+    SSID_genmatch->Fill("GenMatch_Photon", 0);
     SSID_genmatch->Fill("SSID_GenMatch", 0);
     SSID_genmatch->Fill("SSID_Photon", 0);
-    SSID_genmatch->Fill("GenMatch_Photon", 0);
     SSID_genmatch->Fill("All", 0);
-    SSID_genmatch->Fill("None", 0);
   }
 
   cout<<"Histograms initialized"<<endl;
@@ -3175,12 +3194,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       // ----------------
       // DEBUG MODE
       // ----------------
-      if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
+      /*if ( inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) != 0){
         cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<endl;
         inspection_copy.erase(make_tuple(phys.evt(), phys.run(), phys.lumi()));
         printStats=true;
         printFail=true;
-      }
+      }*/
       // ----------------
       // DEBUG MODE
       // ----------------
@@ -3242,15 +3261,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         // ----------------
         // DEBUG MODE
         // ----------------
-        if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
+        /*if (inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi())) == 0){
           cout<<"NEW||evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<endl;
           //cout<<"Inspection Set Count "<<inspection_set_erl.count(make_tuple(phys.evt(), phys.run(), phys.lumi()))<<endl;
-        }
+        }*/
         // ----------------
         // DEBUG MODE
         // ----------------
         //When Debug mode is off, you can turn this on:
-        //cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
+        cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
 //===========================================
 // Analysis Code
 //===========================================
@@ -3526,25 +3545,32 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           SSID_genmatch->Fill("AllLeps", weight/g_nlep);
           std::pair<double, double> IsoRelIso = GetPhotonIsolationForLeptonMother(lepind);
           bool isPhoton = isLepGenPhoton(lepind);
-          if (phys.lep_motherIdSS().at(lepind) == -3){ 
+          if (genMatchWZMomma(lepind)){ 
+            SSID_genmatch->Fill("None-W/Z Mother", weight/g_nlep); 
+            cout<<"None-W/Z Mother evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
+          }
+          else if (phys.lep_motherIdSS().at(lepind) == -3){ 
             
             cout<<"GENPHOTON MotherID -3 for evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
             
             if (IsoRelIso.first != -1) { 
               if (isPhoton){
                 SSID_genmatch->Fill("All", weight/g_nlep);
+                cout<<"All evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
               }
               else{
                 SSID_genmatch->Fill("SSID_GenMatch", weight/g_nlep);
+                cout<<"SSID_GenMatch evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
               }
             }
             else { 
               if (isPhoton){
                 SSID_genmatch->Fill("SSID_Photon", weight/g_nlep);
+                cout<<"SSID_Photon evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
               }
               else{
                 SSID_genmatch->Fill("OnlySSID", weight/g_nlep); 
-                cout<<"ONLYSSID evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
+                cout<<"OnlySSID evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
               }
             }
 
@@ -3557,17 +3583,21 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
             if (IsoRelIso.first != -1) {
               if (isPhoton){
                 SSID_genmatch->Fill("GenMatch_Photon", weight/g_nlep);
+                cout<<"GenMatch_Photon evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
               }
               else{
                 SSID_genmatch->Fill("OnlyGenMatch", weight/g_nlep);
+                cout<<"OnlyGenMatch evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
               } 
             }
             else { 
               if (isPhoton){
                 SSID_genmatch->Fill("OnlyPhoton", weight/g_nlep);
+                cout<<"OnlyPhoton evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
               }
               else{
-                SSID_genmatch->Fill("None", weight/g_nlep);
+                SSID_genmatch->Fill("None-Fakes", weight/g_nlep);
+                cout<<"None-Fakes evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
               }
             }
           }
@@ -3617,10 +3647,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   // ----------------
   // DEBUG MODE
   // ----------------
-  cout<<"Events that weren't in your babies:"<<endl;
+  /*cout<<"Events that weren't in your babies:"<<endl;
   for (set<tuple<long,long,long>>::iterator it=inspection_copy.begin(); it!=inspection_copy.end(); ++it){
     cout<<"evt: "<<std::get<0>(*it)<<" run: "<<std::get<1>(*it)<<" lumi: "<<std::get<2>(*it)<<endl;
-  }
+  }*/
   // ----------------
   // DEBUG MODE
   // ----------------

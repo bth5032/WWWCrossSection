@@ -86,11 +86,11 @@ bool FRS, LooseIso, FRS_use_veto;
 // DEBUG MODE
 // ----------------
 
-set<tuple<long,long,long>>  inspection_set_erl = {make_tuple(1885869146,278018,1014), make_tuple(957069489,282663,713)};
+//set<tuple<long,long,long>>  inspection_set_erl = {make_tuple(1885869146,278018,1014), make_tuple(957069489,282663,713)};
 
 //set<long> inspection_set = {99795815,998615983,998751102,999957050};
 
-set<tuple<long,long,long>> inspection_copy = inspection_set_erl;
+//set<tuple<long,long,long>> inspection_copy = inspection_set_erl;
 
 bool printStats = false;
 bool printFail = false;
@@ -249,6 +249,9 @@ std::pair<double, double> GetPhotonIsolationForLeptonMother(int index, double dR
 
 /* Takes in a reco lepton index, looks through the gen collection to try and find a status 1 photon that is closer the object in dR than any other status 1 particle */
 bool isLepGenPhoton(int index, double dR=0.2);
+
+/* Checks gen table for lepton with same PDG ID within a DR of 0.2 with a W or Z mother. */
+bool genMatchWZMomma(int lepind);
 //=============================
 // Triggers
 //=============================
