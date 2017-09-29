@@ -844,6 +844,9 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   }
   else if (conf->get("horizontal_legend") == "true"){
     short n_cols = short(ceil(num_hists/3.0));
+    if (num_hists <= 3){
+      n_cols = num_hists;
+    }
     //cout<<"n_cols "<<n_cols<<endl;
     l1 = new TLegend(0.151, 0.8, 0.95, 0.949); 
     l1->SetNColumns(n_cols);
@@ -1478,6 +1481,9 @@ TString drawArbitraryNumber(ConfigParser *conf){
   }
   else if (conf->get("horizontal_legend") == "true"){
     short n_cols = short(ceil(num_hists/3.0));
+    if (num_hists <= 3){
+      n_cols = num_hists;
+    }
     //cout<<"n_cols "<<n_cols<<endl;
     l1 = new TLegend(0.151, 0.8, 0.95, 0.949); 
     l1->SetNColumns(n_cols);

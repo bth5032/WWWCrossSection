@@ -473,3 +473,22 @@ relabel_x_axis=true
 bin_size=1
 hist_0_name=SSID_genmatch
 
+Name=SSID_genmatch_WWG
+plot_name=SSID_genmatch_WWG
+num_hists=2
+logy=false
+sample_0=WW
+sample_1=WWGamma
+hist_0_label=WW
+hist_1_label=WW\gamma
+title=Count of Leptons which passed ID. 
+overflow=false
+horizontal_legend=true
+xmin=0
+xmax=9
+xlabel=Type
+ylabel=Count
+relabel_x_axis=true
+bin_size=1
+hist_0_name=SSID_genmatch
+

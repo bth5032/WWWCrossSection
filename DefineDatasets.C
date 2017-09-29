@@ -220,6 +220,11 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     
     ch->Add(dir+"wzg_incl_amcnlo*"); 
   }
+  else if (set == "WWG"){
+    cout<<"Adding WWGamma"<<endl; 
+    
+    ch->Add(dir+"wwg_incl_amcnlo*"); 
+  }
 
 //====================================
 // QCD
