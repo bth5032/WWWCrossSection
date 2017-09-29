@@ -633,7 +633,7 @@ bool isLepGenPhoton(int index, double dR/*=0.2*/){
 
 bool genMatchWZMomma(int lepind){
   /* Checks gen table for lepton with same PDG ID within a DR of 0.2 with a W or Z mother. */
-  int lpdgId = phys.genPart_pdgId().at(lepind);
+  int lpdgId = phys.lep_pdgId().at(lepind);
   LorentzVector lp4 = phys.lep_p4().at(lepind);
 
   for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
