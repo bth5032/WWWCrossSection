@@ -261,25 +261,25 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
 // Leptonic Data
 //====================================
   
-  version="WWW_v0.1.11";
-  if (skimmed){
-    dir=base_path+version+"/skim/";
-  }
-  else{
-    dir=base_path+version+"/output/";
-  }
+  //version="WWW_v0.1.11";
+  //if (skimmed){
+  //  dir=base_path+version+"/skim/";
+  //}
+  //else{
+  //  dir=base_path+version+"/output/";
+  //}
 
   if (set == "Data-EE"){
     cout<<"Adding EE Trigger Data"<<endl;
 
-    ch->Add(dir+"data_Run2016B_03feb2017rereco_ee_v2*");
-    ch->Add(dir+"data_Run2016C_03feb2017rereco_ee_v1*");
-    ch->Add(dir+"data_Run2016D_03feb2017rereco_ee_v1*");
-    ch->Add(dir+"data_Run2016E_03feb2017rereco_ee_v1*");
-    ch->Add(dir+"data_Run2016F_03feb2017rereco_ee_v1*");
-    ch->Add(dir+"data_Run2016G_03feb2017rereco_ee_v1*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_ee_v2*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_ee_v3*");
+    ch->Add(dir+"data_Run2016B_03feb2017rereco_unmerged_ee_v2*");
+    ch->Add(dir+"data_Run2016C_03feb2017rereco_unmerged_ee_v1*");
+    ch->Add(dir+"data_Run2016D_03feb2017rereco_unmerged_ee_v1*");
+    ch->Add(dir+"data_Run2016E_03feb2017rereco_unmerged_ee_v1*");
+    ch->Add(dir+"data_Run2016F_03feb2017rereco_unmerged_ee_v1*");
+    ch->Add(dir+"data_Run2016G_03feb2017rereco_unmerged_ee_v1*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_unmerged_ee_v2*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_unmerged_ee_v3*");
   }
   else if (set == "Data-EMu"){  
     cout<<"Adding EMu Trigger Data"<<endl;
@@ -296,26 +296,26 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
   else if (set == "Data-MuMu"){
     cout<<"Adding MuMu Trigger Data"<<endl;
     
-    ch->Add(dir+"data_Run2016B_03feb2017rereco_mm_v2*");
-    ch->Add(dir+"data_Run2016C_03feb2017rereco_mm_v1*");
-    ch->Add(dir+"data_Run2016D_03feb2017rereco_mm_v1*");
-    ch->Add(dir+"data_Run2016E_03feb2017rereco_mm_v1*");
-    ch->Add(dir+"data_Run2016F_03feb2017rereco_mm_v1*");
-    ch->Add(dir+"data_Run2016G_03feb2017rereco_mm_v1*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_mm_v2*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_mm_v3*");
+    ch->Add(dir+"data_Run2016B_03feb2017rereco_unmerged_mm_v2*");
+    ch->Add(dir+"data_Run2016C_03feb2017rereco_unmerged_mm_v1*");
+    ch->Add(dir+"data_Run2016D_03feb2017rereco_unmerged_mm_v1*");
+    ch->Add(dir+"data_Run2016E_03feb2017rereco_unmerged_mm_v1*");
+    ch->Add(dir+"data_Run2016F_03feb2017rereco_unmerged_mm_v1*");
+    ch->Add(dir+"data_Run2016G_03feb2017rereco_unmerged_mm_v1*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_unmerged_mm_v2*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_unmerged_mm_v3*");
   }
   else if (set == "Data-Mu"){
     cout<<"Adding Single Muon Trigger Data"<<endl;
     
-    ch->Add(dir+"data_Run2016B_03feb2017rereco_sm_v2*");
-    ch->Add(dir+"data_Run2016C_03feb2017rereco_sm_v1*");
-    ch->Add(dir+"data_Run2016D_03feb2017rereco_sm_v1*");
-    ch->Add(dir+"data_Run2016E_03feb2017rereco_sm_v1*");
-    ch->Add(dir+"data_Run2016F_03feb2017rereco_sm_v1*");
-    ch->Add(dir+"data_Run2016G_03feb2017rereco_sm_v1*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_sm_v2*");
-    ch->Add(dir+"data_Run2016H_03feb2017rereco_sm_v3*");
+    ch->Add(dir+"data_Run2016B_03feb2017rereco_unmerged_sm_v2*");
+    ch->Add(dir+"data_Run2016C_03feb2017rereco_unmerged_sm_v1*");
+    ch->Add(dir+"data_Run2016D_03feb2017rereco_unmerged_sm_v1*");
+    ch->Add(dir+"data_Run2016E_03feb2017rereco_unmerged_sm_v1*");
+    ch->Add(dir+"data_Run2016F_03feb2017rereco_unmerged_sm_v1*");
+    ch->Add(dir+"data_Run2016G_03feb2017rereco_unmerged_sm_v1*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_unmerged_sm_v2*");
+    ch->Add(dir+"data_Run2016H_03feb2017rereco_unmerged_sm_v3*");
   }
 
 //====================================

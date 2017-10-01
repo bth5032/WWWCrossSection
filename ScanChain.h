@@ -83,15 +83,17 @@ bool FRS, LooseIso, FRS_use_veto;
 //std::function<const std::vector<bool>&()> g_looseIDs; //holds loose IDs when doing the Fake Rate study.
 
 // ----------------
-// DEBUG MODE
+// EVENT LIST DEBUG MODE
 // ----------------
 
-//set<tuple<long,long,long>>  inspection_set_erl = {make_tuple(1885869146,278018,1014), make_tuple(957069489,282663,713)};
+#ifdef EVENT_LIST_DIFF
+  set<tuple<long,long,long>>  inspection_set_erl = {make_tuple(2284320,1,4498), make_tuple(11732516,1,23100), make_tuple(5507669,1,10844)};
 
-//set<long> inspection_set = {99795815,998615983,998751102,999957050};
+  //set<long> inspection_set = {99795815,998615983,998751102,999957050};
 
-//set<tuple<long,long,long>> inspection_copy = inspection_set_erl;
-
+  set<tuple<long,long,long>> inspection_copy = inspection_set_erl;
+#endif
+  
 bool printStats = false;
 bool printFail = false;
 
