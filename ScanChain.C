@@ -621,10 +621,10 @@ bool isLepGenPhoton(int index, double dR/*=0.2*/){
 
   for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
     if ( (DeltaR(phys.genPart_p4().at(i), lp4) < dR) && (fabs(phys.genPart_status().at(i)) == 1) ){
-      if (phys.genPart_motherId().at(i) != 111){ //no pions
-        best_match = i;
-        dR = DeltaR(phys.genPart_p4().at(i), lp4);
-      }
+      if (phys.genPart_motherId().at(i) == 111){ continue; } //no pions
+      if ( ( (lp4.pt() - phys.genPart_p4().at(i).pt()) / lp4.pt() ) > 0.5  ){ continue; }
+      best_match = i;
+      dR = DeltaR(phys.genPart_p4().at(i), lp4);
     }
   }
   if (best_match == -1) { return false; }
@@ -638,6 +638,15 @@ bool genMatchWZMomma(int lepind){
 
   for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
     if (phys.genPart_pdgId().at(i) == lpdgId){
+      //cout<<"Found lepton "<<index<<" in evt: "<<phys.evt()<<" Gen Record with (pt, eta, phi) = ("<<phys.genPart_p4().at(i).pt()<<", "<<phys.genPart_p4().at(i).eta()<<", "<<phys.genPart_p4().at(i).phi()<<"). Lep has ("<<phys.lep_p4().at(index).pt()<<", "<<phys.lep_p4().at(index).eta()<<", "<<phys.lep_p4().at(index).phi()<<")."<<endl;
+      if ( DeltaR(phys.genPart_p4().at(i), lp4) < 0.2 ) {
+        if ( (fabs(phys.genPart_motherId().at(i)) == 23) || (fabs(phys.genPart_motherId().at(i)) == 24) ) { return true; }
+      }
+    }
+  }
+
+  for (int i = 0; i < (int) phys.genPart_p4().size(); i++){
+    if (phys.genPart_pdgId().at(i) == -lpdgId){
       //cout<<"Found lepton "<<index<<" in evt: "<<phys.evt()<<" Gen Record with (pt, eta, phi) = ("<<phys.genPart_p4().at(i).pt()<<", "<<phys.genPart_p4().at(i).eta()<<", "<<phys.genPart_p4().at(i).phi()<<"). Lep has ("<<phys.lep_p4().at(index).pt()<<", "<<phys.lep_p4().at(index).eta()<<", "<<phys.lep_p4().at(index).phi()<<")."<<endl;
       if ( DeltaR(phys.genPart_p4().at(i), lp4) < 0.2 ) {
         if ( (fabs(phys.genPart_motherId().at(i)) == 23) || (fabs(phys.genPart_motherId().at(i)) == 24) ) { return true; }
@@ -2958,7 +2967,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     SSID_genmatch->Sumw2();
 
     SSID_genmatch->Fill("AllLeps", 0);
-    SSID_genmatch->Fill("None-W/Z Mother", 0);
+    SSID_genmatch->Fill("W/Z Lep", 0);
     SSID_genmatch->Fill("None-Fakes", 0);
     SSID_genmatch->Fill("OnlySSID", 0);
     SSID_genmatch->Fill("OnlyGenMatch", 0);
@@ -3546,8 +3555,8 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           std::pair<double, double> IsoRelIso = GetPhotonIsolationForLeptonMother(lepind);
           bool isPhoton = isLepGenPhoton(lepind);
           if (genMatchWZMomma(lepind)){ 
-            SSID_genmatch->Fill("None-W/Z Mother", weight/g_nlep); 
-            cout<<"None-W/Z Mother evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
+            SSID_genmatch->Fill("W/Z Lep", weight/g_nlep); 
+            cout<<"W/Z Lep evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
           }
           else if (phys.lep_motherIdSS().at(lepind) == -3){ 
             
