@@ -679,6 +679,30 @@ bool genMatchWZMomma(int lepind){
   }
   return false;
 }
+
+TString getEventClass(){
+  /* Returns the Event Class for Each Event */
+
+  int numFromGamma = 0;
+  int numFromW = 0;
+  int numFromFake = 0;
+  int numFromZ = 0;
+
+  for (auto lepind : g_lep_inds ){
+    if      (phys.lep_motherIdSS().at(lepind) == -3) numFromGamma++;
+    else if (genMatchWZMomma(lepind))                numFromW++;
+  }
+
+  if (numFromGamma > 0){
+    return TString("Photon Fake");
+  }
+  else if (numFromW == g_nlep){
+    return TString("Real");
+  }
+  else {
+    return TString("Hadron Fake");
+  }
+}
 //=============================
 // Triggers
 //=============================
@@ -3247,6 +3271,16 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     SSID_genmatch->Fill("All", 0);
   }
 
+  TH1D *eventclass = new TH1D("eventclass", "Number of Events Passing Each Class", 0, 0, 0);
+  eventclass->SetDirectory(rootdir);
+  eventclass->Sumw2();
+
+  eventclass->Fill("All Events", 0);
+  eventclass->Fill("Real", 0);
+  eventclass->Fill("Hadron Fake", 0);
+  eventclass->Fill("Photon Fake", 0);
+  eventclass->Fill("Other", 0);
+
   cout<<"Histograms initialized"<<endl;
   #ifdef DEBUG 
     cout<<__LINE__<<endl; 
@@ -3701,6 +3735,8 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         cout<<__LINE__<<endl; 
       #endif
       
+      eventclass->Fill(getEventClass(), weight);
+
       if (conf->get("num_leptons") == "3"){
         pair<int, int> indicies = getMostZlikePair(phys.lep_p4());
         dilmass_zlike->Fill((phys.lep_p4().at(indicies.first) + phys.lep_p4().at(indicies.second)).M(), weight);
@@ -3958,15 +3994,6 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       #ifdef DEBUG 
         cout<<__LINE__<<endl; 
       #endif
-    /*SSID_genmatch->Fill("AllLeps", 0);
-    SSID_genmatch->Fill("OnlySSID", 0);
-    SSID_genmatch->Fill("OnlyGenMatch", 0);
-    SSID_genmatch->Fill("OnlyPhoton", 0);
-    SSID_genmatch->Fill("SSID_GenMatch", 0);
-    SSID_genmatch->Fill("SSID_Photon", 0);
-    SSID_genmatch->Fill("GenMatch_Photon", 0);
-    SSID_genmatch->Fill("All", 0);
-    SSID_genmatch->Fill("None", 0);*/
 
       if (conf->get("check_leps_from_photon_iso") == "true"){
         for (auto lepind : g_lep_inds ){
@@ -4358,6 +4385,10 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   #endif
   otherleps_ptRatio->Write();
   weighted_count->Write();
+  #ifdef DEBUG 
+    cout<<__LINE__<<endl; 
+  #endif
+  eventclass->Write();
   #ifdef DEBUG 
     cout<<__LINE__<<endl; 
   #endif

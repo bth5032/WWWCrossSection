@@ -93,7 +93,7 @@ bool FRS, LooseIso, FRS_use_veto;
 
   set<tuple<long,long,long>> inspection_copy = inspection_set_erl;
 #endif
-  
+
 bool printStats = false;
 bool printFail = false;
 
@@ -254,6 +254,9 @@ bool isLepGenPhoton(int index, double dR=0.2);
 
 /* Checks gen table for lepton with same PDG ID within a DR of 0.2 with a W or Z mother. */
 bool genMatchWZMomma(int lepind);
+
+/* Returns the Event Class for Each Event */
+TString getEventClass();
 //=============================
 // Triggers
 //=============================
