@@ -556,7 +556,7 @@ bin_size=1
 hist_0_name=SSID_genmatch
 
 DEFAULT::logy=false
-DEFAULT::plot_type=stack
+DEFAULT::PLOT_TYPE=stack
 
 Name=SSID_genmatch_stack
 plot_name=SSID_genmatch_stack
