@@ -3237,7 +3237,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   weighted_count->SetDirectory(rootdir);
   weighted_count->Sumw2();
 
-  TH1D *photon_lep_momma_geniso, *photon_lep_momma_SSID_geniso, *photon_lep_momma_genreliso, *photon_lep_momma_SSID_genreliso, *SSID_genmatch;
+  TH1D *photon_lep_momma_geniso, *photon_lep_momma_SSID_geniso, *photon_lep_momma_genreliso, *photon_lep_momma_SSID_genreliso, *SSID_genmatch, *fakeBreakdown;
   if (conf->get("check_leps_from_photon_iso") == "true"){
     photon_lep_momma_geniso = new TH1D("photon_lep_momma_geniso", "Relative Isolation of Photons which are identified as lepton mothers", 1000, 0, 1000);
     photon_lep_momma_geniso->SetDirectory(rootdir);
@@ -3269,6 +3269,18 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     SSID_genmatch->Fill("SSID_GenMatch", 0);
     SSID_genmatch->Fill("SSID_Photon", 0);
     SSID_genmatch->Fill("All", 0);
+
+    fakeBreakdown = new TH1D("fakeBreakdown", "Are Fakes Gen Matched?", 0, 0, 0);
+    fakeBreakdown->SetDirectory(rootdir);
+    fakeBreakdown->Sumw2();
+
+    fakeBreakdown->Fill("All",0);
+    fakeBreakdown->Fill("Matched",0);
+    fakeBreakdown->Fill("Unmatched",0);
+    fakeBreakdown->Fill("Matched B",0);
+    fakeBreakdown->Fill("Matched C",0);
+    fakeBreakdown->Fill("Matched LF",0);
+    fakeBreakdown->Fill("Matched L",0);
   }
 
   TH1D *eventclass = new TH1D("eventclass", "Number of Events Passing Each Class", 0, 0, 0);
@@ -4053,6 +4065,12 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
               else{
                 SSID_genmatch->Fill("None-Fakes", weight/g_nlep);
                 cout<<"None-Fakes evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" lep: "<<lepind<<endl; 
+                fakeBreakdown->Fill("All", weight/g_nlep);
+                if (phys.lep_isFromB().at(lepind)){ fakeBreakdown->Fill("Matched",weight/g_nlep); fakeBreakdown->Fill("Matched B",weight/g_nlep); }
+                else if (phys.lep_isFromC().at(lepind)){ fakeBreakdown->Fill("Matched",weight/g_nlep); fakeBreakdown->Fill("Matched C",weight/g_nlep); }
+                else if (phys.lep_isFromLF().at(lepind)){ fakeBreakdown->Fill("Matched",weight/g_nlep); fakeBreakdown->Fill("Matched LF",weight/g_nlep); }
+                else if (phys.lep_isFromL().at(lepind)){ fakeBreakdown->Fill("Matched",weight/g_nlep); fakeBreakdown->Fill("Matched L",weight/g_nlep); }
+                else { fakeBreakdown->Fill("Unmatched",weight/g_nlep); }
               }
             }
           }
@@ -4442,6 +4460,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     photon_lep_momma_geniso->Write();
     photon_lep_momma_genreliso->Write();
     SSID_genmatch->Write();
+    fakeBreakdown->Write();
   }
 
   //close output file

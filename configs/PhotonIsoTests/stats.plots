@@ -555,6 +555,41 @@ relabel_x_axis=true
 bin_size=1
 hist_0_name=SSID_genmatch
 
+Name=fakeBreakdown_TTG
+plot_name=fakeBreakdown_TTG
+num_hists=2
+logy=false
+sample_0=TTBar
+sample_1=TTGamma
+hist_0_label=T\bar{T} \rightarrow 2l
+hist_1_label=T\bar{T}\gamma
+title=Count of Leptons which passed ID. 
+overflow=false
+horizontal_legend=true
+xmin=0
+xmax=6
+ylabel=Count
+relabel_x_axis=true
+bin_size=1
+hist_0_name=fakeBreakdown
+
+Name=fakeBreakdown_TTG_log
+plot_name=fakeBreakdown_TTG_log
+num_hists=2
+sample_0=TTBar
+sample_1=TTGamma
+hist_0_label=T\bar{T} \rightarrow 2l
+hist_1_label=T\bar{T}\gamma
+title=Count of Leptons which passed ID. 
+overflow=false
+horizontal_legend=true
+xmin=0
+xmax=7
+ylabel=Count
+relabel_x_axis=true
+bin_size=1
+hist_0_name=fakeBreakdown
+
 DEFAULT::logy=false
 DEFAULT::PLOT_TYPE=stack
 
