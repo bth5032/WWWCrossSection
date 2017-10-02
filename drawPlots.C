@@ -23,7 +23,7 @@
 
 using namespace std;
 
-std::array<int, 14> ROOT_COLOR_PALATE = {46,8,9,38,40,2,30,6,28,42,3,5,7,41};
+std::array<int, 14> ROOT_COLOR_PALATE = {46,8,9,40,38,2,30,6,28,42,3,5,7,41};
 
 TColor rc_light_blue   = TColor(2001,91/255.,187/255.,241/255.);
 TColor rc_blue         = TColor(2002,60/255.,144/255.,196/255.);
@@ -508,7 +508,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
     }
 
     if (conf->get("horizontal_legend") == "true"){
-      ymax = 1.2*ymax;
+      ymax = 1.3*ymax;
     }
   }
 
@@ -1094,7 +1094,9 @@ TString drawArbitraryNumber(ConfigParser *conf){
   //cout<<__LINE__<<endl;
 
   if (conf->get("relabel_x_axis") == "true"){
-    hists[0]->LabelsDeflate();
+    for (int i = 0; i<num_hists; i++){
+      hists[i]->LabelsDeflate();
+    }
   }
 
   double xmax = (conf->get("xmax") != "" ) ? stod(conf->get("xmax")) : hists[0]->GetNbinsX();
@@ -1191,7 +1193,8 @@ TString drawArbitraryNumber(ConfigParser *conf){
   else{
     for (int i = 0; i<num_hists; i++){
       //cout<<__LINE__<<endl;
-      hists[i]->SetFillColor(ROOT_COLOR_PALATE[(i-1) % ROOT_COLOR_PALATE.size()]);
+      hists[i]->SetFillColor(ROOT_COLOR_PALATE[(i) % ROOT_COLOR_PALATE.size()]);
+      cout<<"Hist "<<i<<" got color "<<ROOT_COLOR_PALATE[(i) % ROOT_COLOR_PALATE.size()]<<endl;
       //cout<<__LINE__<<endl;
       hists[i]->SetFillStyle(1001);
     }
@@ -1214,7 +1217,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   else{
       ymax = 1.2*clonedBG->GetMaximum();
       if (conf->get("horizontal_legend") == "true"){
-        ymax = 1.2*ymax;
+        ymax = 1.3*ymax;
       }
   }
   if (conf->get("logy") == "true"){
@@ -1233,11 +1236,13 @@ TString drawArbitraryNumber(ConfigParser *conf){
 
   cout<<"Proper plot maximum set to "<<ymax<<endl;
   
+  TH2F* h_axes = new TH2F(Form("%s_axes",plot_name.Data()),plot_title,clonedBG->GetNbinsX(),xmin,xmax,1000,ymin,ymax);
+
+  cout<<"ymin: "<<h_axes->GetYaxis()->GetXmax()<<" ymax: "<<h_axes->GetYaxis()->GetXmin()<<" xmin: "<<h_axes->GetXaxis()->GetXmin()<<" xmax: "<<h_axes->GetXaxis()->GetXmax()<<" NbinsX: "<<h_axes->GetXaxis()->GetNbins()<<endl;
+  
   delete clonedBG;
   //cout<<__LINE__<<endl;
-  
-  TH2F* h_axes = new TH2F(Form("%s_axes",plot_name.Data()),plot_title,hists[0]->GetNbinsX(),xmin,xmax,1000,ymin,ymax);
-  
+
   if (conf->get("relabel_x_axis") == "true"){
     TString bin_label;
     for (int i = (int) xmin; i < (int) xmax; i++)
@@ -1354,7 +1359,9 @@ TString drawArbitraryNumber(ConfigParser *conf){
 
     updateOverUnderflow(bg_sum, xmax);
     for (int i = 0; i<num_hists; i++){
+      cout<<"before OF -- hist "<<i<<" : NbinsX == "<<hists[i]->GetNbinsX()<<" xmax == "<<hists[i]->GetXaxis()->GetXmax()<<endl;
       updateOverUnderflow(hists[i], xmax);
+      cout<<"after OF -- hist "<<i<<" : NbinsX == "<<hists[i]->GetNbinsX()<<" xmax == "<<hists[i]->GetXaxis()->GetXmax()<<endl;
     }
     
     /*double n_bins = hists[0]->GetNbinsX();
@@ -1377,9 +1384,13 @@ TString drawArbitraryNumber(ConfigParser *conf){
   h_axes->GetYaxis()->SetTitleOffset(1.3);
   h_axes->GetYaxis()->SetTitleSize(0.05);
   h_axes->GetYaxis()->SetLabelSize(0.04);
+  h_axes->GetXaxis()->SetTitleSize(0.05);
+  h_axes->GetXaxis()->SetLabelSize(0.04);
   //cout<<__LINE__<<endl;
   cout<<"Drawing histograms"<<endl;
+  cout<<"ymin: "<<h_axes->GetYaxis()->GetXmax()<<" ymax: "<<h_axes->GetYaxis()->GetXmin()<<" xmin: "<<h_axes->GetXaxis()->GetXmin()<<" xmax: "<<h_axes->GetXaxis()->GetXmax()<<" NbinsX: "<<h_axes->GetXaxis()->GetNbins()<<endl;
   h_axes->Draw();
+  //c->SaveAs(save_dir+plot_name+TString("_tmp1.png"));
 
   //==========================
   // Hist Groups
@@ -1440,13 +1451,14 @@ TString drawArbitraryNumber(ConfigParser *conf){
   // MAKE STACK
   //===========================
   //Add all the background hists to a stack.
+  //c->SaveAs(save_dir+plot_name+TString("_tmp1a.png"));
   THStack * stack = new THStack(("stack_"+conf->get("Name")).c_str(), conf->get("title").c_str());
   //cout<<__LINE__<<endl;
-
   vector<pair<TH1D*, TString>> hists_labeled; 
 
   for (int i=0; i<num_hists; i++)
   {
+    cout<<"Before Sort: hist "<<i<<" : NbinsX == "<<hists[i]->GetNbinsX()<<" xmax == "<<hists[i]->GetXaxis()->GetXmax()<<endl;
     hists_labeled.push_back(make_pair(hists[i], hist_labels[i]));
   } 
 
@@ -1454,9 +1466,11 @@ TString drawArbitraryNumber(ConfigParser *conf){
   
   for (int i=0; i<num_hists; i++)
   {
+    cout<<"After Sort: hist "<<i<<" : NbinsX == "<<hists_labeled[i].first->GetNbinsX()<<" xmax == "<<hists_labeled[i].first->GetXaxis()->GetXmax()<<" max == "<<hists_labeled[i].first->GetMaximum()<<endl;
     stack->Add(hists_labeled[i].first);
   } 
-  stack->Draw("HIST");
+  stack->Draw("HIST SAME");
+  //c->SaveAs(save_dir+plot_name+TString("_tmp2.png"));
   
   TGraphAsymmErrors *bg_err = new TGraphAsymmErrors(bg_sum);
   
@@ -1465,6 +1479,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
     bg_err->SetFillStyle(3244);
     bg_err->SetFillColor(kGray+3);
     bg_err->Draw("SAME 2");
+    //c->SaveAs(save_dir+plot_name+TString("_tmp3.png"));
   }
 
   fullpad->RedrawAxis();
@@ -1511,6 +1526,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   }
 
   l1->Draw("SAME");
+  //c->SaveAs(save_dir+plot_name+TString("_tmp4.png"));
   cout<<"Drawing Latex String"<<endl;
  
   fullpad->cd();
@@ -1518,6 +1534,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   if (conf->get("luminosity_fb") != ""){
     drawCMSLatex(stod(conf->get("luminosity_fb")));
   }
+  //c->SaveAs(save_dir+plot_name+TString("_tmp5.png"));
   cout<<__LINE__<<endl;
 
   cout<<"Saving..."<<endl;
@@ -1666,7 +1683,7 @@ TString drawSingleTH1(ConfigParser *conf){
   
   if (conf->get("relabel_x_axis") == "true"){
     TString bin_label;
-    for (int i = (int) xmin; i <= (int) xmax; i++)
+    for (int i = (int) xmin; i < (int) xmax; i++)
     {
       bin_label=p_hist->GetXaxis()->GetBinLabel(p_hist->FindBin(i));
       h_axes->GetXaxis()->SetBinLabel(h_axes->FindBin(i), bin_label);

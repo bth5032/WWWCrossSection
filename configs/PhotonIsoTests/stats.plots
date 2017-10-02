@@ -590,6 +590,7 @@ hist_1_label=T\bar{T}\gamma
 hist_2_label=WZ\gamma
 hist_3_label=WW\gamma
 title=Count of Leptons which passed ID. 
+logy=true
 overflow=false
 horizontal_legend=true
 xmin=0
