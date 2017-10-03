@@ -1,8 +1,8 @@
+#include "modes.C"
 #include "TString.h"
 #include "ScanChain.C"
 #include "DefineDatasets.C"
 #include "ConfigParser.C"
-#include "modes.C"
 
 void runScanChain(ConfigParser* conf){
   cout<<"Using config:"<<endl;
