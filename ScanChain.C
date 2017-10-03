@@ -3882,14 +3882,14 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       #ifdef DEBUG 
         cout<<__LINE__<<endl; 
       #endif
-
-      lep1_ip3d->Fill(fabs(phys.lep_ip3d().at(g_lep_inds.at(0))), weight);
-      lep1_ip3derr->Fill(fabs(phys.lep_ip3derr().at(g_lep_inds.at(0))), weight);
-      lep1_sip3d->Fill(fabs(phys.lep_ip3d().at(g_lep_inds.at(0)))/fabs(phys.lep_ip3derr().at(g_lep_inds.at(0))), weight);
-      lep2_ip3d->Fill(fabs(phys.lep_ip3d().at(g_lep_inds.at(1))), weight);
-      lep2_ip3derr->Fill(fabs(phys.lep_ip3derr().at(g_lep_inds.at(1))), weight);
-      lep2_sip3d->Fill(fabs(phys.lep_ip3d().at(g_lep_inds.at(1)))/fabs(phys.lep_ip3derr().at(g_lep_inds.at(1))), weight);
-
+      if (g_nlep >= 2){
+        lep1_ip3d->Fill(fabs(phys.lep_ip3d().at(g_lep_inds.at(0))), weight);
+        lep1_ip3derr->Fill(fabs(phys.lep_ip3derr().at(g_lep_inds.at(0))), weight);
+        lep1_sip3d->Fill(fabs(phys.lep_ip3d().at(g_lep_inds.at(0)))/fabs(phys.lep_ip3derr().at(g_lep_inds.at(0))), weight);
+        lep2_ip3d->Fill(fabs(phys.lep_ip3d().at(g_lep_inds.at(1))), weight);
+        lep2_ip3derr->Fill(fabs(phys.lep_ip3derr().at(g_lep_inds.at(1))), weight);
+        lep2_sip3d->Fill(fabs(phys.lep_ip3d().at(g_lep_inds.at(1)))/fabs(phys.lep_ip3derr().at(g_lep_inds.at(1))), weight);
+      }
       #ifdef DEBUG 
         cout<<__LINE__<<endl; 
       #endif
