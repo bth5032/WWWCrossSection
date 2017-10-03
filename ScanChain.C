@@ -141,16 +141,9 @@ double getMT2HiggsZ(bool select_highest_closest_higgs_mass/*=false*/){
 
 double bosonPt(){
   // Returns boson Pt, determines whether sample is gjets or zjets first.
-  if (conf->get("event_type") == "dilepton") {
-    return (phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).pt();
-  }
-  else{
-    if (phys.evt_type() == 2 && phys.ngamma() > 0){
-      return phys.gamma_pt().at(0);
-    }
-    else
-      return 0;
-  }
+  if ( (conf->get("event_type") == "dilepton") && (g_nlep >= 2) ) { return (phys.lep_p4().at(g_lep_inds.at(0)) + phys.lep_p4().at(g_lep_inds.at(1))).pt(); }
+  else if (phys.evt_type() == 2 && phys.ngamma() > 0)             { return phys.gamma_pt().at(0); }
+  return 0;
 }
 
 double getMTLepMET(short id/*=0*/){
