@@ -1738,6 +1738,8 @@ TString drawSingleTH1(ConfigParser *conf){
   h_axes->GetYaxis()->SetTitleOffset(1.3);
   h_axes->GetYaxis()->SetTitleSize(0.05);
   h_axes->GetYaxis()->SetLabelSize(0.03);
+  h_axes->GetXaxis()->SetTitleSize(0.05);
+  h_axes->GetXaxis()->SetLabelSize(0.04);
   p_hist->SetLineWidth(3);
   
   cout<<"Drawing histograms"<<endl;

@@ -1592,6 +1592,19 @@ double getPrescaleWeight(){
 
 bool passSignalRegionCuts(){
   
+ //Gen HT
+  if (conf->get("genht_max") != ""){
+    if (phys.genht() < stod(conf->get("genht_max"))){
+      numEvents->Fill(76);
+      if (printFail) cout<<phys.evt()<<" :Failed geb HT max cut"<<endl;
+      return false;
+    }
+  }
+
+  #ifdef DEBUG 
+    cout<<__LINE__<<endl; 
+  #endif
+
   //Njets Min Cut
   if (conf->get("Njets_min") != ""){
     if (g_njets < stod(conf->get("Njets_min"))){
