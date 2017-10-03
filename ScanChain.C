@@ -1132,10 +1132,12 @@ bool hasGood2l(){
 
   //bool tmp = (g_nlep == stoi(conf->get("num_leptons")));
   //cout<<"Event has "<<g_nlep<<" leps, checking against "<<stoi(conf->get("num_leptons"))<<", with answer "<<tmp<<endl;
-  if ( g_nlep != stoi(conf->get("num_leptons"))){
+  if ( conf->get("num_leptons") != "" ){
+    if ( g_nlep != stoi(conf->get("num_leptons"))){
       numEvents->Fill(10); 
       if (printFail) cout<<phys.evt()<<" :Failed num leptons cut. Needed "<<conf->get("num_leptons")<<" got "<<g_nlep<<endl;
       return false; // require 2 leps
+    }
   }
 
   if (conf->get("dil_sign") == "same"){
