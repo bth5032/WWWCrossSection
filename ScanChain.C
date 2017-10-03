@@ -2132,6 +2132,10 @@ bool passBaseCut(){
   
   //bool pass=true;
 
+  #ifdef DEBUG 
+    cout<<__LINE__<<endl; 
+  #endif      
+
   if (phys.isData()){
     if (! (goodrun(phys.run(), phys.lumi()))){ 
       numEvents->Fill(8);
@@ -2139,6 +2143,10 @@ bool passBaseCut(){
       return false; //golden json
     }
   }
+
+  #ifdef DEBUG 
+    cout<<__LINE__<<endl; 
+  #endif      
 
   if(conf->get("num_leptons") != ""){
     if (conf->get("fakerate_study") == "true"){ 
@@ -2150,14 +2158,18 @@ bool passBaseCut(){
       } 
     }
     //if (printStats) { cout<<"Number of Leptons: "<<phys.nlep()<<" "; }
-    }
     else{
       if( g_nlep != stoi(conf->get("num_leptons")) ){ 
         numEvents->Fill(10);
         if (printFail) cout<<phys.evt()<<" :Failed 2 lepton cut"<<endl;
         return false; // require at least 2 good leptons
       }
+    }
   }
+
+  #ifdef DEBUG 
+    cout<<__LINE__<<endl; 
+  #endif      
 
   if(conf->get("tau_veto") == "true"){
     if (phys.nTaus20() >= 1){
@@ -2166,6 +2178,10 @@ bool passBaseCut(){
       return false;
     }
   }
+
+  #ifdef DEBUG 
+    cout<<__LINE__<<endl; 
+  #endif
 
   //if (printPass) cout<<phys.evt()<<": Passes Base Cuts"<<endl;
   //return pass;
