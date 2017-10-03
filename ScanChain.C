@@ -1594,9 +1594,9 @@ bool passSignalRegionCuts(){
   
  //Gen HT
   if (conf->get("genht_max") != ""){
-    if (phys.genht() < stod(conf->get("genht_max"))){
+    if (phys.gen_ht() < stod(conf->get("genht_max"))){
       numEvents->Fill(76);
-      if (printFail) cout<<phys.evt()<<" :Failed geb HT max cut"<<endl;
+      if (printFail) cout<<phys.evt()<<" :Failed gen HT max cut"<<endl;
       return false;
     }
   }
