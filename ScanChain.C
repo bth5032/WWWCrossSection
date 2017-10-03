@@ -3802,7 +3802,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         signs *= (phys.lep_pdgId().at(g_lep_inds.at(2))/fabs(phys.lep_pdgId().at(g_lep_inds.at(2))));
         lep_signs->Fill(signs, weight);
       }
-      else{
+      else if ( (conf->get("num_leptons") == "2") || (g_nlep >= 2) ){
         #ifdef DEBUG 
           cout<<__LINE__<<endl; 
         #endif
