@@ -62,7 +62,7 @@ def getYield(hist, pt_bins, eta_bins, h_fr):
     epsilon = h_fr.GetBinContent(epsilon_x, epsilon_y)
     epsilon_err = h_fr.GetBinError(epsilon_x, epsilon_y)
 
-    fr, fr_err = frErr(epsilon, ep)
+    fr, fr_err = frErr(epsilon, epsilon_err)
 
     #print("Got fake rate: %0.2f +/ %0.2f" % (fr, fr_err))
 
@@ -121,8 +121,8 @@ def moveIntoCombined(hist_path, SRs):
   Outputs the final hists into a directory called /Combined/ in the same config"""
   
   #Check if output path for hist exists
-  if (not os.path.isdir(hist_path)):
-    os.system("mkdir -p %s" % hist_path)
+  if (not os.path.isdir("%s/Combined/" % hist_path)):
+    os.system("mkdir -p %s/Combined/" % hist_path)
 
   samples = ["TTBar1l", "WJets", "DY", "Fakes"]
   pretty_SR_names = {"2lepSSEE": "ee", "2lepSSEMu":  "e #mu", "2lepSSMuMu": "#mu #mu", "3lep_0SFOS": "0SFOS", "3lep_1SFOS": "1SFOS", "3lep_2SFOS": "2SFOS"}
@@ -143,7 +143,7 @@ def moveIntoCombined(hist_path, SRs):
       sample_count = sample_file_in_sr.Get("weighted_count").Clone("weighted_count_%s_%s" % (sr, sample) )
       bin_num = h_signal_count.Fill(pretty_SR_names[sr], sample_count.GetBinContent(2))
       h_signal_count.SetBinError(bin_num, sample_count.GetBinError(2))
-      tex_dict[sample][latex_SR_names[sr]] = {"cv": sample_count.GetBinContent(2), "unc": sample_count.GetBinError(1)}
+      tex_dict[sample][latex_SR_names[sr]] = {"cv": sample_count.GetBinContent(2), "unc": sample_count.GetBinError(2)}
     
     outfile.cd()
     h_signal_count.Write()
@@ -153,7 +153,7 @@ def moveIntoCombined(hist_path, SRs):
 
 def printLatexTable(tex_dict):
   outfile = open("outputs/frhists_%s.tex" % args.study_dir, "w+")
-  pretty_sample_names = {"WZ":"WZ", "WW":"WW", "ZZ":"ZZ", "TTBar2l":"TTBar $\\to$ 2lep", "DY":"DY", "WWW":"WWW", "Wh":"WH", "VVV":"VVV", "TTV":"TTV", "SingleTop":"SingleTop", "Other":"ZH", "Data":"Data", "Fakes":"Fakes"}
+  pretty_sample_names = {"WZ":"WZ", "WW":"WW", "ZZ":"ZZ", "TTBar2l":"$T\\bar{T} \\to$ 2lep", "DY":"DY", "WWW":"WWW", "Wh":"WH", "VVV":"VVV", "TTV":"TTV", "SingleTop":"SingleTop", "Other":"ZH", "Data":"Data", "Fakes":"Fakes", "WJets":"W+Jets", "TTBar1l":"$T\\bar{T} \\to$ 1l"}
 
   if args.signal_regions == "SS":
     SRs = ["$ee$", "$e \mu$", "$\mu \mu$"]
@@ -181,7 +181,7 @@ def printLatexTable(tex_dict):
   ## Predictions
   ##==============
   for sample in tex_dict.keys():
-    if sample == "Data":
+    if sample == "Fakes":
       continue
     line = "%s" % pretty_sample_names[sample]
     for sr in SRs:
@@ -203,9 +203,9 @@ def printLatexTable(tex_dict):
   outfile.write(line)
 
   ##==============
-  ## Predictions
+  ## Fakes
   ##==============
-  sample="Data"
+  sample="Fakes"
   line = "%s" % sample
   for sr in SRs:
     line+=" & $%0.2f \\pm %0.2f$" % (tex_dict[sample][sr]["cv"], tex_dict[sample][sr]["unc"])
