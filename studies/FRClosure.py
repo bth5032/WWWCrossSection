@@ -59,8 +59,8 @@ def getYield(hist, pt_bins, eta_bins, h_fr):
     #Get FR from Histogram
     epsilon_x = h_fr.GetXaxis().FindBin(pt_low)
     epsilon_y = h_fr.GetYaxis().FindBin(eta_low)
-    epsilon = h_fr.GetBinContent(fr_x, fr_y)
-    epsilon_err = h_fr.GetBinError(fr_x, fr_y)
+    epsilon = h_fr.GetBinContent(epsilon_x, epsilon_y)
+    epsilon_err = h_fr.GetBinError(epsilon_x, epsilon_y)
 
     fr, fr_err = frErr(epsilon, ep)
 
@@ -247,7 +247,6 @@ def main():
     makeHistos(pt_bins, eta_bins_e, eta_bins_m, hist_paths, FR_Hist_path, signal_region)
 
   moveIntoCombined(base_hists_path, SRs)
-  printPlotMakerCommand(prediction_hist_path)
 
 if __name__ == "__main__":
   main()
