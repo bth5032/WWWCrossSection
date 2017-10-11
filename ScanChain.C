@@ -2537,6 +2537,66 @@ void setLepIndexes(){
     cout<<__LINE__<<endl; 
   #endif
 
+  if (conf->get("Loose_isTriggerSafe") != ""){
+    bool pass_isTriggerSafe = false;
+    TString sel = conf->get("Loose_isTriggerSafe");
+    
+    //cout<<"Electron reliso cut found at: "<<reliso03_max_els<<endl;
+
+    for (int i = 0; i<(int) g_looseIDs.size(); i++){
+      if (sel == "v1")            { pass_isTriggerSafe = phys.lep_isTriggerSafe_v1().at(i);      }
+      else if (sel == "v1_noiso") { pass_isTriggerSafe = phys.lep_isTriggerSafenoIso_v1().at(i); }
+      else if (sel == "v2")       { pass_isTriggerSafe = phys.lep_isTriggerSafe_v2().at(i);      }
+      else if (sel == "v2_noiso") { pass_isTriggerSafe = phys.lep_isTriggerSafenoIso_v2().at(i); }
+      else {
+        cout<<"Throwing error, can not apply trigger safe cut with given value"<<endl;
+        std::stringstream message;
+        message<<"Don't know how to apply loose ID trigger safe selection for: "<<conf->get("Loose_isTriggerSafe");
+        throw std::invalid_argument(message.str());
+      }
+
+      //cout<<"Electron at "<<i<<" has reliso03 "<<phys.lep_relIso03EAv2().at(i)<<" and pass: "<<pass_reliso03_max_els<<" loose ID was "<<g_looseIDs[i];
+      g_looseIDs[i] = (g_looseIDs[i] && pass_isTriggerSafe);
+      //cout<<" and now is "<<g_looseIDs[i]<<endl;
+    }
+  }
+
+  #ifdef DEBUG 
+    cout<<__LINE__<<endl; 
+  #endif
+
+  //----------------------------------
+  //TIGHT ONLY CUTS:
+  //----------------------------------
+
+    if (conf->get("Tight_isTriggerSafe") != ""){
+    bool pass_isTriggerSafe = false;
+    TString sel = conf->get("Tight_isTriggerSafe");
+    
+    //cout<<"Electron reliso cut found at: "<<reliso03_max_els<<endl;
+
+    for (int i = 0; i<(int) g_looseIDs.size(); i++){
+      if (sel == "v1")            { pass_isTriggerSafe = phys.lep_isTriggerSafe_v1().at(i);      }
+      else if (sel == "v1_noiso") { pass_isTriggerSafe = phys.lep_isTriggerSafenoIso_v1().at(i); }
+      else if (sel == "v2")       { pass_isTriggerSafe = phys.lep_isTriggerSafe_v2().at(i);      }
+      else if (sel == "v2_noiso") { pass_isTriggerSafe = phys.lep_isTriggerSafenoIso_v2().at(i); }
+      else {
+        cout<<"Throwing error, can not apply trigger safe cut with given value"<<endl;
+        std::stringstream message;
+        message<<"Don't know how to apply tight ID trigger safe selection for: "<<conf->get("Tight_isTriggerSafe");
+        throw std::invalid_argument(message.str());
+      }
+
+      //cout<<"Electron at "<<i<<" has reliso03 "<<phys.lep_relIso03EAv2().at(i)<<" and pass: "<<pass_reliso03_max_els<<" loose ID was "<<g_looseIDs[i];
+      g_tightIDs[i] = (g_tightIDs[i] && pass_isTriggerSafe);
+      //cout<<" and now is "<<g_tightIDs[i]<<endl;
+    }
+  }
+
+  #ifdef DEBUG 
+    cout<<__LINE__<<endl; 
+  #endif
+
   for (short i = 0; i < (short) phys.lep_p4().size(); i++){
     if (g_tightIDs.at(i))              g_lep_inds.push_back(i);
     else if (FRS && g_looseIDs.at(i))  g_lep_inds.push_back(i);

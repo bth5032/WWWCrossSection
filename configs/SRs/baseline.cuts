@@ -7,6 +7,9 @@ DEFAULT::event_type=dilepton
 DEFAULT::MCTriggerEmulation=true
 DEFAULT::do_met_filters=false #MET filters off for now
 
+DEFAULT::Tight_isTriggerSafe=v2
+DEFAULT::Loose_isTriggerSafe=v1
+
 DEFAULT::dilmass_Z_veto=true
 #DEFAULT::tau_veto=true
 DEFAULT::NBjets_max=0

@@ -22,6 +22,8 @@ DEFAULT::MET_min=45
 #DEFAULT::3chargeagree=true
 
 DEFAULT::ip3d_max=0.015
+DEFAULT::Tight_isTriggerSafe=v2
+DEFAULT::Loose_isTriggerSafe=v1
 
 DEFAULT::jet1_pt_min=30
 DEFAULT::Njets_max=1

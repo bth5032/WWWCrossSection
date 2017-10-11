@@ -143,6 +143,11 @@ void WWW::Init(TTree *tree) {
 		nVert_branch = tree->GetBranch("nVert");
 		if (nVert_branch) {nVert_branch->SetAddress(&nVert_);}
 	}
+	firstgoodvertex_branch = 0;
+	if (tree->GetBranch("firstgoodvertex") != 0) {
+		firstgoodvertex_branch = tree->GetBranch("firstgoodvertex");
+		if (firstgoodvertex_branch) {firstgoodvertex_branch->SetAddress(&firstgoodvertex_);}
+	}
 	nTrueInt_branch = 0;
 	if (tree->GetBranch("nTrueInt") != 0) {
 		nTrueInt_branch = tree->GetBranch("nTrueInt");
@@ -853,6 +858,26 @@ void WWW::Init(TTree *tree) {
 		lep_miniRelIsoCMS3_DB_branch = tree->GetBranch("lep_miniRelIsoCMS3_DB");
 		if (lep_miniRelIsoCMS3_DB_branch) {lep_miniRelIsoCMS3_DB_branch->SetAddress(&lep_miniRelIsoCMS3_DB_);}
 	}
+	lep_isTriggerSafenoIso_v1_branch = 0;
+	if (tree->GetBranch("lep_isTriggerSafenoIso_v1") != 0) {
+		lep_isTriggerSafenoIso_v1_branch = tree->GetBranch("lep_isTriggerSafenoIso_v1");
+		if (lep_isTriggerSafenoIso_v1_branch) {lep_isTriggerSafenoIso_v1_branch->SetAddress(&lep_isTriggerSafenoIso_v1_);}
+	}
+	lep_isTriggerSafenoIso_v2_branch = 0;
+	if (tree->GetBranch("lep_isTriggerSafenoIso_v2") != 0) {
+		lep_isTriggerSafenoIso_v2_branch = tree->GetBranch("lep_isTriggerSafenoIso_v2");
+		if (lep_isTriggerSafenoIso_v2_branch) {lep_isTriggerSafenoIso_v2_branch->SetAddress(&lep_isTriggerSafenoIso_v2_);}
+	}
+	lep_isTriggerSafe_v1_branch = 0;
+	if (tree->GetBranch("lep_isTriggerSafe_v1") != 0) {
+		lep_isTriggerSafe_v1_branch = tree->GetBranch("lep_isTriggerSafe_v1");
+		if (lep_isTriggerSafe_v1_branch) {lep_isTriggerSafe_v1_branch->SetAddress(&lep_isTriggerSafe_v1_);}
+	}
+	lep_isTriggerSafe_v2_branch = 0;
+	if (tree->GetBranch("lep_isTriggerSafe_v2") != 0) {
+		lep_isTriggerSafe_v2_branch = tree->GetBranch("lep_isTriggerSafe_v2");
+		if (lep_isTriggerSafe_v2_branch) {lep_isTriggerSafe_v2_branch->SetAddress(&lep_isTriggerSafe_v2_);}
+	}
 	lep_pass_VVV_cutbased_veto_branch = 0;
 	if (tree->GetBranch("lep_pass_VVV_cutbased_veto") != 0) {
 		lep_pass_VVV_cutbased_veto_branch = tree->GetBranch("lep_pass_VVV_cutbased_veto");
@@ -867,6 +892,21 @@ void WWW::Init(TTree *tree) {
 	if (tree->GetBranch("lep_pass_VVV_cutbased_veto_noiso_noip") != 0) {
 		lep_pass_VVV_cutbased_veto_noiso_noip_branch = tree->GetBranch("lep_pass_VVV_cutbased_veto_noiso_noip");
 		if (lep_pass_VVV_cutbased_veto_noiso_noip_branch) {lep_pass_VVV_cutbased_veto_noiso_noip_branch->SetAddress(&lep_pass_VVV_cutbased_veto_noiso_noip_);}
+	}
+	lep_pass_VVV_cutbased_veto_bak1_branch = 0;
+	if (tree->GetBranch("lep_pass_VVV_cutbased_veto_bak1") != 0) {
+		lep_pass_VVV_cutbased_veto_bak1_branch = tree->GetBranch("lep_pass_VVV_cutbased_veto_bak1");
+		if (lep_pass_VVV_cutbased_veto_bak1_branch) {lep_pass_VVV_cutbased_veto_bak1_branch->SetAddress(&lep_pass_VVV_cutbased_veto_bak1_);}
+	}
+	lep_pass_VVV_cutbased_veto_noiso_bak1_branch = 0;
+	if (tree->GetBranch("lep_pass_VVV_cutbased_veto_noiso_bak1") != 0) {
+		lep_pass_VVV_cutbased_veto_noiso_bak1_branch = tree->GetBranch("lep_pass_VVV_cutbased_veto_noiso_bak1");
+		if (lep_pass_VVV_cutbased_veto_noiso_bak1_branch) {lep_pass_VVV_cutbased_veto_noiso_bak1_branch->SetAddress(&lep_pass_VVV_cutbased_veto_noiso_bak1_);}
+	}
+	lep_pass_VVV_cutbased_veto_noiso_noip_bak1_branch = 0;
+	if (tree->GetBranch("lep_pass_VVV_cutbased_veto_noiso_noip_bak1") != 0) {
+		lep_pass_VVV_cutbased_veto_noiso_noip_bak1_branch = tree->GetBranch("lep_pass_VVV_cutbased_veto_noiso_noip_bak1");
+		if (lep_pass_VVV_cutbased_veto_noiso_noip_bak1_branch) {lep_pass_VVV_cutbased_veto_noiso_noip_bak1_branch->SetAddress(&lep_pass_VVV_cutbased_veto_noiso_noip_bak1_);}
 	}
 	lep_pass_VVV_cutbased_fo_branch = 0;
 	if (tree->GetBranch("lep_pass_VVV_cutbased_fo") != 0) {
@@ -917,6 +957,21 @@ void WWW::Init(TTree *tree) {
 	if (tree->GetBranch("nlep_VVV_cutbased_veto_noiso_noip") != 0) {
 		nlep_VVV_cutbased_veto_noiso_noip_branch = tree->GetBranch("nlep_VVV_cutbased_veto_noiso_noip");
 		if (nlep_VVV_cutbased_veto_noiso_noip_branch) {nlep_VVV_cutbased_veto_noiso_noip_branch->SetAddress(&nlep_VVV_cutbased_veto_noiso_noip_);}
+	}
+	nlep_VVV_cutbased_veto_bak1_branch = 0;
+	if (tree->GetBranch("nlep_VVV_cutbased_veto_bak1") != 0) {
+		nlep_VVV_cutbased_veto_bak1_branch = tree->GetBranch("nlep_VVV_cutbased_veto_bak1");
+		if (nlep_VVV_cutbased_veto_bak1_branch) {nlep_VVV_cutbased_veto_bak1_branch->SetAddress(&nlep_VVV_cutbased_veto_bak1_);}
+	}
+	nlep_VVV_cutbased_veto_noiso_bak1_branch = 0;
+	if (tree->GetBranch("nlep_VVV_cutbased_veto_noiso_bak1") != 0) {
+		nlep_VVV_cutbased_veto_noiso_bak1_branch = tree->GetBranch("nlep_VVV_cutbased_veto_noiso_bak1");
+		if (nlep_VVV_cutbased_veto_noiso_bak1_branch) {nlep_VVV_cutbased_veto_noiso_bak1_branch->SetAddress(&nlep_VVV_cutbased_veto_noiso_bak1_);}
+	}
+	nlep_VVV_cutbased_veto_noiso_noip_bak1_branch = 0;
+	if (tree->GetBranch("nlep_VVV_cutbased_veto_noiso_noip_bak1") != 0) {
+		nlep_VVV_cutbased_veto_noiso_noip_bak1_branch = tree->GetBranch("nlep_VVV_cutbased_veto_noiso_noip_bak1");
+		if (nlep_VVV_cutbased_veto_noiso_noip_bak1_branch) {nlep_VVV_cutbased_veto_noiso_noip_bak1_branch->SetAddress(&nlep_VVV_cutbased_veto_noiso_noip_bak1_);}
 	}
 	nlep_VVV_cutbased_fo_branch = 0;
 	if (tree->GetBranch("nlep_VVV_cutbased_fo") != 0) {
@@ -982,6 +1037,11 @@ void WWW::Init(TTree *tree) {
 	if (tree->GetBranch("lep_etaSC") != 0) {
 		lep_etaSC_branch = tree->GetBranch("lep_etaSC");
 		if (lep_etaSC_branch) {lep_etaSC_branch->SetAddress(&lep_etaSC_);}
+	}
+	lep_r9_branch = 0;
+	if (tree->GetBranch("lep_r9") != 0) {
+		lep_r9_branch = tree->GetBranch("lep_r9");
+		if (lep_r9_branch) {lep_r9_branch->SetAddress(&lep_r9_);}
 	}
 	lep_dz_branch = 0;
 	if (tree->GetBranch("lep_dz") != 0) {
@@ -1077,6 +1137,21 @@ void WWW::Init(TTree *tree) {
 	if (tree->GetBranch("nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip") != 0) {
 		nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_branch = tree->GetBranch("nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip");
 		if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_branch) {nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_branch->SetAddress(&nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_);}
+	}
+	nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_branch = 0;
+	if (tree->GetBranch("nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1") != 0) {
+		nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_branch = tree->GetBranch("nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1");
+		if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_branch) {nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_branch->SetAddress(&nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_);}
+	}
+	nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_branch = 0;
+	if (tree->GetBranch("nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1") != 0) {
+		nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_branch = tree->GetBranch("nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1");
+		if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_branch) {nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_branch->SetAddress(&nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_);}
+	}
+	nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_branch = 0;
+	if (tree->GetBranch("nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1") != 0) {
+		nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_branch = tree->GetBranch("nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1");
+		if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_branch) {nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_branch->SetAddress(&nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_);}
 	}
 	nisoTrack_mt2_cleaned_VVV_cutbased_fo_branch = 0;
 	if (tree->GetBranch("nisoTrack_mt2_cleaned_VVV_cutbased_fo") != 0) {
@@ -2138,6 +2213,71 @@ void WWW::Init(TTree *tree) {
 		weightsf_lepip_FS_branch = tree->GetBranch("weightsf_lepip_FS");
 		if (weightsf_lepip_FS_branch) {weightsf_lepip_FS_branch->SetAddress(&weightsf_lepip_FS_);}
 	}
+	weight_rn_r1_n1_branch = 0;
+	if (tree->GetBranch("weight_rn_r1_n1") != 0) {
+		weight_rn_r1_n1_branch = tree->GetBranch("weight_rn_r1_n1");
+		if (weight_rn_r1_n1_branch) {weight_rn_r1_n1_branch->SetAddress(&weight_rn_r1_n1_);}
+	}
+	weight_rn_r1_n2_branch = 0;
+	if (tree->GetBranch("weight_rn_r1_n2") != 0) {
+		weight_rn_r1_n2_branch = tree->GetBranch("weight_rn_r1_n2");
+		if (weight_rn_r1_n2_branch) {weight_rn_r1_n2_branch->SetAddress(&weight_rn_r1_n2_);}
+	}
+	weight_rn_r1_np05_branch = 0;
+	if (tree->GetBranch("weight_rn_r1_np05") != 0) {
+		weight_rn_r1_np05_branch = tree->GetBranch("weight_rn_r1_np05");
+		if (weight_rn_r1_np05_branch) {weight_rn_r1_np05_branch->SetAddress(&weight_rn_r1_np05_);}
+	}
+	weight_rn_r2_n1_branch = 0;
+	if (tree->GetBranch("weight_rn_r2_n1") != 0) {
+		weight_rn_r2_n1_branch = tree->GetBranch("weight_rn_r2_n1");
+		if (weight_rn_r2_n1_branch) {weight_rn_r2_n1_branch->SetAddress(&weight_rn_r2_n1_);}
+	}
+	weight_rn_r2_n2_branch = 0;
+	if (tree->GetBranch("weight_rn_r2_n2") != 0) {
+		weight_rn_r2_n2_branch = tree->GetBranch("weight_rn_r2_n2");
+		if (weight_rn_r2_n2_branch) {weight_rn_r2_n2_branch->SetAddress(&weight_rn_r2_n2_);}
+	}
+	weight_rn_r2_n0p5_branch = 0;
+	if (tree->GetBranch("weight_rn_r2_n0p5") != 0) {
+		weight_rn_r2_n0p5_branch = tree->GetBranch("weight_rn_r2_n0p5");
+		if (weight_rn_r2_n0p5_branch) {weight_rn_r2_n0p5_branch->SetAddress(&weight_rn_r2_n0p5_);}
+	}
+	weight_rn_r0p5_n1_branch = 0;
+	if (tree->GetBranch("weight_rn_r0p5_n1") != 0) {
+		weight_rn_r0p5_n1_branch = tree->GetBranch("weight_rn_r0p5_n1");
+		if (weight_rn_r0p5_n1_branch) {weight_rn_r0p5_n1_branch->SetAddress(&weight_rn_r0p5_n1_);}
+	}
+	weight_rn_r0p5_n2_branch = 0;
+	if (tree->GetBranch("weight_rn_r0p5_n2") != 0) {
+		weight_rn_r0p5_n2_branch = tree->GetBranch("weight_rn_r0p5_n2");
+		if (weight_rn_r0p5_n2_branch) {weight_rn_r0p5_n2_branch->SetAddress(&weight_rn_r0p5_n2_);}
+	}
+	weight_rn_r0p5_n0p5_branch = 0;
+	if (tree->GetBranch("weight_rn_r0p5_n0p5") != 0) {
+		weight_rn_r0p5_n0p5_branch = tree->GetBranch("weight_rn_r0p5_n0p5");
+		if (weight_rn_r0p5_n0p5_branch) {weight_rn_r0p5_n0p5_branch->SetAddress(&weight_rn_r0p5_n0p5_);}
+	}
+	weight_pdf_up_branch = 0;
+	if (tree->GetBranch("weight_pdf_up") != 0) {
+		weight_pdf_up_branch = tree->GetBranch("weight_pdf_up");
+		if (weight_pdf_up_branch) {weight_pdf_up_branch->SetAddress(&weight_pdf_up_);}
+	}
+	weight_pdf_down_branch = 0;
+	if (tree->GetBranch("weight_pdf_down") != 0) {
+		weight_pdf_down_branch = tree->GetBranch("weight_pdf_down");
+		if (weight_pdf_down_branch) {weight_pdf_down_branch->SetAddress(&weight_pdf_down_);}
+	}
+	weight_alphas_down_branch = 0;
+	if (tree->GetBranch("weight_alphas_down") != 0) {
+		weight_alphas_down_branch = tree->GetBranch("weight_alphas_down");
+		if (weight_alphas_down_branch) {weight_alphas_down_branch->SetAddress(&weight_alphas_down_);}
+	}
+	weight_alphas_up_branch = 0;
+	if (tree->GetBranch("weight_alphas_up") != 0) {
+		weight_alphas_up_branch = tree->GetBranch("weight_alphas_up");
+		if (weight_alphas_up_branch) {weight_alphas_up_branch->SetAddress(&weight_alphas_up_);}
+	}
   tree->SetMakeClass(0);
 }
 void WWW::GetEntry(unsigned int idx) 
@@ -2157,6 +2297,7 @@ void WWW::GetEntry(unsigned int idx)
 		evt_dataset_isLoaded = false;
 		puWeight_isLoaded = false;
 		nVert_isLoaded = false;
+		firstgoodvertex_isLoaded = false;
 		nTrueInt_isLoaded = false;
 		rho_isLoaded = false;
 		rho25_isLoaded = false;
@@ -2301,9 +2442,16 @@ void WWW::GetEntry(unsigned int idx)
 		lep_miniRelIsoCMS3_EA_isLoaded = false;
 		lep_miniRelIsoCMS3_EAv2_isLoaded = false;
 		lep_miniRelIsoCMS3_DB_isLoaded = false;
+		lep_isTriggerSafenoIso_v1_isLoaded = false;
+		lep_isTriggerSafenoIso_v2_isLoaded = false;
+		lep_isTriggerSafe_v1_isLoaded = false;
+		lep_isTriggerSafe_v2_isLoaded = false;
 		lep_pass_VVV_cutbased_veto_isLoaded = false;
 		lep_pass_VVV_cutbased_veto_noiso_isLoaded = false;
 		lep_pass_VVV_cutbased_veto_noiso_noip_isLoaded = false;
+		lep_pass_VVV_cutbased_veto_bak1_isLoaded = false;
+		lep_pass_VVV_cutbased_veto_noiso_bak1_isLoaded = false;
+		lep_pass_VVV_cutbased_veto_noiso_noip_bak1_isLoaded = false;
 		lep_pass_VVV_cutbased_fo_isLoaded = false;
 		lep_pass_VVV_cutbased_fo_noiso_isLoaded = false;
 		lep_pass_VVV_cutbased_tight_noiso_isLoaded = false;
@@ -2314,6 +2462,9 @@ void WWW::GetEntry(unsigned int idx)
 		nlep_VVV_cutbased_veto_isLoaded = false;
 		nlep_VVV_cutbased_veto_noiso_isLoaded = false;
 		nlep_VVV_cutbased_veto_noiso_noip_isLoaded = false;
+		nlep_VVV_cutbased_veto_bak1_isLoaded = false;
+		nlep_VVV_cutbased_veto_noiso_bak1_isLoaded = false;
+		nlep_VVV_cutbased_veto_noiso_noip_bak1_isLoaded = false;
 		nlep_VVV_cutbased_fo_isLoaded = false;
 		nlep_VVV_cutbased_fo_noiso_isLoaded = false;
 		nlep_VVV_cutbased_tight_noiso_isLoaded = false;
@@ -2327,6 +2478,7 @@ void WWW::GetEntry(unsigned int idx)
 		lep_ip3d_isLoaded = false;
 		lep_ip3derr_isLoaded = false;
 		lep_etaSC_isLoaded = false;
+		lep_r9_isLoaded = false;
 		lep_dz_isLoaded = false;
 		lep_tightId_isLoaded = false;
 		lep_mcMatchId_isLoaded = false;
@@ -2346,6 +2498,9 @@ void WWW::GetEntry(unsigned int idx)
 		nisoTrack_mt2_cleaned_VVV_cutbased_veto_isLoaded = false;
 		nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_isLoaded = false;
 		nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_isLoaded = false;
+		nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_isLoaded = false;
+		nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_isLoaded = false;
+		nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_isLoaded = false;
 		nisoTrack_mt2_cleaned_VVV_cutbased_fo_isLoaded = false;
 		nisoTrack_mt2_cleaned_VVV_cutbased_fo_noiso_isLoaded = false;
 		nisoTrack_mt2_cleaned_VVV_cutbased_tight_noiso_isLoaded = false;
@@ -2571,6 +2726,19 @@ void WWW::GetEntry(unsigned int idx)
 		weightsf_lepid_FS_isLoaded = false;
 		weightsf_lepiso_FS_isLoaded = false;
 		weightsf_lepip_FS_isLoaded = false;
+		weight_rn_r1_n1_isLoaded = false;
+		weight_rn_r1_n2_isLoaded = false;
+		weight_rn_r1_np05_isLoaded = false;
+		weight_rn_r2_n1_isLoaded = false;
+		weight_rn_r2_n2_isLoaded = false;
+		weight_rn_r2_n0p5_isLoaded = false;
+		weight_rn_r0p5_n1_isLoaded = false;
+		weight_rn_r0p5_n2_isLoaded = false;
+		weight_rn_r0p5_n0p5_isLoaded = false;
+		weight_pdf_up_isLoaded = false;
+		weight_pdf_down_isLoaded = false;
+		weight_alphas_down_isLoaded = false;
+		weight_alphas_up_isLoaded = false;
 	}
 
 void WWW::LoadAllBranches() 
@@ -2589,6 +2757,7 @@ void WWW::LoadAllBranches()
 	if (evt_dataset_branch != 0) evt_dataset();
 	if (puWeight_branch != 0) puWeight();
 	if (nVert_branch != 0) nVert();
+	if (firstgoodvertex_branch != 0) firstgoodvertex();
 	if (nTrueInt_branch != 0) nTrueInt();
 	if (rho_branch != 0) rho();
 	if (rho25_branch != 0) rho25();
@@ -2733,9 +2902,16 @@ void WWW::LoadAllBranches()
 	if (lep_miniRelIsoCMS3_EA_branch != 0) lep_miniRelIsoCMS3_EA();
 	if (lep_miniRelIsoCMS3_EAv2_branch != 0) lep_miniRelIsoCMS3_EAv2();
 	if (lep_miniRelIsoCMS3_DB_branch != 0) lep_miniRelIsoCMS3_DB();
+	if (lep_isTriggerSafenoIso_v1_branch != 0) lep_isTriggerSafenoIso_v1();
+	if (lep_isTriggerSafenoIso_v2_branch != 0) lep_isTriggerSafenoIso_v2();
+	if (lep_isTriggerSafe_v1_branch != 0) lep_isTriggerSafe_v1();
+	if (lep_isTriggerSafe_v2_branch != 0) lep_isTriggerSafe_v2();
 	if (lep_pass_VVV_cutbased_veto_branch != 0) lep_pass_VVV_cutbased_veto();
 	if (lep_pass_VVV_cutbased_veto_noiso_branch != 0) lep_pass_VVV_cutbased_veto_noiso();
 	if (lep_pass_VVV_cutbased_veto_noiso_noip_branch != 0) lep_pass_VVV_cutbased_veto_noiso_noip();
+	if (lep_pass_VVV_cutbased_veto_bak1_branch != 0) lep_pass_VVV_cutbased_veto_bak1();
+	if (lep_pass_VVV_cutbased_veto_noiso_bak1_branch != 0) lep_pass_VVV_cutbased_veto_noiso_bak1();
+	if (lep_pass_VVV_cutbased_veto_noiso_noip_bak1_branch != 0) lep_pass_VVV_cutbased_veto_noiso_noip_bak1();
 	if (lep_pass_VVV_cutbased_fo_branch != 0) lep_pass_VVV_cutbased_fo();
 	if (lep_pass_VVV_cutbased_fo_noiso_branch != 0) lep_pass_VVV_cutbased_fo_noiso();
 	if (lep_pass_VVV_cutbased_tight_noiso_branch != 0) lep_pass_VVV_cutbased_tight_noiso();
@@ -2746,6 +2922,9 @@ void WWW::LoadAllBranches()
 	if (nlep_VVV_cutbased_veto_branch != 0) nlep_VVV_cutbased_veto();
 	if (nlep_VVV_cutbased_veto_noiso_branch != 0) nlep_VVV_cutbased_veto_noiso();
 	if (nlep_VVV_cutbased_veto_noiso_noip_branch != 0) nlep_VVV_cutbased_veto_noiso_noip();
+	if (nlep_VVV_cutbased_veto_bak1_branch != 0) nlep_VVV_cutbased_veto_bak1();
+	if (nlep_VVV_cutbased_veto_noiso_bak1_branch != 0) nlep_VVV_cutbased_veto_noiso_bak1();
+	if (nlep_VVV_cutbased_veto_noiso_noip_bak1_branch != 0) nlep_VVV_cutbased_veto_noiso_noip_bak1();
 	if (nlep_VVV_cutbased_fo_branch != 0) nlep_VVV_cutbased_fo();
 	if (nlep_VVV_cutbased_fo_noiso_branch != 0) nlep_VVV_cutbased_fo_noiso();
 	if (nlep_VVV_cutbased_tight_noiso_branch != 0) nlep_VVV_cutbased_tight_noiso();
@@ -2759,6 +2938,7 @@ void WWW::LoadAllBranches()
 	if (lep_ip3d_branch != 0) lep_ip3d();
 	if (lep_ip3derr_branch != 0) lep_ip3derr();
 	if (lep_etaSC_branch != 0) lep_etaSC();
+	if (lep_r9_branch != 0) lep_r9();
 	if (lep_dz_branch != 0) lep_dz();
 	if (lep_tightId_branch != 0) lep_tightId();
 	if (lep_mcMatchId_branch != 0) lep_mcMatchId();
@@ -2778,6 +2958,9 @@ void WWW::LoadAllBranches()
 	if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_branch != 0) nisoTrack_mt2_cleaned_VVV_cutbased_veto();
 	if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_branch != 0) nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso();
 	if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_branch != 0) nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip();
+	if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_branch != 0) nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1();
+	if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_branch != 0) nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1();
+	if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_branch != 0) nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1();
 	if (nisoTrack_mt2_cleaned_VVV_cutbased_fo_branch != 0) nisoTrack_mt2_cleaned_VVV_cutbased_fo();
 	if (nisoTrack_mt2_cleaned_VVV_cutbased_fo_noiso_branch != 0) nisoTrack_mt2_cleaned_VVV_cutbased_fo_noiso();
 	if (nisoTrack_mt2_cleaned_VVV_cutbased_tight_noiso_branch != 0) nisoTrack_mt2_cleaned_VVV_cutbased_tight_noiso();
@@ -3003,6 +3186,19 @@ void WWW::LoadAllBranches()
 	if (weightsf_lepid_FS_branch != 0) weightsf_lepid_FS();
 	if (weightsf_lepiso_FS_branch != 0) weightsf_lepiso_FS();
 	if (weightsf_lepip_FS_branch != 0) weightsf_lepip_FS();
+	if (weight_rn_r1_n1_branch != 0) weight_rn_r1_n1();
+	if (weight_rn_r1_n2_branch != 0) weight_rn_r1_n2();
+	if (weight_rn_r1_np05_branch != 0) weight_rn_r1_np05();
+	if (weight_rn_r2_n1_branch != 0) weight_rn_r2_n1();
+	if (weight_rn_r2_n2_branch != 0) weight_rn_r2_n2();
+	if (weight_rn_r2_n0p5_branch != 0) weight_rn_r2_n0p5();
+	if (weight_rn_r0p5_n1_branch != 0) weight_rn_r0p5_n1();
+	if (weight_rn_r0p5_n2_branch != 0) weight_rn_r0p5_n2();
+	if (weight_rn_r0p5_n0p5_branch != 0) weight_rn_r0p5_n0p5();
+	if (weight_pdf_up_branch != 0) weight_pdf_up();
+	if (weight_pdf_down_branch != 0) weight_pdf_down();
+	if (weight_alphas_down_branch != 0) weight_alphas_down();
+	if (weight_alphas_up_branch != 0) weight_alphas_up();
 }
 
 	const int &WWW::run()
@@ -3173,6 +3369,19 @@ void WWW::LoadAllBranches()
 			nVert_isLoaded = true;
 		}
 		return nVert_;
+	}
+	const int &WWW::firstgoodvertex()
+	{
+		if (not firstgoodvertex_isLoaded) {
+			if (firstgoodvertex_branch != 0) {
+				firstgoodvertex_branch->GetEntry(index);
+			} else { 
+				printf("branch firstgoodvertex_branch does not exist!\n");
+				exit(1);
+			}
+			firstgoodvertex_isLoaded = true;
+		}
+		return firstgoodvertex_;
 	}
 	const int &WWW::nTrueInt()
 	{
@@ -5046,6 +5255,58 @@ void WWW::LoadAllBranches()
 		}
 		return *lep_miniRelIsoCMS3_DB_;
 	}
+	const vector<bool> &WWW::lep_isTriggerSafenoIso_v1()
+	{
+		if (not lep_isTriggerSafenoIso_v1_isLoaded) {
+			if (lep_isTriggerSafenoIso_v1_branch != 0) {
+				lep_isTriggerSafenoIso_v1_branch->GetEntry(index);
+			} else { 
+				printf("branch lep_isTriggerSafenoIso_v1_branch does not exist!\n");
+				exit(1);
+			}
+			lep_isTriggerSafenoIso_v1_isLoaded = true;
+		}
+		return *lep_isTriggerSafenoIso_v1_;
+	}
+	const vector<bool> &WWW::lep_isTriggerSafenoIso_v2()
+	{
+		if (not lep_isTriggerSafenoIso_v2_isLoaded) {
+			if (lep_isTriggerSafenoIso_v2_branch != 0) {
+				lep_isTriggerSafenoIso_v2_branch->GetEntry(index);
+			} else { 
+				printf("branch lep_isTriggerSafenoIso_v2_branch does not exist!\n");
+				exit(1);
+			}
+			lep_isTriggerSafenoIso_v2_isLoaded = true;
+		}
+		return *lep_isTriggerSafenoIso_v2_;
+	}
+	const vector<bool> &WWW::lep_isTriggerSafe_v1()
+	{
+		if (not lep_isTriggerSafe_v1_isLoaded) {
+			if (lep_isTriggerSafe_v1_branch != 0) {
+				lep_isTriggerSafe_v1_branch->GetEntry(index);
+			} else { 
+				printf("branch lep_isTriggerSafe_v1_branch does not exist!\n");
+				exit(1);
+			}
+			lep_isTriggerSafe_v1_isLoaded = true;
+		}
+		return *lep_isTriggerSafe_v1_;
+	}
+	const vector<bool> &WWW::lep_isTriggerSafe_v2()
+	{
+		if (not lep_isTriggerSafe_v2_isLoaded) {
+			if (lep_isTriggerSafe_v2_branch != 0) {
+				lep_isTriggerSafe_v2_branch->GetEntry(index);
+			} else { 
+				printf("branch lep_isTriggerSafe_v2_branch does not exist!\n");
+				exit(1);
+			}
+			lep_isTriggerSafe_v2_isLoaded = true;
+		}
+		return *lep_isTriggerSafe_v2_;
+	}
 	const vector<bool> &WWW::lep_pass_VVV_cutbased_veto()
 	{
 		if (not lep_pass_VVV_cutbased_veto_isLoaded) {
@@ -5084,6 +5345,45 @@ void WWW::LoadAllBranches()
 			lep_pass_VVV_cutbased_veto_noiso_noip_isLoaded = true;
 		}
 		return *lep_pass_VVV_cutbased_veto_noiso_noip_;
+	}
+	const vector<bool> &WWW::lep_pass_VVV_cutbased_veto_bak1()
+	{
+		if (not lep_pass_VVV_cutbased_veto_bak1_isLoaded) {
+			if (lep_pass_VVV_cutbased_veto_bak1_branch != 0) {
+				lep_pass_VVV_cutbased_veto_bak1_branch->GetEntry(index);
+			} else { 
+				printf("branch lep_pass_VVV_cutbased_veto_bak1_branch does not exist!\n");
+				exit(1);
+			}
+			lep_pass_VVV_cutbased_veto_bak1_isLoaded = true;
+		}
+		return *lep_pass_VVV_cutbased_veto_bak1_;
+	}
+	const vector<bool> &WWW::lep_pass_VVV_cutbased_veto_noiso_bak1()
+	{
+		if (not lep_pass_VVV_cutbased_veto_noiso_bak1_isLoaded) {
+			if (lep_pass_VVV_cutbased_veto_noiso_bak1_branch != 0) {
+				lep_pass_VVV_cutbased_veto_noiso_bak1_branch->GetEntry(index);
+			} else { 
+				printf("branch lep_pass_VVV_cutbased_veto_noiso_bak1_branch does not exist!\n");
+				exit(1);
+			}
+			lep_pass_VVV_cutbased_veto_noiso_bak1_isLoaded = true;
+		}
+		return *lep_pass_VVV_cutbased_veto_noiso_bak1_;
+	}
+	const vector<bool> &WWW::lep_pass_VVV_cutbased_veto_noiso_noip_bak1()
+	{
+		if (not lep_pass_VVV_cutbased_veto_noiso_noip_bak1_isLoaded) {
+			if (lep_pass_VVV_cutbased_veto_noiso_noip_bak1_branch != 0) {
+				lep_pass_VVV_cutbased_veto_noiso_noip_bak1_branch->GetEntry(index);
+			} else { 
+				printf("branch lep_pass_VVV_cutbased_veto_noiso_noip_bak1_branch does not exist!\n");
+				exit(1);
+			}
+			lep_pass_VVV_cutbased_veto_noiso_noip_bak1_isLoaded = true;
+		}
+		return *lep_pass_VVV_cutbased_veto_noiso_noip_bak1_;
 	}
 	const vector<bool> &WWW::lep_pass_VVV_cutbased_fo()
 	{
@@ -5214,6 +5514,45 @@ void WWW::LoadAllBranches()
 			nlep_VVV_cutbased_veto_noiso_noip_isLoaded = true;
 		}
 		return nlep_VVV_cutbased_veto_noiso_noip_;
+	}
+	const int &WWW::nlep_VVV_cutbased_veto_bak1()
+	{
+		if (not nlep_VVV_cutbased_veto_bak1_isLoaded) {
+			if (nlep_VVV_cutbased_veto_bak1_branch != 0) {
+				nlep_VVV_cutbased_veto_bak1_branch->GetEntry(index);
+			} else { 
+				printf("branch nlep_VVV_cutbased_veto_bak1_branch does not exist!\n");
+				exit(1);
+			}
+			nlep_VVV_cutbased_veto_bak1_isLoaded = true;
+		}
+		return nlep_VVV_cutbased_veto_bak1_;
+	}
+	const int &WWW::nlep_VVV_cutbased_veto_noiso_bak1()
+	{
+		if (not nlep_VVV_cutbased_veto_noiso_bak1_isLoaded) {
+			if (nlep_VVV_cutbased_veto_noiso_bak1_branch != 0) {
+				nlep_VVV_cutbased_veto_noiso_bak1_branch->GetEntry(index);
+			} else { 
+				printf("branch nlep_VVV_cutbased_veto_noiso_bak1_branch does not exist!\n");
+				exit(1);
+			}
+			nlep_VVV_cutbased_veto_noiso_bak1_isLoaded = true;
+		}
+		return nlep_VVV_cutbased_veto_noiso_bak1_;
+	}
+	const int &WWW::nlep_VVV_cutbased_veto_noiso_noip_bak1()
+	{
+		if (not nlep_VVV_cutbased_veto_noiso_noip_bak1_isLoaded) {
+			if (nlep_VVV_cutbased_veto_noiso_noip_bak1_branch != 0) {
+				nlep_VVV_cutbased_veto_noiso_noip_bak1_branch->GetEntry(index);
+			} else { 
+				printf("branch nlep_VVV_cutbased_veto_noiso_noip_bak1_branch does not exist!\n");
+				exit(1);
+			}
+			nlep_VVV_cutbased_veto_noiso_noip_bak1_isLoaded = true;
+		}
+		return nlep_VVV_cutbased_veto_noiso_noip_bak1_;
 	}
 	const int &WWW::nlep_VVV_cutbased_fo()
 	{
@@ -5383,6 +5722,19 @@ void WWW::LoadAllBranches()
 			lep_etaSC_isLoaded = true;
 		}
 		return *lep_etaSC_;
+	}
+	const vector<float> &WWW::lep_r9()
+	{
+		if (not lep_r9_isLoaded) {
+			if (lep_r9_branch != 0) {
+				lep_r9_branch->GetEntry(index);
+			} else { 
+				printf("branch lep_r9_branch does not exist!\n");
+				exit(1);
+			}
+			lep_r9_isLoaded = true;
+		}
+		return *lep_r9_;
 	}
 	const vector<float> &WWW::lep_dz()
 	{
@@ -5630,6 +5982,45 @@ void WWW::LoadAllBranches()
 			nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_isLoaded = true;
 		}
 		return nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_;
+	}
+	const int &WWW::nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1()
+	{
+		if (not nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_isLoaded) {
+			if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_branch != 0) {
+				nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_branch->GetEntry(index);
+			} else { 
+				printf("branch nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_branch does not exist!\n");
+				exit(1);
+			}
+			nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_isLoaded = true;
+		}
+		return nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1_;
+	}
+	const int &WWW::nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1()
+	{
+		if (not nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_isLoaded) {
+			if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_branch != 0) {
+				nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_branch->GetEntry(index);
+			} else { 
+				printf("branch nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_branch does not exist!\n");
+				exit(1);
+			}
+			nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_isLoaded = true;
+		}
+		return nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1_;
+	}
+	const int &WWW::nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1()
+	{
+		if (not nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_isLoaded) {
+			if (nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_branch != 0) {
+				nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_branch->GetEntry(index);
+			} else { 
+				printf("branch nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_branch does not exist!\n");
+				exit(1);
+			}
+			nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_isLoaded = true;
+		}
+		return nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1_;
 	}
 	const int &WWW::nisoTrack_mt2_cleaned_VVV_cutbased_fo()
 	{
@@ -8556,6 +8947,175 @@ void WWW::LoadAllBranches()
 		}
 		return *weightsf_lepip_FS_;
 	}
+	const double &	WWW::weight_rn_r1_n1()
+	{
+		if (not weight_rn_r1_n1_isLoaded) {
+			if (weight_rn_r1_n1_branch != 0) {
+				weight_rn_r1_n1_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_rn_r1_n1_branch does not exist!\n");
+				exit(1);
+			}
+			weight_rn_r1_n1_isLoaded = true;
+		}
+		return weight_rn_r1_n1_;
+	}
+	const double &	WWW::weight_rn_r1_n2()
+	{
+		if (not weight_rn_r1_n2_isLoaded) {
+			if (weight_rn_r1_n2_branch != 0) {
+				weight_rn_r1_n2_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_rn_r1_n2_branch does not exist!\n");
+				exit(1);
+			}
+			weight_rn_r1_n2_isLoaded = true;
+		}
+		return weight_rn_r1_n2_;
+	}
+	const double &	WWW::weight_rn_r1_np05()
+	{
+		if (not weight_rn_r1_np05_isLoaded) {
+			if (weight_rn_r1_np05_branch != 0) {
+				weight_rn_r1_np05_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_rn_r1_np05_branch does not exist!\n");
+				exit(1);
+			}
+			weight_rn_r1_np05_isLoaded = true;
+		}
+		return weight_rn_r1_np05_;
+	}
+	const double &	WWW::weight_rn_r2_n1()
+	{
+		if (not weight_rn_r2_n1_isLoaded) {
+			if (weight_rn_r2_n1_branch != 0) {
+				weight_rn_r2_n1_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_rn_r2_n1_branch does not exist!\n");
+				exit(1);
+			}
+			weight_rn_r2_n1_isLoaded = true;
+		}
+		return weight_rn_r2_n1_;
+	}
+	const double &	WWW::weight_rn_r2_n2()
+	{
+		if (not weight_rn_r2_n2_isLoaded) {
+			if (weight_rn_r2_n2_branch != 0) {
+				weight_rn_r2_n2_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_rn_r2_n2_branch does not exist!\n");
+				exit(1);
+			}
+			weight_rn_r2_n2_isLoaded = true;
+		}
+		return weight_rn_r2_n2_;
+	}
+	const double &	WWW::weight_rn_r2_n0p5()
+	{
+		if (not weight_rn_r2_n0p5_isLoaded) {
+			if (weight_rn_r2_n0p5_branch != 0) {
+				weight_rn_r2_n0p5_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_rn_r2_n0p5_branch does not exist!\n");
+				exit(1);
+			}
+			weight_rn_r2_n0p5_isLoaded = true;
+		}
+		return weight_rn_r2_n0p5_;
+	}
+	const double &	WWW::weight_rn_r0p5_n1()
+	{
+		if (not weight_rn_r0p5_n1_isLoaded) {
+			if (weight_rn_r0p5_n1_branch != 0) {
+				weight_rn_r0p5_n1_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_rn_r0p5_n1_branch does not exist!\n");
+				exit(1);
+			}
+			weight_rn_r0p5_n1_isLoaded = true;
+		}
+		return weight_rn_r0p5_n1_;
+	}
+	const double &	WWW::weight_rn_r0p5_n2()
+	{
+		if (not weight_rn_r0p5_n2_isLoaded) {
+			if (weight_rn_r0p5_n2_branch != 0) {
+				weight_rn_r0p5_n2_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_rn_r0p5_n2_branch does not exist!\n");
+				exit(1);
+			}
+			weight_rn_r0p5_n2_isLoaded = true;
+		}
+		return weight_rn_r0p5_n2_;
+	}
+	const double &	WWW::weight_rn_r0p5_n0p5()
+	{
+		if (not weight_rn_r0p5_n0p5_isLoaded) {
+			if (weight_rn_r0p5_n0p5_branch != 0) {
+				weight_rn_r0p5_n0p5_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_rn_r0p5_n0p5_branch does not exist!\n");
+				exit(1);
+			}
+			weight_rn_r0p5_n0p5_isLoaded = true;
+		}
+		return weight_rn_r0p5_n0p5_;
+	}
+	const double &	WWW::weight_pdf_up()
+	{
+		if (not weight_pdf_up_isLoaded) {
+			if (weight_pdf_up_branch != 0) {
+				weight_pdf_up_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_pdf_up_branch does not exist!\n");
+				exit(1);
+			}
+			weight_pdf_up_isLoaded = true;
+		}
+		return weight_pdf_up_;
+	}
+	const double &	WWW::weight_pdf_down()
+	{
+		if (not weight_pdf_down_isLoaded) {
+			if (weight_pdf_down_branch != 0) {
+				weight_pdf_down_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_pdf_down_branch does not exist!\n");
+				exit(1);
+			}
+			weight_pdf_down_isLoaded = true;
+		}
+		return weight_pdf_down_;
+	}
+	const double &	WWW::weight_alphas_down()
+	{
+		if (not weight_alphas_down_isLoaded) {
+			if (weight_alphas_down_branch != 0) {
+				weight_alphas_down_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_alphas_down_branch does not exist!\n");
+				exit(1);
+			}
+			weight_alphas_down_isLoaded = true;
+		}
+		return weight_alphas_down_;
+	}
+	const double &	WWW::weight_alphas_up()
+	{
+		if (not weight_alphas_up_isLoaded) {
+			if (weight_alphas_up_branch != 0) {
+				weight_alphas_up_branch->GetEntry(index);
+			} else { 
+				printf("branch weight_alphas_up_branch does not exist!\n");
+				exit(1);
+			}
+			weight_alphas_up_isLoaded = true;
+		}
+		return weight_alphas_up_;
+	}
 
   void WWW::progress( int nEventsTotal, int nEventsChain ){
     int period = 1000;
@@ -8591,6 +9151,7 @@ namespace WWW_babies {
 	const vector<TString> &evt_dataset() { return phys.evt_dataset(); }
 	const float &puWeight() { return phys.puWeight(); }
 	const int &nVert() { return phys.nVert(); }
+	const int &firstgoodvertex() { return phys.firstgoodvertex(); }
 	const int &nTrueInt() { return phys.nTrueInt(); }
 	const float &rho() { return phys.rho(); }
 	const float &rho25() { return phys.rho25(); }
@@ -8735,9 +9296,16 @@ namespace WWW_babies {
 	const vector<double> &lep_miniRelIsoCMS3_EA() { return phys.lep_miniRelIsoCMS3_EA(); }
 	const vector<double> &lep_miniRelIsoCMS3_EAv2() { return phys.lep_miniRelIsoCMS3_EAv2(); }
 	const vector<double> &lep_miniRelIsoCMS3_DB() { return phys.lep_miniRelIsoCMS3_DB(); }
+	const vector<bool> &lep_isTriggerSafenoIso_v1() { return phys.lep_isTriggerSafenoIso_v1(); }
+	const vector<bool> &lep_isTriggerSafenoIso_v2() { return phys.lep_isTriggerSafenoIso_v2(); }
+	const vector<bool> &lep_isTriggerSafe_v1() { return phys.lep_isTriggerSafe_v1(); }
+	const vector<bool> &lep_isTriggerSafe_v2() { return phys.lep_isTriggerSafe_v2(); }
 	const vector<bool> &lep_pass_VVV_cutbased_veto() { return phys.lep_pass_VVV_cutbased_veto(); }
 	const vector<bool> &lep_pass_VVV_cutbased_veto_noiso() { return phys.lep_pass_VVV_cutbased_veto_noiso(); }
 	const vector<bool> &lep_pass_VVV_cutbased_veto_noiso_noip() { return phys.lep_pass_VVV_cutbased_veto_noiso_noip(); }
+	const vector<bool> &lep_pass_VVV_cutbased_veto_bak1() { return phys.lep_pass_VVV_cutbased_veto_bak1(); }
+	const vector<bool> &lep_pass_VVV_cutbased_veto_noiso_bak1() { return phys.lep_pass_VVV_cutbased_veto_noiso_bak1(); }
+	const vector<bool> &lep_pass_VVV_cutbased_veto_noiso_noip_bak1() { return phys.lep_pass_VVV_cutbased_veto_noiso_noip_bak1(); }
 	const vector<bool> &lep_pass_VVV_cutbased_fo() { return phys.lep_pass_VVV_cutbased_fo(); }
 	const vector<bool> &lep_pass_VVV_cutbased_fo_noiso() { return phys.lep_pass_VVV_cutbased_fo_noiso(); }
 	const vector<bool> &lep_pass_VVV_cutbased_tight_noiso() { return phys.lep_pass_VVV_cutbased_tight_noiso(); }
@@ -8748,6 +9316,9 @@ namespace WWW_babies {
 	const int &nlep_VVV_cutbased_veto() { return phys.nlep_VVV_cutbased_veto(); }
 	const int &nlep_VVV_cutbased_veto_noiso() { return phys.nlep_VVV_cutbased_veto_noiso(); }
 	const int &nlep_VVV_cutbased_veto_noiso_noip() { return phys.nlep_VVV_cutbased_veto_noiso_noip(); }
+	const int &nlep_VVV_cutbased_veto_bak1() { return phys.nlep_VVV_cutbased_veto_bak1(); }
+	const int &nlep_VVV_cutbased_veto_noiso_bak1() { return phys.nlep_VVV_cutbased_veto_noiso_bak1(); }
+	const int &nlep_VVV_cutbased_veto_noiso_noip_bak1() { return phys.nlep_VVV_cutbased_veto_noiso_noip_bak1(); }
 	const int &nlep_VVV_cutbased_fo() { return phys.nlep_VVV_cutbased_fo(); }
 	const int &nlep_VVV_cutbased_fo_noiso() { return phys.nlep_VVV_cutbased_fo_noiso(); }
 	const int &nlep_VVV_cutbased_tight_noiso() { return phys.nlep_VVV_cutbased_tight_noiso(); }
@@ -8761,6 +9332,7 @@ namespace WWW_babies {
 	const vector<float> &lep_ip3d() { return phys.lep_ip3d(); }
 	const vector<float> &lep_ip3derr() { return phys.lep_ip3derr(); }
 	const vector<float> &lep_etaSC() { return phys.lep_etaSC(); }
+	const vector<float> &lep_r9() { return phys.lep_r9(); }
 	const vector<float> &lep_dz() { return phys.lep_dz(); }
 	const vector<int> &lep_tightId() { return phys.lep_tightId(); }
 	const vector<int> &lep_mcMatchId() { return phys.lep_mcMatchId(); }
@@ -8780,6 +9352,9 @@ namespace WWW_babies {
 	const int &nisoTrack_mt2_cleaned_VVV_cutbased_veto() { return phys.nisoTrack_mt2_cleaned_VVV_cutbased_veto(); }
 	const int &nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso() { return phys.nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso(); }
 	const int &nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip() { return phys.nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip(); }
+	const int &nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1() { return phys.nisoTrack_mt2_cleaned_VVV_cutbased_veto_bak1(); }
+	const int &nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1() { return phys.nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_bak1(); }
+	const int &nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1() { return phys.nisoTrack_mt2_cleaned_VVV_cutbased_veto_noiso_noip_bak1(); }
 	const int &nisoTrack_mt2_cleaned_VVV_cutbased_fo() { return phys.nisoTrack_mt2_cleaned_VVV_cutbased_fo(); }
 	const int &nisoTrack_mt2_cleaned_VVV_cutbased_fo_noiso() { return phys.nisoTrack_mt2_cleaned_VVV_cutbased_fo_noiso(); }
 	const int &nisoTrack_mt2_cleaned_VVV_cutbased_tight_noiso() { return phys.nisoTrack_mt2_cleaned_VVV_cutbased_tight_noiso(); }
@@ -9005,4 +9580,17 @@ namespace WWW_babies {
 	const vector<float> &weightsf_lepid_FS() { return phys.weightsf_lepid_FS(); }
 	const vector<float> &weightsf_lepiso_FS() { return phys.weightsf_lepiso_FS(); }
 	const vector<float> &weightsf_lepip_FS() { return phys.weightsf_lepip_FS(); }
+	const double &weight_rn_r1_n1() { return phys.weight_rn_r1_n1(); }
+	const double &weight_rn_r1_n2() { return phys.weight_rn_r1_n2(); }
+	const double &weight_rn_r1_np05() { return phys.weight_rn_r1_np05(); }
+	const double &weight_rn_r2_n1() { return phys.weight_rn_r2_n1(); }
+	const double &weight_rn_r2_n2() { return phys.weight_rn_r2_n2(); }
+	const double &weight_rn_r2_n0p5() { return phys.weight_rn_r2_n0p5(); }
+	const double &weight_rn_r0p5_n1() { return phys.weight_rn_r0p5_n1(); }
+	const double &weight_rn_r0p5_n2() { return phys.weight_rn_r0p5_n2(); }
+	const double &weight_rn_r0p5_n0p5() { return phys.weight_rn_r0p5_n0p5(); }
+	const double &weight_pdf_up() { return phys.weight_pdf_up(); }
+	const double &weight_pdf_down() { return phys.weight_pdf_down(); }
+	const double &weight_alphas_down() { return phys.weight_alphas_down(); }
+	const double &weight_alphas_up() { return phys.weight_alphas_up(); }
 }

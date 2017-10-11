@@ -21,6 +21,8 @@ DEFAULT::lep2_pt_min=30
 DEFAULT::3chargeagree=true
 
 DEFAULT::ip3d_max=0.015
+DEFAULT::Tight_isTriggerSafe=v2
+DEFAULT::Loose_isTriggerSafe=v1
 
 DEFAULT::jet_pt_min=30
 DEFAULT::Mll_min=40
