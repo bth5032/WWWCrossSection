@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
-"""Plots and outputs the rate of predicting BG samples from Loose/Tight into Tight/Tight vs. QCD"""
+"""Creates Histogram for the Fake Rate Clsoure Test.
+
+Before this script is run, the configs in FRClosure/<Conf>/ need to be made...
+This script will output new histograms in the FRClosure/<Conf>/Combined/. 
+One with the Fake rate prediction called 'fakes.root' and one for each sample."""
 
 import argparse, os, sys, math, array, ctypes, itertools
 import ROOT as r
@@ -8,44 +12,12 @@ r.gROOT.SetBatch(True)
 
 parser = argparse.ArgumentParser(add_help=False)
 
-parser.add_argument("-s", "--study_dir", help="The config directory name in FRClosure, e.g. LooseIso", type=str, default="LooseIso")
-parser.add_argument("-p", "--pt_bins", help="Choose Pt bins for the study, ex: [10, 15, 20, 25, 30, 35, 50, 120]", type=str, default="[10, 15, 20, 25, 30, 35, 50, 120]")
-parser.add_argument("-e", "--eta_bins", help="Choose Eta bins for the study, ex: [0, 1.2, 2.1, 2.4]", type=str, default="[0, 0.8, 1.479, 2.5]")
-parser.add_argument("--txt", help="Print table in txt format", action="store_true")
-
-parser.add_argument("--ttbar_dilep", help="Use TTBar to dilepton sample", action="store_true")
-parser.add_argument("--ttbar_1lep", help="Use TTBar to single lepton samples", action="store_true")
-parser.add_argument("--dy", help="Use DY sample", action="store_true")
-parser.add_argument("--wz", help="Use WZ sample", action="store_true")
-parser.add_argument("--ww", help="Use WW sample", action="store_true")
-parser.add_argument("--zz", help="Use ZZ sample", action="store_true")
-parser.add_argument("--vvv", help="Use VVV sample", action="store_true")
-parser.add_argument("--wjets", help="Use W+Jets sample", action="store_true")
-parser.add_argument("--ttv", help="Use TTV sample", action="store_true")
-parser.add_argument("--singletop", help="Use TTV sample", action="store_true")
-parser.add_argument("--zh", help="Use ZH sample", action="store_true")
-parser.add_argument("--www", help="Use WWW sample", action="store_true")
-parser.add_argument("--wh", help="Use WH sample", action="store_true")
-
-parser.add_argument("-l", "--lepton", help="Choose which lepton is used to select the pt bin. 1 for leading, 2 for subleading, -1 for trailing.", type=int, default=-1)
-
+parser.add_argument("-s", "--study_dir", help="The config directory name in FRClosure, e.g. Btag", type=str, default="Btag")
+parser.add_argument("-c", "--closure_error", help="Set the closure error on the fakerate method", type=float, default=0.3)
+parser.add_argument("-r", "--signal_regions", help="Choose SS, 3lep, or all signal regions", type=str, default="SS")
 parser.add_argument("-u", "--usage", help="Print help message and quit", action="store_true")
 
 args=parser.parse_args()
-
-#SRs = ["2lepSS", "2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
-SRs = ["2lepSS", "2lepSSEE","2lepSSEMu","2lepSSMuMu"]
-pretty_SR_names = {"2lepSS": "SS",
-"2lepSSEE": "SSee",
-"2lepSSEMu": "SSe$\mu$",
-"2lepSSMuMu": "SS$\mu\mu$",
-"3lep_0SFOS": "0SFOS",
-"3lep_1SFOS": "1SFOS",
-"3lep_2SFOS": "2SFOS"}
-lepton=-1
-
-base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRClosure/"
-base_plot_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRClosure/"
 
 if (args.usage):
   parser.print_help()
@@ -55,255 +27,227 @@ def err_ratio(num, den, Dnum, Dden):
   """Returns the 1 sigma on a ratio"""
   return abs((float(den)*Dnum - float(num)*Dden)/(den*den))
 
-def getCell(nTight, nLoose, DnTight, DnLoose):
-  """Returns (fr, Dfr) for the numerator and denomenator"""
-  try:
-    return (nTight, DnTight, nLoose, DnLoose,float(nTight)/nLoose, err_ratio(nTight, nLoose, DnTight, DnLoose))
-  except Exception as e:
-    #print(e)
-    return (nTight, DnTight, nLoose, DnLoose, -1, -1)
+def frErr(epsilon, Depsilon):
+  """Computes the fake rate and error from the number in Phil's Hist, which is NTight/(NLoose+NTight)"""
+  fr = epsilon/float(1-epsilon)
+  Dfr = Depsilon*(1/float(1-epsilon))*(1+fr)
+  return (fr, Dfr)
 
-def parsePtBins(bin_string):
-  """Makes a list of ints from a string of the form [x0,x1,x2,...xN]"""
-  s_bins = bin_string[1:-1].split(',')
-  bins = []
-  for s in s_bins:
-    bins.append(float(s))
-  if (bins[-1] < 6000):
-    bins.append(6001.0)
-  return bins
-
-def parseEtaBins(bin_string):
-  """Makes a list of ints from a string of the form [x0,x1,x2,...xN]"""
-  if bin_string == "muon":
-    return [0, 1.2, 2.1, 2.4]
-  elif bin_string == "electron":
-    return [0, 0.8, 1.479, 2.5]
-
-  s_bins = bin_string[1:-1].split(',')
-  bins = []
-  for s in s_bins:
-    bins.append(float(s))
-  if (bins[-1] < 2.4):
-    bins.append(2.4)
-  return bins
-
-def makePlots(bg_t, bg_l, qcd_t, qcd_l, pt_bins, sr):
-  """Plots the QCD and BG stack as a function of the pt bins"""
-  canvas=r.TCanvas("c_%s" % sr,"", 2000, 2000)
-  canvas.cd()
-
-  bg=bg_t.Clone("stack_%s" % sr)
-  bg.Divide(bg_l)
-
-  qcd=qcd_t.Clone("qcd_%s" % sr)
-  qcd.Divide(qcd_l)
-
-  pt_b_array = array.array('d', [float(a) for a in pt_bins])
-
-  qcd = qcd.Rebin(len(pt_bins)-1,"qcd_rebinned_%s" % sr,  pt_b_array)
-  bg = bg.Rebin(len(pt_bins)-1,"bg_rebinned_%s" % sr,  pt_b_array)
-
-  bg.SetFillColor(r.kBlue)
-  bg.Draw("HISTE")
-  qcd.Draw("same")
-
-  canvas.SaveAs("%s/%s.png" % (base_plot_path, sr))
-  canvas.SaveAs("%s/%s.pdf" % (base_plot_path, sr)) 
-
-def PrintSRTable(yields, pt_bins, eta_bins, latex):
-  """Prints the yeilds tables and make plots"""
-  print(yields)
-  print("Using Config: %s" % args.study_dir)
-  print("\\begin{table}[ht!]")
-  print("\\begin{center}")
-  head="\\begin{tabular}{l|l"
-  title = "Signal Region & Source "
-  for i in xrange(len(pt_bins) - 1):
-    title+=" & %0.0f - %0.0f " % (pt_bins[i], pt_bins[i+1])
-    head+="|c"
-  title+= " \\\\ \\hline"
-  head+="}"
-  print(head)
-  print(title)
+def buildIntervals(pt_bins, eta_bins):
+  """Returns all intervals in pt and eta bins"""
+  pt_intervals = [(pt_bins[i], pt_bins[i+1] - 0.001) for i in xrange(0, len(pt_bins) - 1) ]
+  eta_intervals = [(eta_bins[i], eta_bins[i+1] - 0.001) for i in xrange(0, len(eta_bins) - 1) ]
+  return [(i[0][0], i[0][1], i[1][0], i[1][1]) for i in itertools.product(pt_intervals, eta_intervals)]
   
-  for sr in SRs:
-    for j in xrange(len(eta_bins) - 1):
-      row = "%s $(\eta \\in [%f,%f))$ &  BGs " % (pretty_SR_names[sr], eta_bins[j], eta_bins[j+1])
-      for i in xrange(len(pt_bins) - 1):
-        row += " & $\\frac{%0.2f \pm %0.2f}{%0.2f \pm %0.2f} (%0.2f \pm %0.2f)$ " % getCell(yields[sr]["bg_t"]["%f_%f" % (pt_bins[i], eta_bins[j])], yields[sr]["bg_l"]["%f_%f" % (pt_bins[i], eta_bins[j])], yields[sr]["bg_t_unc"]["%f_%f" % (pt_bins[i], eta_bins[j])], yields[sr]["bg_l_unc"]["%f_%f" % (pt_bins[i], eta_bins[j])])
-      row+= " \\\\"
-      print(row)
+def getYield(hist, pt_bins, eta_bins, h_fr):
+  """Computes the number of objects in the pt/eta bins and applies the FR given with the error."""
 
-    #makePlots(yields[sr]["bg_sum_t"], yields[sr]["bg_sum_l"], yields[sr]["h_qcd_t"], yields[sr]["h_qcd_l"], pt_bins, sr)
+  cv = 0
+  dev = 0
 
-  print("\\end{tabular}")
-  print("\\end{center}")
-  print("\\end{table}")
-
-def getYieldsFromSample(hist_loc, SR, pt_bins, eta_bins, sample):
-  """returns a tuple of lists ([Tight_bin1, ..., Tight_binN], [Loose_bin1, ..., Loose_binN]) for the number of events in"""
-  f = r.TFile(hist_loc)
-
-  if lepton == 1:
-    h_tight_pteta = f.Get("tight_l1pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
-    h_loose_pteta = f.Get("loose_l1pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
-  elif lepton == 2:
-    h_tight_pteta = f.Get("tight_l2pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
-    h_loose_pteta = f.Get("loose_l2pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
-  else:
-    if("2lep" in SR):
-      h_tight_pteta = f.Get("tight_l2pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
-      h_loose_pteta = f.Get("loose_l2pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
-    else:
-      h_tight_pteta = f.Get("tight_l3pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
-      h_loose_pteta = f.Get("loose_l3pteta").Clone("tight_pteta_%s_%s" % (SR, sample))
-
-  h_tight_pteta.SetDirectory(0)
-  h_loose_pteta.SetDirectory(0)
-
-  t = {}
-  t_unc = {}
-  l = {}
-  l_unc = {}
-
-  #loop over all pt intervals
-  for i in xrange(len(pt_bins) - 1):
-    for j in xrange(len(eta_bins) - 1):
-      pt_low = h_tight_pteta.GetXaxis().FindBin(pt_bins[i])
-      pt_high = h_tight_pteta.GetXaxis().FindBin(pt_bins[i+1]-0.0001)
-      eta_low = h_tight_pteta.GetYaxis().FindBin(eta_bins[j])
-      eta_high = h_tight_pteta.GetYaxis().FindBin(eta_bins[j+1]-.00001)
-      bin_string = "%f_%f" % (pt_bins[i], eta_bins[j])
-
-      t_unc_=r.Double()
-      t_=h_tight_pteta.IntegralAndError(pt_low, pt_high, eta_low, eta_high, t_unc_)
-
-      l_unc_=r.Double()
-      l_=h_loose_pteta.IntegralAndError(pt_low, pt_high, eta_low, eta_high, l_unc_)
-      
-      t[bin_string] = t_
-      t_unc[bin_string] = t_unc_
-      l[bin_string] = l_
-      l_unc[bin_string] = l_unc_
-
-  print("Returning for %s from %s: tight=%s+/-%s, loose=%s+/-%s" % (sample, hist_loc, t, t_unc, l, l_unc))
-
-  return (t, l, t_unc, l_unc, h_tight_pteta, h_loose_pteta)
-
-def getCombinedYields(samples, pt_bins, eta_bins):
-  """Constructs and returns the yields dictionary used in PrintTable. Goes through each SR and adds the yields for each sample in that SR and organizes them in the dict."""
-
-  yields = {}
-  #bg_stack_t = r.THStack("bg_stack_tight", "Background Stack for Tight Events")
-  #bg_stack_l = r.THStack("bg_stack_loose", "Background Stack for Loose Events")
-
-  for sr in SRs:
-    t = {}
-    l = {}
-    t_unc = {}
-    l_unc = {}
+  err = r.Double()
+  for pt_low, pt_high, eta_low, eta_high in buildIntervals(pt_bins, eta_bins):
+    x1=hist.GetXaxis().FindBin(pt_low)
+    x2=hist.GetXaxis().FindBin(pt_high)
+    y1=hist.GetYaxis().FindBin(eta_low)
+    y2=hist.GetYaxis().FindBin(eta_high)
+    #print(x1,x2,y1,y2)
+    #print(pt_low, pt_high, eta_low, eta_high)
+    y = hist.IntegralAndError(x1, x2, y1, y2, err)
+    #print("Count in (pt, eta) in (%0.2f, %0.2f, %0.2f, %0.2f) = %0.2f +/- %0.2f" % (pt_low, pt_high, eta_low, eta_high, y, err) )
     
-    for i in xrange(len(pt_bins) - 1):
-      for j in xrange(len(eta_bins) -1):
-        t["%f_%f" % (pt_bins[i], eta_bins[j])] = 0
-        l["%f_%f" % (pt_bins[i], eta_bins[j])] = 0
-        t_unc["%f_%f" % (pt_bins[i], eta_bins[j])] = 0
-        l_unc["%f_%f" % (pt_bins[i], eta_bins[j])] = 0
-      
-    for s in samples:
-      t_, l_, t_unc_, l_unc_, h_tight_pt, h_loose_pt = getYieldsFromSample(base_hists_path+sr+"/"+s+".root", sr, pt_bins, eta_bins, s)
-      #print("integral of thing %f" % h_tight_pt.Integral())
-      for i in xrange(len(pt_bins) - 1):
-        for j in xrange(len(eta_bins) -1):
-          bin_string = "%f_%f" % (pt_bins[i], eta_bins[j])
-          t[bin_string] += t_[bin_string]
-          l[bin_string] += l_[bin_string]
-          t_unc[bin_string] += t_unc_[bin_string]*t_unc_[bin_string]
-          l_unc[bin_string] += l_unc_[bin_string]*l_unc_[bin_string]
-          #bg_stack_t.Add(h_tight_pt)
-          #bg_stack_l.Add(h_loose_pt)
-          #if "bg_sum_t" in locals():
-          #  bg_sum_t.Add(h_tight_pt)
-          #  bg_sum_l.Add(h_loose_pt)
-          #else:
-          #  bg_sum_t = h_tight_pt.Clone("bg_sum_t_%s" % sr)
-          #  bg_sum_t.SetDirectory(0)
-          #  bg_sum_l = h_loose_pt.Clone("bg_sum_l_%s" % sr)
-          #  bg_sum_l.SetDirectory(0)
+    #Get FR from Histogram
+    epsilon_x = h_fr.GetXaxis().FindBin(pt_low)
+    epsilon_y = h_fr.GetYaxis().FindBin(eta_low)
+    epsilon = h_fr.GetBinContent(fr_x, fr_y)
+    epsilon_err = h_fr.GetBinError(fr_x, fr_y)
 
-      for i in xrange(len(pt_bins) - 1):
-        for j in xrange(len(eta_bins) -1):
-          bin_string = "%f_%f" % (pt_bins[i], eta_bins[j])
-          t_unc[bin_string] = math.sqrt(t_unc[bin_string])
-          l_unc[bin_string] = math.sqrt(l_unc[bin_string])
+    fr, fr_err = frErr(epsilon, ep)
 
-    #Get numbers for QCD as well
-    #qcd_t, qcd_l, qcd_t_unc, qcd_l_unc, h_qcd_t, h_qcd_l = getYieldsFromSample(base_hists_path+sr+"/QCD.root", sr, pt_bins, "QCD")
+    #print("Got fake rate: %0.2f +/ %0.2f" % (fr, fr_err))
 
-    #yields[sr] = {"bg_t": t, "bg_l": l, "bg_t_unc": t_unc, "bg_l_unc": l_unc, "qcd_t": qcd_t, "qcd_l": qcd_l, "qcd_t_unc": qcd_t_unc, "qcd_l_unc": qcd_l_unc, "bg_stack_t": bg_stack_t, "bg_stack_l": bg_stack_l, "bg_sum_t": bg_sum_t, "bg_sum_l": bg_sum_l, "h_qcd_t": h_qcd_t, "h_qcd_l": h_qcd_l}
-    yields[sr] = {"bg_t": t, "bg_l": l, "bg_t_unc": t_unc, "bg_l_unc": l_unc}
+    #print("Bin count is: %0.2f +/- %0.2f" % (fr*y, math.sqrt( (fr*err)**2 + (y*fr_err)**2 ) ) )
+    yield_bin = fr*y
+    err_bin = (fr*err)**2 + (y*fr_err)**2
+    cv+=yield_bin
+    dev += err_bin
 
-  return yields
+  return (cv, math.sqrt(dev))
+  
+def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path, signal_region):
+  """Writes out the completed histogram for a list of sample files for the Fake Rate in that region."""
+  fr_file = r.TFile(FR_Hist_path)
+  h_m_FRs = fr_file.Get("muon_fakerate_conecorrpt_v_eta").Clone("h_m_FRs")
+  h_e_FRs = fr_file.Get("elec_fakerate_conecorrpt_v_eta").Clone("h_e_FRs")
+
+  output_dir = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRClosure/%s" % args.study_dir
+
+  total_count = 0
+  total_error = 0
+
+  #Loop over samples in a particlar signal region
+  for s_file in sample_files:
+    tfile = r.TFile(s_file)
+    s = s_file[s_file.rfind('/')+1:s_file.index(".root")] #extract sample name from filename
+    
+    h_loose_e = tfile.Get("loose_loose_pteta_e").Clone("h_loose_e_%s" % s)
+    h_loose_m = tfile.Get("loose_loose_pteta_m").Clone("h_loose_m_%s" % s)
+
+    num_e, err_e = getYield(h_loose_e, pt_bins, eta_bins_m, h_e_FRs)
+    num_m, err_m = getYield(h_loose_m, pt_bins, eta_bins_m, h_m_FRs)
+
+    print("count for %s: %0.2f +/- %0.2f " % (s, num_e+num_m, math.sqrt(err_e**2 + err_m**2)) )
+    total_count += num_e+num_m
+    total_error += err_e**2 + err_m**2
+
+  print("Total Fake Count (plus closure error): %0.2f +/- %0.2f (%0.2f)" % (total_count, math.sqrt(total_error), math.sqrt(total_error+(total_count*args.closure_error)**2) ) ) 
+  total_error += (total_count*args.closure_error)**2
+  total_error = math.sqrt(total_error)
+
+
+  outfile = r.TFile("%s/%s/Fakes.root" % (output_dir, signal_region), "RECREATE" )
+  outfile.cd()
+  h_fake_count = r.TH1D("weighted_count", "Weighted Count of Events", 4, 0, 4)
+  h_fake_count.SetDirectory(0)
+  h_fake_count.SetBinContent(2, total_count)
+  h_fake_count.SetBinError(2, total_error)
+  h_fake_count.Write()
+  print("Wrote Total Fake Count: %0.2f +/- %0.2f" % (total_count, total_error) )
+  outfile.Close()
+
+def moveIntoCombined(hist_path, SRs):
+  """Basically a fancy HADD just for the weighted_counts hist in the list of samples given. 
+  Makes a histogram for each sample where the bins are the total counts in each of the signal reigons sent.
+  Outputs the final hists into a directory called /Combined/ in the same config"""
+  
+  #Check if output path for hist exists
+  if (not os.path.isdir(hist_path)):
+    os.system("mkdir -p %s" % hist_path)
+
+  samples = ["TTBar1l", "WJets", "DY", "Fakes"]
+  pretty_SR_names = {"2lepSSEE": "ee", "2lepSSEMu":  "e #mu", "2lepSSMuMu": "#mu #mu", "3lep_0SFOS": "0SFOS", "3lep_1SFOS": "1SFOS", "3lep_2SFOS": "2SFOS"}
+  latex_SR_names = {"2lepSSEE": "$ee$", "2lepSSEMu":  "$e \mu$", "2lepSSMuMu": "$\mu \mu$", "3lep_0SFOS": "0SFOS", "3lep_1SFOS": "1SFOS", "3lep_2SFOS": "2SFOS"}
+  tex_dict = {}
+  
+  #Loop over samples, combining the 'weighted count' hist into a new hist in the /Combined/ directory
+  for sample in samples:
+    outfile = r.TFile("%s/Combined/%s.root" % (hist_path, sample), "RECREATE")
+    outfile.cd()
+    h_signal_count = r.TH1D("weighted_count", "Weighted Count of Events", 0, 0, 0)
+    h_signal_count.SetDirectory(0)
+    tex_dict[sample] = {}
+    
+    for sr in SRs:
+      #Fill in an entry in the h_signal_count histogram for each signal region, label the x axis with the name of the SR.
+      sample_file_in_sr = r.TFile("%s/%s/%s.root" % (hist_path, sr, sample), "r")
+      sample_count = sample_file_in_sr.Get("weighted_count").Clone("weighted_count_%s_%s" % (sr, sample) )
+      bin_num = h_signal_count.Fill(pretty_SR_names[sr], sample_count.GetBinContent(2))
+      h_signal_count.SetBinError(bin_num, sample_count.GetBinError(2))
+      tex_dict[sample][latex_SR_names[sr]] = {"cv": sample_count.GetBinContent(2), "unc": sample_count.GetBinError(1)}
+    
+    outfile.cd()
+    h_signal_count.Write()
+    outfile.Close()
+
+  printLatexTable(tex_dict)
+
+def printLatexTable(tex_dict):
+  outfile = open("outputs/frhists_%s.tex" % args.study_dir, "w+")
+  pretty_sample_names = {"WZ":"WZ", "WW":"WW", "ZZ":"ZZ", "TTBar2l":"TTBar $\\to$ 2lep", "DY":"DY", "WWW":"WWW", "Wh":"WH", "VVV":"VVV", "TTV":"TTV", "SingleTop":"SingleTop", "Other":"ZH", "Data":"Data", "Fakes":"Fakes"}
+
+  if args.signal_regions == "SS":
+    SRs = ["$ee$", "$e \mu$", "$\mu \mu$"]
+  elif args.signal_regions == "3lep":
+    SRs = ["0SFOS", "1SFOS", "2SFOS"]
+  else:
+    SRs = ["$ee$", "$e \mu$", "$\mu \mu$", "0SFOS", "1SFOS", "2SFOS"]
+
+  line1 = tex_dict[tex_dict.keys()[0]]
+  pred_count = {}
+
+  outfile.write("\\begin{table}[ht!]\n")
+  outfile.write("\\begin{center}\n")
+  outfile.write("\\begin{tabular}{l"+"|c"*len(line1.keys())+"}\n")
+  
+  header="Sample  "
+  for sr in SRs:
+    header+="& %s " % sr
+    pred_count[sr] = {"cv": 0, "unc": 0}
+  header+="\\\\ \\hline\n"
+
+  outfile.write(header)
+
+  ##==============
+  ## Predictions
+  ##==============
+  for sample in tex_dict.keys():
+    if sample == "Data":
+      continue
+    line = "%s" % pretty_sample_names[sample]
+    for sr in SRs:
+      line+=" & $%0.2f \\pm %0.2f$" % (tex_dict[sample][sr]["cv"], tex_dict[sample][sr]["unc"])
+      pred_count[sr]["cv"]+=tex_dict[sample][sr]["cv"]
+      pred_count[sr]["unc"]+=tex_dict[sample][sr]["unc"]**2
+    line+= "\\\\ \n"
+    outfile.write(line)
+  
+  outfile.write("\\hline \n")
+
+  ##==============
+  ## Prediction Sum
+  ##==============
+  line = "Sum "
+  for sr in SRs:
+    line+=" & $%0.2f \\pm %0.2f$" % (pred_count[sr]["cv"], math.sqrt(pred_count[sr]["unc"]))
+  line+= "\\\\ \n"
+  outfile.write(line)
+
+  ##==============
+  ## Predictions
+  ##==============
+  sample="Data"
+  line = "%s" % sample
+  for sr in SRs:
+    line+=" & $%0.2f \\pm %0.2f$" % (tex_dict[sample][sr]["cv"], tex_dict[sample][sr]["unc"])
+  line+= "\\\\ \n"
+  
+  outfile.write(line)
+
+  outfile.write("\\end{tabular} \n")
+  outfile.write("\\end{center} \n")
+  outfile.write("\\end{table} \n")
+
+def printPlotMakerCommand(prediction_hist_path):
+  conf_dir = "configs/%s/Combined" % prediction_hist_path[prediction_hist_path.find("WWWCrossSection_Hists")+22:]
+  print("makeAllForDir %s plots" % conf_dir)
 
 def main():
-  samples = []
-  latex=True
-  global base_hists_path, base_plot_path
-
-  if (args.ttbar_dilep or args.ttbar_1lep or args.dy or args.wz or args.ww or args.zz or args.vvv or args.wjets or args.ttv or args.singletop or args.zh or args.www or args.wh):
-    #Asking for specific samples
-    #Signal
-    if (args.www):
-      samples.append("WWW")
-    if (args.wh):
-      samples.append("WH")
-
-    #BG
-    if (args.ttbar_dilep):
-      samples.append("TTBar2l")
-    if (args.wz):
-      samples.append("WZ")
-    if (args.zz):
-      samples.append("ZZ")
-    if (args.ww):
-      samples.append("WW")
-    if (args.ttv):
-      samples.append("TTV")    
-    if (args.vvv):
-      samples.append("VVV")
-
-    #FR BG
-    if (args.ttbar_1lep):
-      samples.append("TTBar1l")
-    if (args.singletop):
-      samples.append("SingleTop")
-    if (args.wjets):
-      samples.append("WJets")
-    if (args.dy):
-      samples.append("DY")
-    if (args.zh):
-      samples.append("ZH")
-  else:
-    #Asking for default samples
-    samples = ["WJets", "TTBar1l"]
-
-
-  if (args.txt):
-    latex=False
-
-
-  print("Going to use %s to make table from %s..." % (samples, args.study_dir))
+  samples = ["TTBar1l", "WJets"]
   
-  pt_bins = parsePtBins(args.pt_bins)
-  eta_bins = parseEtaBins(args.eta_bins)
-  lepton=args.lepton
-  base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRClosure/%s/" % args.study_dir
-  base_plot_path = "/home/users/bhashemi/public_html/WWWCrossSection/FRClosure/%s/" % args.study_dir
+  if args.signal_regions == "SS":
+    SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu"]
+  elif args.signal_regions == "3lep":
+    SRs = ["3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
+  else:
+    SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
 
-  yields = getCombinedYields(samples, pt_bins, eta_bins)
-  #print(yields)
-  PrintSRTable(yields, pt_bins, eta_bins, latex)
+  base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRClosure/"
+
+  FR_Hist_path = "auxFiles/fakerate_pt_v_eta.root" 
+
+  pt_bins = [10, 15, 20, 25, 30, 35, 50, 120, 6001]
+  eta_bins_m = [0, 1.2, 2.1, 2.4, 3]
+  eta_bins_e = [0, 0.8, 1.479, 2.5, 3]
+  
+  base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/FRClosure/%s" % args.study_dir
+
+  for signal_region in SRs:
+    hist_paths= [ "%s/%s/%s.root" % (base_hists_path, signal_region, s) for s in samples]
+    print("Signal Region: %s: " % signal_region)
+    makeHistos(pt_bins, eta_bins_e, eta_bins_m, hist_paths, FR_Hist_path, signal_region)
+
+  moveIntoCombined(base_hists_path, SRs)
+  printPlotMakerCommand(prediction_hist_path)
 
 if __name__ == "__main__":
   main()

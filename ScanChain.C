@@ -3317,7 +3317,8 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     loose_loose_pteta_m->Sumw2();
   }
 
-  TH1D *weighted_count = new TH1D("weighted_count", "Weighted count of events", 1,0,1);
+  //Bin 1: All Evts, Bin 2: Only Tight, Bin 3: Only Loose
+  TH1D *weighted_count = new TH1D("weighted_count", "Weighted count of events", 4,0,4);
   weighted_count->SetDirectory(rootdir);
   weighted_count->Sumw2();
 
@@ -4023,6 +4024,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
 
         //There was a loose lep in this event
         if (loose_lep_index != -1){
+          weighted_count->Fill(2.5 ,weight); //Bin 3
           if (conf->get("FR_closure_study") == "true"){
             loose_l1pteta->Fill(getFRConeCorrPt(g_lep_inds[0]), phys.lep_etaSC().at(g_lep_inds[0]),weight);
             loose_l2pteta->Fill(getFRConeCorrPt(g_lep_inds[1]), phys.lep_etaSC().at(g_lep_inds[1]),weight);
@@ -4057,7 +4059,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           if (g_nlep > 2) loose_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
         }
         else{
-
+          weighted_count->Fill(1.5 ,weight); //Bin 2
           #ifdef DEBUG 
             cout<<__LINE__<<endl; 
           #endif

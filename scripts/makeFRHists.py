@@ -28,6 +28,12 @@ def err_ratio(num, den, Dnum, Dden):
   """Returns the 1 sigma on a ratio"""
   return abs((float(den)*Dnum - float(num)*Dden)/(den*den))
 
+def frErr(epsilon, Depsilon):
+  """Computes the fake rate and error from the number in Phil's Hist, which is NTight/(NLoose+NTight)"""
+  fr = epsilon/float(1-epsilon)
+  Dfr = Depsilon*(1/float(1-epsilon))*(1+fr)
+  return (fr, Dfr)
+
 def buildIntervals(pt_bins, eta_bins):
   """Returns all intervals in pt and eta bins"""
   pt_intervals = [(pt_bins[i], pt_bins[i+1] - 0.001) for i in xrange(0, len(pt_bins) - 1) ]
@@ -52,10 +58,12 @@ def getYield(hist, pt_bins, eta_bins, h_fr):
     #print("Count in (pt, eta) in (%0.2f, %0.2f, %0.2f, %0.2f) = %0.2f +/- %0.2f" % (pt_low, pt_high, eta_low, eta_high, y, err) )
     
     #Get FR from Histogram
-    fr_x = h_fr.GetXaxis().FindBin(pt_low)
-    fr_y = h_fr.GetYaxis().FindBin(eta_low)
-    fr = h_fr.GetBinContent(fr_x, fr_y)
-    fr_err = h_fr.GetBinError(fr_x, fr_y)
+    epsilon_x = h_fr.GetXaxis().FindBin(pt_low)
+    epsilon_y = h_fr.GetYaxis().FindBin(eta_low)
+    epsilon = h_fr.GetBinContent(fr_x, fr_y)
+    epsilon_err = h_fr.GetBinError(fr_x, fr_y)
+
+    fr, fr_err = frErr(epsilon, ep)
 
     #print("Got fake rate: %0.2f +/ %0.2f" % (fr, fr_err))
 
@@ -110,7 +118,8 @@ def makeHistos(pt_bins, eta_bins_m, eta_bins_e, sample_files, FR_Hist_path, sign
 
 def moveIntoCombined(prediction_hist_path, SRs):
   """Reads the files in all the signal regions sent over, copies the weighted_count hists over to Combined directory such that """
-  samples = ["WZ", "WW", "ZZ", "TTBar2l", "DY", "WWW", "Wh", "VVV", "TTV", "SingleTop", "Other", "Data", "Fakes"]
+  #samples = ["WZ", "WW", "ZZ", "TTBar2l", "DY", "WWW", "Wh", "VVV", "TTV", "SingleTop", "Other", "Data", "Fakes"]
+  samples = ["WZ", "WW", "ZZ", "TTBar2l", "TTBar1l", "WJets", "DY", "WWW", "Wh", "VVV", "TTV", "SingleTop", "Other", "Data", "Fakes"]
   pretty_SR_names = {"2lepSSEE": "ee", "2lepSSEMu":  "e #mu", "2lepSSMuMu": "#mu #mu", "3lep_0SFOS": "0SFOS", "3lep_1SFOS": "1SFOS", "3lep_2SFOS": "2SFOS"}
   latex_SR_names = {"2lepSSEE": "$ee$", "2lepSSEMu":  "$e \mu$", "2lepSSMuMu": "$\mu \mu$", "3lep_0SFOS": "0SFOS", "3lep_1SFOS": "1SFOS", "3lep_2SFOS": "2SFOS"}
   tex_dict = {}
