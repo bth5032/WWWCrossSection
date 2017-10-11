@@ -124,7 +124,7 @@ def moveIntoCombined(hist_path, SRs):
   if (not os.path.isdir("%s/Combined/" % hist_path)):
     os.system("mkdir -p %s/Combined/" % hist_path)
 
-  samples = ["TTBar1l", "WJets", "DY", "Fakes"]
+  samples = ["TTBar1l", "WJets", "Fakes"]
   pretty_SR_names = {"2lepSSEE": "ee", "2lepSSEMu":  "e #mu", "2lepSSMuMu": "#mu #mu", "3lep_0SFOS": "0SFOS", "3lep_1SFOS": "1SFOS", "3lep_2SFOS": "2SFOS"}
   latex_SR_names = {"2lepSSEE": "$ee$", "2lepSSEMu":  "$e \mu$", "2lepSSMuMu": "$\mu \mu$", "3lep_0SFOS": "0SFOS", "3lep_1SFOS": "1SFOS", "3lep_2SFOS": "2SFOS"}
   tex_dict = {}
