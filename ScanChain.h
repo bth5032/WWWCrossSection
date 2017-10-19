@@ -66,10 +66,11 @@ vector<pair <TH1D*, TString> > g_reweight_pairs;
 TDirectory *rootdir = gDirectory->GetDirectory("Rint:");
 TH1D *g_pileup_hist, *g_l1prescale_hist22, *g_l1prescale_hist30, *g_l1prescale_hist36; 
 
-//Btag and ISR Scale Factor overall normalization
+//Uncertainties and overall normalization
 TH2D *g_btagsf_norm, *g_btagsf_light_norm_up, *g_btagsf_heavy_norm_up;
 TH2D *g_isr_norm, *g_isr_norm_up;
 TFile *g_SUSYsf_norm_file;
+TH1D *g_neventsinfile;
 
 TEfficiency *g_pt_eff_barrel, *g_pt_eff_endcap; 
 TFile *g_weight_hist_file, *g_pileup_hist_file, *g_l1prescale_file;
@@ -366,6 +367,9 @@ void writeCleanedJets(const vector<LorentzVector> &vecs);
 
 /*This function writes only elements of the given vector to g_jets_medb_p4 variable, it can be passed the up and down variations as well. Distingushed from the regular jet function because we need to keep track of the CSV values as well.*/
 void writeCleanedBJets(const vector<LorentzVector> &vecs, const vector<float> &csvs);
+
+/* Loads things that change per file, for instance MC uncertainty variations */
+void setupPerFileGlobals();
 
 /*Sets up global variables for the event which are the quantities that might be fluctuated in the process of computing uncertainty limits*/
 void setupGlobals();
