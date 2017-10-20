@@ -20,6 +20,7 @@
 #include "TDirectory.h"
 #include "TFile.h"
 #include "TROOT.h"
+#include "TSystem.h" //gSystem
 #include "TTreeCache.h"
 #include "TEfficiency.h"
 #include "TH1.h"

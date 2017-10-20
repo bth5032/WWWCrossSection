@@ -2695,21 +2695,19 @@ void setupPerFileGlobals(){
   
   //get path to file without #.root
   TString fname = currentFile->GetTitle();
-  fname.Replace("skim", "output");
+  fname.ReplaceAll("skim", "output");
   fname = fname.Remove(fname.Index(".root")).Remove(fname.Last('_'));
   fname += "_"; 
-
-  // copy the h_neventsinfile hist into g_neventsinfile
+  cout<<"Cleaned name: "<<fname<<endl;
   int i=1;
-  TFile *f = new TFile(fname+to_string(i)+".root", "r");
-  g_neventsinfile = (TH1D*) f->Get("h_neventsinfile")->Clone("g_neventsinfile");
-  i++;
-
   //While more files exist add their hists to g_neventsinfile
   while (! gSystem->AccessPathName(fname+to_string(i)+".root", kFileExists)){
+    cout<<"Found new file: "<<fname+to_string(i)+".root"<<endl;
     TFile *f = new TFile(fname+to_string(i)+".root", "r");
+    if (i == 1) g_neventsinfile = (TH1D*) f->Get("h_neventsinfile")->Clone("g_neventsinfile"); // copy the h_neventsinfile hist into g_neventsinfile if first file
+    else        g_neventsinfile->Add((TH1D*) f->Get("h_neventsinfile"));                       // otherwise add it to the hist
+    cout<<"num events in sample now "<<g_neventsinfile->GetBinContent(0);
     i++;
-    g_neventsinfile->Add((TH1D*) f->Get("h_neventsinfile"));
   } 
 }
 
@@ -3348,9 +3346,25 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   //Bin 4: r1f2, Bin 5: r1f0.5, Bin 6: r2f1, Bin 7: r2f2, Bin 8: r2f0.5, Bin 9: r0.5f1, Bin 10: r0.5f2, Bin 11: r0.5f0.5
   //Bin 12: alpha_s down, Bin 13: alpha_s up
   //Bin 14: pdf up, Bin 15: pdf down
-  TH1D *weighted_count = new TH1D("weighted_count", "Weighted count of events", 16,0,16);
+  TH1D *weighted_count = new TH1D("weighted_count", "Weighted count of events", 0,0,0);
   weighted_count->SetDirectory(rootdir);
   weighted_count->Sumw2();
+
+  weighted_count->Fill("All Events",0);
+  weighted_count->Fill("Only Tight",0);
+  weighted_count->Fill("Only Loose",0);
+  weighted_count->Fill("R1F2",0);
+  weighted_count->Fill("R1F0.5",0);
+  weighted_count->Fill("R2F1",0);
+  weighted_count->Fill("R2F2",0);
+  weighted_count->Fill("R2F0.5",0);
+  weighted_count->Fill("R0.5F1",0);
+  weighted_count->Fill("R0.5F2",0);
+  weighted_count->Fill("R0.5F0.5",0);
+  weighted_count->Fill("alpha_s up",0);
+  weighted_count->Fill("alpha_s down",0);
+  weighted_count->Fill("pdf up",0);
+  weighted_count->Fill("pdf down",0);
 
   TH1D *photon_lep_momma_geniso, *photon_lep_momma_SSID_geniso, *photon_lep_momma_genreliso, *photon_lep_momma_SSID_genreliso, *SSID_genmatch, *fakeBreakdown;
   if (conf->get("check_leps_from_photon_iso") == "true"){
@@ -3793,23 +3807,23 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       //Bin 4: r1f2, Bin 5: r1f0.5, Bin 6: r2f1, Bin 7: r2f2, Bin 8: r2f0.5, Bin 9: r0.5f1, Bin 10: r0.5f2, Bin 11: r0.5f0.5
       //Bin 12: alpha_s down, Bin 13: alpha_s up
       //Bin 14: pdf up, Bin 15: pdf down
-      weighted_count->Fill(0.5,  weight);  //All events
-      
-      //                         weight        divide by baseline            apply new factor                      sum of new factors         divide by total num events for avg of new factors
-      weighted_count->Fill(3.5,  weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_n2()       *   g_neventsinfile->GetBinContent(2)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 1   Fac Scale 2
-      weighted_count->Fill(4.5,  weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_np05()     *   g_neventsinfile->GetBinContent(3)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 1   Fac Scale 0.5
-      weighted_count->Fill(5.5,  weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n1()       *   g_neventsinfile->GetBinContent(4)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 2   Fac Scale 1
-      weighted_count->Fill(6.5,  weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n2()       *   g_neventsinfile->GetBinContent(5)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 2   Fac Scale 2
-      weighted_count->Fill(7.5,  weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n0p5()     *   g_neventsinfile->GetBinContent(6)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 2   Fac Scale 0.5
-      weighted_count->Fill(8.5,  weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n1()     *   g_neventsinfile->GetBinContent(7)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 0.5 Fac Scale 1
-      weighted_count->Fill(9.5,  weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n2()     *   g_neventsinfile->GetBinContent(8)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 0.5 Fac Scale 2
-      weighted_count->Fill(10.5, weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n0p5()   *   g_neventsinfile->GetBinContent(9)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 0.5 Fac Scale 0.5
-      
-      weighted_count->Fill(11.5, weight  *                                 phys.weight_alphas_down()    *   g_neventsinfile->GetBinContent(12) *  (1/g_neventsinfile->GetBinContent(0))); //alpha_s down
-      weighted_count->Fill(12.5, weight  *                                 phys.weight_alphas_up()      *   g_neventsinfile->GetBinContent(13) *  (1/g_neventsinfile->GetBinContent(0))); //alpha_s up
+      weighted_count->Fill("All Events",  weight);  //All events
 
-      weighted_count->Fill(13.5, weight  *                                 phys.weight_pdf_up()         *   g_neventsinfile->GetBinContent(10) *  (1/g_neventsinfile->GetBinContent(0))); //pdf up
-      weighted_count->Fill(14.5, weight  *                                 phys.weight_pdf_down()       *   g_neventsinfile->GetBinContent(11) *  (1/g_neventsinfile->GetBinContent(0))); //pdf down
+      //                                   weight        divide by baseline            apply new factor                      sum of new factors         divide by total num events for avg of new factors
+      weighted_count->Fill("R1F2",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_n2()       *   g_neventsinfile->GetBinContent(2)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 1   Fac Scale 2
+      weighted_count->Fill("R1F0.5",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_np05()     *   g_neventsinfile->GetBinContent(3)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 1   Fac Scale 0.5
+      weighted_count->Fill("R2F1",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n1()       *   g_neventsinfile->GetBinContent(4)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 2   Fac Scale 1
+      weighted_count->Fill("R2F2",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n2()       *   g_neventsinfile->GetBinContent(5)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 2   Fac Scale 2
+      weighted_count->Fill("R2F0.5",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n0p5()     *   g_neventsinfile->GetBinContent(6)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 2   Fac Scale 0.5
+      weighted_count->Fill("R0.5F1",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n1()     *   g_neventsinfile->GetBinContent(7)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 0.5 Fac Scale 1
+      weighted_count->Fill("R0.5F2",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n2()     *   g_neventsinfile->GetBinContent(8)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 0.5 Fac Scale 2
+      weighted_count->Fill("R0.5F0.5",     weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n0p5()   *   g_neventsinfile->GetBinContent(9)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 0.5 Fac Scale 0.5
+      
+      weighted_count->Fill("alpha_s up",   weight  *                                 phys.weight_alphas_down()    *   g_neventsinfile->GetBinContent(12) *  (1/g_neventsinfile->GetBinContent(0))); //alpha_s down
+      weighted_count->Fill("alpha_s down", weight  *                                 phys.weight_alphas_up()      *   g_neventsinfile->GetBinContent(13) *  (1/g_neventsinfile->GetBinContent(0))); //alpha_s up
+
+      weighted_count->Fill("pdf up",       weight  *                                 phys.weight_pdf_up()         *   g_neventsinfile->GetBinContent(10) *  (1/g_neventsinfile->GetBinContent(0))); //pdf up
+      weighted_count->Fill("pdf down",     weight  *                                 phys.weight_pdf_down()       *   g_neventsinfile->GetBinContent(11) *  (1/g_neventsinfile->GetBinContent(0))); //pdf down
 
         // ----------------
         // EVENT LIST DEBUG MODE
@@ -4078,7 +4092,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
 
         //There was a loose lep in this event
         if (loose_lep_index != -1){
-          weighted_count->Fill(2.5 ,weight); //Bin 3
+          weighted_count->Fill("Only Loose" ,weight); //Bin 3
           if (conf->get("FR_closure_study") == "true"){
             loose_l1pteta->Fill(getFRConeCorrPt(g_lep_inds[0]), phys.lep_etaSC().at(g_lep_inds[0]),weight);
             loose_l2pteta->Fill(getFRConeCorrPt(g_lep_inds[1]), phys.lep_etaSC().at(g_lep_inds[1]),weight);
@@ -4113,7 +4127,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
           if (g_nlep > 2) loose_lep3pt->Fill(phys.lep_pt().at(g_lep_inds[2]),weight);
         }
         else{
-          weighted_count->Fill(1.5 ,weight); //Bin 2
+          weighted_count->Fill("Only Tight" ,weight); //Bin 2
           #ifdef DEBUG 
             cout<<__LINE__<<endl; 
           #endif
