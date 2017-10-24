@@ -683,7 +683,12 @@ TString getEventClass(){
   else if (c == 3) return "Lost Lepton";
   else if (c == 4) return "Hadronic Fake";
   else if (c == 5) return "Photon Fake";
-}
+  else{
+    cout<<"Throwing error, can not match event class "<<c<<endl;
+    std::stringstream message;
+    message<<"Event class for event: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" is "<<c<<", need value 0-5";
+    throw std::invalid_argument(message.str());}
+  }
 
 int gentype_v2(unsigned lep1_index/*=0*/,unsigned lep2_index/*=1*/, int lep3_index/*=-1*/){
   /* HJ event classifier. Return values -- 0: True SS, 1: True 3 lepton, 2: Charge Flip, 3: lost lepton, 4: hadronic fake, 5: photon fake */
@@ -2771,16 +2776,33 @@ void setupPerFileGlobals(){
   fname += "_"; 
   cout<<"Cleaned name: "<<fname<<endl;
   int i=1;
-  g_neventsinfile->clear();
   //While more files exist add their hists to g_neventsinfile
   while (! gSystem->AccessPathName(fname+to_string(i)+".root", kFileExists)){
     cout<<"Found new file: "<<fname+to_string(i)+".root"<<endl;
-    TFile *f = new TFile(fname+to_string(i)+".root", "r");
-    if (i == 1) g_neventsinfile = (TH1D*) f->Get("h_neventsinfile")->Clone("g_neventsinfile"); // copy the h_neventsinfile hist into g_neventsinfile if first file
-    else        g_neventsinfile->Add((TH1D*) f->Get("h_neventsinfile"));                     // otherwise add it to the hist
+    TFile f(fname+to_string(i)+".root", "READ");
+    #ifdef DEBUG 
+      cout<<__LINE__<<endl; 
+    #endif
+    
+    if (i == 1) g_neventsinfile = (TH1D*) f.Get("h_neventsinfile")->Clone("g_neventsinfile"); // copy the h_neventsinfile hist into g_neventsinfile if first file
+    else        g_neventsinfile->Add((TH1D*) f.Get("h_neventsinfile"));                     // otherwise add it to the hist
+    g_neventsinfile->SetDirectory(rootdir);
+    
     cout<<"num events in sample now "<<g_neventsinfile->GetBinContent(1)<<endl;
+    cout<<"bin 2 "<<g_neventsinfile->GetBinContent(2)<<endl;
+    cout<<"bin 3 "<<g_neventsinfile->GetBinContent(3)<<endl;
+    cout<<"bin 4 "<<g_neventsinfile->GetBinContent(4)<<endl;
+    cout<<"bin 5 "<<g_neventsinfile->GetBinContent(5)<<endl;
+    cout<<"bin 6 "<<g_neventsinfile->GetBinContent(6)<<endl;
+    cout<<"bin 7 "<<g_neventsinfile->GetBinContent(7)<<endl;
+    cout<<"bin 8 "<<g_neventsinfile->GetBinContent(8)<<endl;
+    cout<<"bin 9 "<<g_neventsinfile->GetBinContent(9)<<endl;
+    cout<<"bin 10 "<<g_neventsinfile->GetBinContent(10)<<endl;
+    cout<<"bin 11 "<<g_neventsinfile->GetBinContent(11)<<endl;
+    cout<<"bin 12 "<<g_neventsinfile->GetBinContent(12)<<endl;
+    cout<<"bin 13 "<<g_neventsinfile->GetBinContent(13)<<endl;
     i++;
-    f->Close();
+    f.Close();
   } 
 }
 
@@ -3886,7 +3908,9 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       weight_log->Fill(log10(fabs(weight)));
       weight_log_flat->Fill(fabs(weight));
       
-
+      #ifdef DEBUG 
+        cout<<__LINE__<<endl; 
+      #endif
       //Bin 1: All Evts, Bin 2: Only Tight, Bin 3: Only Loose, 
       //Bin 4: r1f2, Bin 5: r1f0.5, Bin 6: r2f1, Bin 7: r2f2, Bin 8: r2f0.5, Bin 9: r0.5f1, Bin 10: r0.5f2, Bin 11: r0.5f0.5
       //Bin 12: alpha_s down, Bin 13: alpha_s up
@@ -3894,9 +3918,22 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       weighted_count->Fill("All Events",  weight);   //All events
       weighted_count->Fill(getEventClass(), weight); //Fill in specific Class String
 
+      #ifdef DEBUG 
+        cout<<__LINE__<<endl; 
+      #endif
+
+      cout<<"weight: "<<weight<<endl;
+      cout<<"(1/phys.weight_rn_r1_n1()): "<<(1/phys.weight_rn_r1_n1())<<endl;
+      cout<<"phys.weight_rn_r1_n2(): "<<phys.weight_rn_r1_n2()<<endl;
+      cout<<"g_neventsinfile->GetBinContent(2): "<<g_neventsinfile->GetBinContent(2)<<endl;
+      cout<<"(1/g_neventsinfile->GetBinContent(1)): "<<(1/g_neventsinfile->GetBinContent(1))<<endl;
+
       MC_variations->Fill("All Events",  weight);  //All events
       //                                   weight        divide by baseline            apply new factor                      sum of new factors         divide by total num events for avg of new factors
       MC_variations->Fill("R1F2",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_n2()       *   g_neventsinfile->GetBinContent(2)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 1   Fac Scale 2
+      #ifdef DEBUG 
+        cout<<__LINE__<<endl; 
+      #endif
       MC_variations->Fill("R1F0.5",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_np05()     *   g_neventsinfile->GetBinContent(3)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 1   Fac Scale 0.5
       MC_variations->Fill("R2F1",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n1()       *   g_neventsinfile->GetBinContent(4)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 2   Fac Scale 1
       MC_variations->Fill("R2F2",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n2()       *   g_neventsinfile->GetBinContent(5)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 2   Fac Scale 2
@@ -3905,11 +3942,15 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       MC_variations->Fill("R0.5F2",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n2()     *   g_neventsinfile->GetBinContent(8)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 0.5 Fac Scale 2
       MC_variations->Fill("R0.5F0.5",     weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n0p5()   *   g_neventsinfile->GetBinContent(9)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 0.5 Fac Scale 0.5
       
-      MC_variations->Fill("alpha_s up",   weight  *                                 phys.weight_alphas_down()    *   g_neventsinfile->GetBinContent(12) *  (1/g_neventsinfile->GetBinContent(1))); //alpha_s down
-      MC_variations->Fill("alpha_s down", weight  *                                 phys.weight_alphas_up()      *   g_neventsinfile->GetBinContent(13) *  (1/g_neventsinfile->GetBinContent(1))); //alpha_s up
+      MC_variations->Fill("alpha_s up",   weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_alphas_down()    *   g_neventsinfile->GetBinContent(12) *  (1/g_neventsinfile->GetBinContent(1))   ); //alpha_s down
+      MC_variations->Fill("alpha_s down", weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_alphas_up()      *   g_neventsinfile->GetBinContent(13) *  (1/g_neventsinfile->GetBinContent(1))   ); //alpha_s up
 
-      MC_variations->Fill("pdf up",       weight  *                                 phys.weight_pdf_up()         *   g_neventsinfile->GetBinContent(10) *  (1/g_neventsinfile->GetBinContent(1))); //pdf up
-      MC_variations->Fill("pdf down",     weight  *                                 phys.weight_pdf_down()       *   g_neventsinfile->GetBinContent(11) *  (1/g_neventsinfile->GetBinContent(1))); //pdf down
+      MC_variations->Fill("pdf up",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_pdf_up()         *   g_neventsinfile->GetBinContent(10) *  (1/g_neventsinfile->GetBinContent(1))   ); //pdf up
+      MC_variations->Fill("pdf down",     weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_pdf_down()       *   g_neventsinfile->GetBinContent(11) *  (1/g_neventsinfile->GetBinContent(1))   ); //pdf down
+
+      #ifdef DEBUG 
+        cout<<__LINE__<<endl; 
+      #endif
 
         // ----------------
         // EVENT LIST DEBUG MODE
