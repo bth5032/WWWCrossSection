@@ -2779,7 +2779,7 @@ void setupPerFileGlobals(){
     else        g_neventsinfile->Add((TH1D*) f->Get("h_neventsinfile"));                     // otherwise add it to the hist
     cout<<"num events in sample now "<<g_neventsinfile->GetBinContent(1)<<endl;
     i++;
-    f.Close();
+    f->Close();
   } 
 }
 
