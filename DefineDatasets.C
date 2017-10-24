@@ -136,6 +136,11 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     ch->Add(dir+"tth_bb_powheg*");
     ch->Add(dir+"tth_nonbb_powheg*");
   }
+  else if (set == "TTH-nonBB"){
+    cout<<"Adding TTH (just non-BB)"<<endl; 
+
+    ch->Add(dir+"tth_nonbb_powheg*");
+  }
   else if (set == "TTG"){
     cout<<"Adding TTG"<<endl; 
     
@@ -159,6 +164,17 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     ch->Add(dir+"wpwpjj_ewk-qcd_madgraph*");
     ch->Add(dir+"ww_2l2nu_dbl_scat*");
   }
+  else if (set == "WpWp"){
+    cout<<"Adding WpWp"<<endl; 
+    
+    ch->Add(dir+"wpwpjj_ewk-qcd_madgraph*");
+  }
+  else if (set == "WW-2L2N"){
+    cout<<"Adding WW (just 2L2N including dble scat)"<<endl; 
+    
+    ch->Add(dir+"ww_2l2nu_powheg*.root");
+    ch->Add(dir+"ww_2l2nu_dbl_scat*");
+  }
   else if (set == "WZ"){
     cout<<"Adding WZ MC"<<endl; 
     
@@ -166,12 +182,22 @@ void addToChain(TChain *ch, TString set, bool hadoop, bool skimmed) {
     ch->Add(dir+"wz_1l3n_amcnlo*");
     ch->Add(dir+"wz_lnqq_amcnlo*");
   }
+  else if (set == "WZ-3LN"){
+    cout<<"Adding WZ (just 3LN)"<<endl; 
+    
+    ch->Add(dir+"wz_3lnu_powheg*");
+  }
   else if (set == "ZZ"){
     cout<<"Adding ZZ"<<endl; 
     
     ch->Add(dir+"zz_2l2n_powheg*");
     ch->Add(dir+"zz_2l2q_powheg*");
     ch->Add(dir+"zz_2q2n_powheg*");
+    ch->Add(dir+"zz_4l_powheg*");
+  }
+  else if (set == "ZZ-4L"){
+    cout<<"Adding ZZ (only 4L)"<<endl; 
+    
     ch->Add(dir+"zz_4l_powheg*");
   }
   else if (set == "VH"){

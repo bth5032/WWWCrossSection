@@ -257,8 +257,11 @@ bool isLepGenPhoton(int index, double dR=0.2);
 /* Checks gen table for lepton with same PDG ID within a DR of 0.2 with a W or Z mother. */
 bool genMatchWZMomma(int lepind);
 
-/* Returns the Event Class for Each Event */
+/* Returns the Event Class for Each Event Using gentype_v2 */
 TString getEventClass();
+
+/* HJ event classifier. Return values -- 0: True SS, 1: True 3 lepton, 2: Charge Flip, 3: lost lepton, 4: hadronic fake, 5: photon fake */
+int gentype_v2(unsigned lep1_index=0,unsigned lep2_index=1, int lep3_index=-1);
 //=============================
 // Triggers
 //=============================

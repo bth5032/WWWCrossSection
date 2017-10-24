@@ -674,26 +674,97 @@ bool genMatchWZMomma(int lepind){
 }
 
 TString getEventClass(){
-  /* Returns the Event Class for Each Event */
+  /* Returns the Event Class for Each Event Using gentype_v2 */
 
-  int numFromGamma = 0;
-  int numFromW = 0;
-  int numFromFake = 0;
-  int numFromZ = 0;
+  int c = (g_nlep == 2) ? gentype_v2(g_lep_inds[0], g_lep_inds[1], -1) : gentype_v2(g_lep_inds[0], g_lep_inds[1], g_lep_inds[2]);
+  if      (c == 0) return "Real Leptons";
+  else if (c == 1) return "Real Leptons";
+  else if (c == 2) return "Charge Flip";
+  else if (c == 3) return "Lost Lepton";
+  else if (c == 4) return "Hadronic Fake";
+  else if (c == 5) return "Photon Fake";
+}
 
-  for (auto lepind : g_lep_inds ){
-    if      (phys.lep_motherIdSS().at(lepind) == -3) numFromGamma++;
-    else if (genMatchWZMomma(lepind))                numFromW++;
+int gentype_v2(unsigned lep1_index/*=0*/,unsigned lep2_index/*=1*/, int lep3_index/*=-1*/){
+  /* HJ event classifier. Return values -- 0: True SS, 1: True 3 lepton, 2: Charge Flip, 3: lost lepton, 4: hadronic fake, 5: photon fake */
+  
+  bool gammafake = false;
+  bool jetfake   = false;
+  unsigned int ngenlep = phys.ngenLepFromTau()+ phys.ngenLep();
+  unsigned int nW(0), nZ(0);
+
+  //call leptons real if they have positive SSID
+  bool lep1_real = phys.lep_motherIdSS().at(lep1_index) > 0;
+  bool lep2_real = phys.lep_motherIdSS().at(lep2_index) > 0;
+  bool lep3_real = false;
+  if(lep3_index>0) lep3_real = phys.lep_motherIdSS().at(lep3_index) > 0;
+  vector<int> reallepindex;
+
+  // Store index of positive SSID leps.
+  // If SSID == -3, call the event a photon fake
+  // If any other SSID for leps, call it a fake
+  for (unsigned int lepindex = 0;lepindex<phys.lep_p4().size();++lepindex){
+    if     (phys.lep_motherIdSS().at(lepindex) > 0)     reallepindex.push_back(lepindex);
+    else if(phys.lep_motherIdSS().at(lepindex) == -3)   gammafake = true;
+    else                                                jetfake = true;
+    if(phys.lep_isFromW().at(lepindex)) nW++;
+    if(phys.lep_isFromZ().at(lepindex)) nZ++;
   }
 
-  if (numFromGamma > 0){
-    return TString("Photon Fake");
-  }
-  else if (numFromW == g_nlep){
-    return TString("Real");
-  }
+  //2 Lepton Event Classifier:
+  if(lep3_index<0){
+    bool ischargeflip = false;
+    bool isSS = false;
+    //Find 2 lepton Charge flips:
+    if(lep1_real&&lep2_real) {
+      int ilep1 = phys.lep_genPart_index().at(lep1_index);
+      int ilep2 = phys.lep_genPart_index().at(lep2_index);
+      bool lep1_chargeflip  =phys.genPart_charge().at(ilep1)!= phys.lep_charge().at(lep1_index);
+      bool lep2_chargeflip  =phys.genPart_charge().at(ilep2)!= phys.lep_charge().at(lep2_index);
+      
+      if      (!lep1_chargeflip&&!lep2_chargeflip&&nW==2) return 0;    // true SS
+      else if (!lep1_chargeflip&&!lep2_chargeflip)        isSS = true; // true SS - but could be still lost lepton WZ
+  
+      if (lep1_chargeflip||lep2_chargeflip) ischargeflip = true; // charge flip
+    }
+
+    if(ngenlep>2  || reallepindex.size()>2 || (nW>0 && nZ>0)) return 3; // lostlep
+    if((ngenlep<2 ||!lep1_real||!lep2_real)&&    jetfake)     return 4; // jetfake - if double fake with one jet fake and one gamma fake call it jet fake
+    if((ngenlep<2 ||!lep1_real||!lep2_real)&&  gammafake)     return 5; // gammafake
+    if((ngenlep<2 ||!lep1_real||!lep2_real)&& !gammafake)     return 4; // call all without gamma fake jetfake - safety cut
+    if(isSS)                                                  return 0; // true SS
+    if(ischargeflip)                                          return 2; // charge flip
+
+    cout << "This event was not classified - 2 lepton event - v2" << endl;
+    return 1;
+  } 
+  //3 Lepton Event Classifier:
   else {
-    return TString("Hadron Fake");
+    bool ischargeflip = false;
+    bool isthreelep = false;
+    //Find 3 lep Charge flips:
+    if(lep1_real&&lep2_real&&lep3_real) {
+      int ilep1 =   phys.lep_genPart_index().at(lep1_index);
+      int ilep2 =   phys.lep_genPart_index().at(lep2_index);
+      int ilep3 =   phys.lep_genPart_index().at(lep3_index);
+      bool lep1_chargeflip  =phys.genPart_charge().at(ilep1)!= phys.lep_charge().at(lep1_index);
+      bool lep2_chargeflip  =phys.genPart_charge().at(ilep2)!= phys.lep_charge().at(lep2_index);
+      bool lep3_chargeflip  =phys.genPart_charge().at(ilep3)!= phys.lep_charge().at(lep3_index);
+      if      (!lep1_chargeflip&&!lep2_chargeflip&&!lep3_chargeflip&&nW==3) return 0;          // true WWW
+      else if (!lep1_chargeflip&&!lep2_chargeflip&&!lep3_chargeflip)        isthreelep = true; // true 3l, but could be lost lepton ZZ
+      
+      if (lep1_chargeflip||lep2_chargeflip||lep3_chargeflip)   ischargeflip = true; // charge flip
+    }
+    if(ngenlep>3 || reallepindex.size()>3 || (nW>=2 && nZ>=1) || (nZ>=3)) return 3; // lostlep (2 lep from W and 2 from Z, or 4 from Z)
+    //there is the case of having WZZ with two lost leptons --> ngenlep>3 - correctly put has lostlep
+    if((ngenlep<3 ||!lep1_real||!lep2_real||!lep3_real)&&    jetfake)     return 4; // jetfake
+    if((ngenlep<3 ||!lep1_real||!lep2_real||!lep3_real)&&  gammafake)     return 5; // gammafake
+    if((ngenlep<3 ||!lep1_real||!lep2_real||!lep3_real)&& !gammafake)     return 4; // jetfake
+    if(isthreelep)                                                        return 1; // Three Lepton
+    if(ischargeflip)                                                      return 2; // charge flip
+
+    cout << "This event was not classified - 3 lepton event - v2" << endl;
+    return 0;
   }
 }
 //=============================
@@ -2705,8 +2776,8 @@ void setupPerFileGlobals(){
     cout<<"Found new file: "<<fname+to_string(i)+".root"<<endl;
     TFile *f = new TFile(fname+to_string(i)+".root", "r");
     if (i == 1) g_neventsinfile = (TH1D*) f->Get("h_neventsinfile")->Clone("g_neventsinfile"); // copy the h_neventsinfile hist into g_neventsinfile if first file
-    else        g_neventsinfile->Add((TH1D*) f->Get("h_neventsinfile"));                       // otherwise add it to the hist
-    cout<<"num events in sample now "<<g_neventsinfile->GetBinContent(0);
+    else        g_neventsinfile->Add((TH1D*) f->Get("h_neventsinfile"));                     // otherwise add it to the hist
+    cout<<"num events in sample now "<<g_neventsinfile->GetBinContent(1)<<endl;
     i++;
   } 
 }
@@ -3353,18 +3424,29 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   weighted_count->Fill("All Events",0);
   weighted_count->Fill("Only Tight",0);
   weighted_count->Fill("Only Loose",0);
-  weighted_count->Fill("R1F2",0);
-  weighted_count->Fill("R1F0.5",0);
-  weighted_count->Fill("R2F1",0);
-  weighted_count->Fill("R2F2",0);
-  weighted_count->Fill("R2F0.5",0);
-  weighted_count->Fill("R0.5F1",0);
-  weighted_count->Fill("R0.5F2",0);
-  weighted_count->Fill("R0.5F0.5",0);
-  weighted_count->Fill("alpha_s up",0);
-  weighted_count->Fill("alpha_s down",0);
-  weighted_count->Fill("pdf up",0);
-  weighted_count->Fill("pdf down",0);
+  weighted_count->Fill("Real Leptons",0);
+  weighted_count->Fill("Hadronic Fake",0);
+  weighted_count->Fill("Lost Lepton",0);
+  weighted_count->Fill("Charge Flip",0);
+  weighted_count->Fill("Photon Fake",0);
+
+  TH1D* MC_variations = new TH1D("MC_variations", "Counts for MC variations", 0,0,0);
+  MC_variations->SetDirectory(rootdir);
+  MC_variations->Sumw2();
+
+  MC_variations->Fill("All Events",0);
+  MC_variations->Fill("R1F2",0);
+  MC_variations->Fill("R1F0.5",0);
+  MC_variations->Fill("R2F1",0);
+  MC_variations->Fill("R2F2",0);
+  MC_variations->Fill("R2F0.5",0);
+  MC_variations->Fill("R0.5F1",0);
+  MC_variations->Fill("R0.5F2",0);
+  MC_variations->Fill("R0.5F0.5",0);
+  MC_variations->Fill("alpha_s up",0);
+  MC_variations->Fill("alpha_s down",0);
+  MC_variations->Fill("pdf up",0);
+  MC_variations->Fill("pdf down",0);
 
   TH1D *photon_lep_momma_geniso, *photon_lep_momma_SSID_geniso, *photon_lep_momma_genreliso, *photon_lep_momma_SSID_genreliso, *SSID_genmatch, *fakeBreakdown;
   if (conf->get("check_leps_from_photon_iso") == "true"){
@@ -3807,23 +3889,25 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       //Bin 4: r1f2, Bin 5: r1f0.5, Bin 6: r2f1, Bin 7: r2f2, Bin 8: r2f0.5, Bin 9: r0.5f1, Bin 10: r0.5f2, Bin 11: r0.5f0.5
       //Bin 12: alpha_s down, Bin 13: alpha_s up
       //Bin 14: pdf up, Bin 15: pdf down
-      weighted_count->Fill("All Events",  weight);  //All events
+      weighted_count->Fill("All Events",  weight);   //All events
+      weighted_count->Fill(getEventClass(), weight); //Fill in specific Class String
 
+      MC_variations->Fill("All Events",  weight);  //All events
       //                                   weight        divide by baseline            apply new factor                      sum of new factors         divide by total num events for avg of new factors
-      weighted_count->Fill("R1F2",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_n2()       *   g_neventsinfile->GetBinContent(2)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 1   Fac Scale 2
-      weighted_count->Fill("R1F0.5",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_np05()     *   g_neventsinfile->GetBinContent(3)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 1   Fac Scale 0.5
-      weighted_count->Fill("R2F1",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n1()       *   g_neventsinfile->GetBinContent(4)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 2   Fac Scale 1
-      weighted_count->Fill("R2F2",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n2()       *   g_neventsinfile->GetBinContent(5)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 2   Fac Scale 2
-      weighted_count->Fill("R2F0.5",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n0p5()     *   g_neventsinfile->GetBinContent(6)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 2   Fac Scale 0.5
-      weighted_count->Fill("R0.5F1",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n1()     *   g_neventsinfile->GetBinContent(7)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 0.5 Fac Scale 1
-      weighted_count->Fill("R0.5F2",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n2()     *   g_neventsinfile->GetBinContent(8)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 0.5 Fac Scale 2
-      weighted_count->Fill("R0.5F0.5",     weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n0p5()   *   g_neventsinfile->GetBinContent(9)  *  (1/g_neventsinfile->GetBinContent(0))   );  //Renorm Scale 0.5 Fac Scale 0.5
+      MC_variations->Fill("R1F2",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_n2()       *   g_neventsinfile->GetBinContent(2)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 1   Fac Scale 2
+      MC_variations->Fill("R1F0.5",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_np05()     *   g_neventsinfile->GetBinContent(3)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 1   Fac Scale 0.5
+      MC_variations->Fill("R2F1",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n1()       *   g_neventsinfile->GetBinContent(4)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 2   Fac Scale 1
+      MC_variations->Fill("R2F2",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n2()       *   g_neventsinfile->GetBinContent(5)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 2   Fac Scale 2
+      MC_variations->Fill("R2F0.5",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n0p5()     *   g_neventsinfile->GetBinContent(6)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 2   Fac Scale 0.5
+      MC_variations->Fill("R0.5F1",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n1()     *   g_neventsinfile->GetBinContent(7)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 0.5 Fac Scale 1
+      MC_variations->Fill("R0.5F2",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n2()     *   g_neventsinfile->GetBinContent(8)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 0.5 Fac Scale 2
+      MC_variations->Fill("R0.5F0.5",     weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n0p5()   *   g_neventsinfile->GetBinContent(9)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 0.5 Fac Scale 0.5
       
-      weighted_count->Fill("alpha_s up",   weight  *                                 phys.weight_alphas_down()    *   g_neventsinfile->GetBinContent(12) *  (1/g_neventsinfile->GetBinContent(0))); //alpha_s down
-      weighted_count->Fill("alpha_s down", weight  *                                 phys.weight_alphas_up()      *   g_neventsinfile->GetBinContent(13) *  (1/g_neventsinfile->GetBinContent(0))); //alpha_s up
+      MC_variations->Fill("alpha_s up",   weight  *                                 phys.weight_alphas_down()    *   g_neventsinfile->GetBinContent(12) *  (1/g_neventsinfile->GetBinContent(1))); //alpha_s down
+      MC_variations->Fill("alpha_s down", weight  *                                 phys.weight_alphas_up()      *   g_neventsinfile->GetBinContent(13) *  (1/g_neventsinfile->GetBinContent(1))); //alpha_s up
 
-      weighted_count->Fill("pdf up",       weight  *                                 phys.weight_pdf_up()         *   g_neventsinfile->GetBinContent(10) *  (1/g_neventsinfile->GetBinContent(0))); //pdf up
-      weighted_count->Fill("pdf down",     weight  *                                 phys.weight_pdf_down()       *   g_neventsinfile->GetBinContent(11) *  (1/g_neventsinfile->GetBinContent(0))); //pdf down
+      MC_variations->Fill("pdf up",       weight  *                                 phys.weight_pdf_up()         *   g_neventsinfile->GetBinContent(10) *  (1/g_neventsinfile->GetBinContent(1))); //pdf up
+      MC_variations->Fill("pdf down",     weight  *                                 phys.weight_pdf_down()       *   g_neventsinfile->GetBinContent(11) *  (1/g_neventsinfile->GetBinContent(1))); //pdf down
 
         // ----------------
         // EVENT LIST DEBUG MODE
@@ -4556,7 +4640,14 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
     cout<<__LINE__<<endl; 
   #endif
   otherleps_ptRatio->Write();
+  #ifdef DEBUG 
+    cout<<__LINE__<<endl; 
+  #endif
   weighted_count->Write();
+  #ifdef DEBUG 
+    cout<<__LINE__<<endl; 
+  #endif
+  MC_variations->Write();
   #ifdef DEBUG 
     cout<<__LINE__<<endl; 
   #endif
