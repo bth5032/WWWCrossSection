@@ -2771,6 +2771,7 @@ void setupPerFileGlobals(){
   fname += "_"; 
   cout<<"Cleaned name: "<<fname<<endl;
   int i=1;
+  g_neventsinfile->clear();
   //While more files exist add their hists to g_neventsinfile
   while (! gSystem->AccessPathName(fname+to_string(i)+".root", kFileExists)){
     cout<<"Found new file: "<<fname+to_string(i)+".root"<<endl;
