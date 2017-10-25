@@ -2774,33 +2774,19 @@ void setupPerFileGlobals(){
   fname.ReplaceAll("skim", "output");
   fname = fname.Remove(fname.Index(".root")).Remove(fname.Last('_'));
   fname += "_"; 
-  cout<<"Cleaned name: "<<fname<<endl;
+  //cout<<"Cleaned name for global counts: "<<fname<<endl;
   int i=1;
   //While more files exist add their hists to g_neventsinfile
   while (! gSystem->AccessPathName(fname+to_string(i)+".root", kFileExists)){
-    cout<<"Found new file: "<<fname+to_string(i)+".root"<<endl;
+    //cout<<"Found new file: "<<fname+to_string(i)+".root"<<endl;
     TFile f(fname+to_string(i)+".root", "READ");
     #ifdef DEBUG 
       cout<<__LINE__<<endl; 
     #endif
-    
     if (i == 1) g_neventsinfile = (TH1D*) f.Get("h_neventsinfile")->Clone("g_neventsinfile"); // copy the h_neventsinfile hist into g_neventsinfile if first file
     else        g_neventsinfile->Add((TH1D*) f.Get("h_neventsinfile"));                     // otherwise add it to the hist
     g_neventsinfile->SetDirectory(rootdir);
-    
-    cout<<"num events in sample now "<<g_neventsinfile->GetBinContent(1)<<endl;
-    cout<<"bin 2 "<<g_neventsinfile->GetBinContent(2)<<endl;
-    cout<<"bin 3 "<<g_neventsinfile->GetBinContent(3)<<endl;
-    cout<<"bin 4 "<<g_neventsinfile->GetBinContent(4)<<endl;
-    cout<<"bin 5 "<<g_neventsinfile->GetBinContent(5)<<endl;
-    cout<<"bin 6 "<<g_neventsinfile->GetBinContent(6)<<endl;
-    cout<<"bin 7 "<<g_neventsinfile->GetBinContent(7)<<endl;
-    cout<<"bin 8 "<<g_neventsinfile->GetBinContent(8)<<endl;
-    cout<<"bin 9 "<<g_neventsinfile->GetBinContent(9)<<endl;
-    cout<<"bin 10 "<<g_neventsinfile->GetBinContent(10)<<endl;
-    cout<<"bin 11 "<<g_neventsinfile->GetBinContent(11)<<endl;
-    cout<<"bin 12 "<<g_neventsinfile->GetBinContent(12)<<endl;
-    cout<<"bin 13 "<<g_neventsinfile->GetBinContent(13)<<endl;
+    //cout<<"num events in sample now "<<g_neventsinfile->GetBinContent(1)<<endl;
     i++;
     f.Close();
   } 
@@ -3922,11 +3908,11 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         cout<<__LINE__<<endl; 
       #endif
 
-      cout<<"weight: "<<weight<<endl;
-      cout<<"(1/phys.weight_rn_r1_n1()): "<<(1/phys.weight_rn_r1_n1())<<endl;
-      cout<<"phys.weight_rn_r1_n2(): "<<phys.weight_rn_r1_n2()<<endl;
-      cout<<"g_neventsinfile->GetBinContent(2): "<<g_neventsinfile->GetBinContent(2)<<endl;
-      cout<<"(1/g_neventsinfile->GetBinContent(1)): "<<(1/g_neventsinfile->GetBinContent(1))<<endl;
+      //cout<<"weight: "<<weight<<endl;
+      //cout<<"(1/phys.weight_rn_r1_n1()): "<<(1/phys.weight_rn_r1_n1())<<endl;
+      //cout<<"phys.weight_rn_r1_n2(): "<<phys.weight_rn_r1_n2()<<endl;
+      //cout<<"g_neventsinfile->GetBinContent(2): "<<g_neventsinfile->GetBinContent(2)<<endl;
+      //cout<<"(1/g_neventsinfile->GetBinContent(1)): "<<(1/g_neventsinfile->GetBinContent(1))<<endl;
 
       MC_variations->Fill("All Events",  weight);  //All events
       //                                   weight        divide by baseline            apply new factor                      sum of new factors         divide by total num events for avg of new factors
