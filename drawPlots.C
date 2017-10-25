@@ -264,9 +264,7 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   cout << "Histograms pulled from files, adding draw options"<<endl;
   
   //cout<<__LINE__<<endl;
-  if (conf->get("relabel_x_axis") == "true"){
-    hists[0]->LabelsDeflate();
-  }
+  if (conf->get("relabel_x_axis") == "true"){ for (int i = 0; i<num_hists; i++){ hists[i]->LabelsDeflate(); } }
 
   double xmax = (conf->get("xmax") != "" ) ? stod(conf->get("xmax")) : hists[0]->GetNbinsX();
   double xmin = (conf->get("xmin") != "" ) ? stod(conf->get("xmin")) : 0;
@@ -321,17 +319,6 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   for (int i = 0; i<num_hists; i++){
     cout<<hist_labels[i]<<" Integral bin 0 to bin 100 Content: "<<hists[i]->Integral(hists[i]->FindBin(0),hists[i]->FindBin(100))<<endl;
   }
-
-  if (conf->get("relabel_x_axis") == "true"){
-    TString bin_label;
-    for (int i = (int) xmin; i < (int) xmax; i++)
-    {
-      bin_label=hists[0]->GetXaxis()->GetBinLabel(hists[0]->FindBin(i));
-      h_axes->GetXaxis()->SetBinLabel(h_axes->FindBin(i), bin_label);
-    }  
-    //h_axes->GetXaxis()->LabelsOption("v");
-    h_axes->GetXaxis()->SetLabelSize(.015);
-  } 
 
   //===========================
   // Normalize
@@ -547,6 +534,17 @@ TString drawArbitraryNumberWithResidual(ConfigParser *conf){
   
   TH2F* h_axes = new TH2F(Form("%s_axes",plot_name.Data()),plot_title,hists[0]->GetNbinsX(),xmin,xmax,1000,ymin,ymax);
   
+  if (conf->get("relabel_x_axis") == "true"){
+    TString bin_label;
+    for (int i = (int) xmin; i < (int) xmax; i++)
+    {
+      bin_label=hists[0]->GetXaxis()->GetBinLabel(hists[0]->FindBin(i));
+      h_axes->GetXaxis()->SetBinLabel(h_axes->FindBin(i), bin_label);
+    }  
+    //h_axes->GetXaxis()->LabelsOption("v");
+    h_axes->GetXaxis()->SetLabelSize(.015);
+  } 
+
   //-----------------------
   // AXES FIX
   //-----------------------
@@ -1094,11 +1092,7 @@ TString drawArbitraryNumber(ConfigParser *conf){
   
   //cout<<__LINE__<<endl;
 
-  if (conf->get("relabel_x_axis") == "true"){
-    for (int i = 0; i<num_hists; i++){
-      hists[i]->LabelsDeflate();
-    }
-  }
+  if (conf->get("relabel_x_axis") == "true"){ for (int i = 0; i<num_hists; i++){ hists[i]->LabelsDeflate(); } }
 
   double xmax = (conf->get("xmax") != "" ) ? stod(conf->get("xmax")) : hists[0]->GetNbinsX();
   double xmin = (conf->get("xmin") != "" ) ? stod(conf->get("xmin")) : 0;
