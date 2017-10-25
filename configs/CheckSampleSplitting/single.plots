@@ -169,3 +169,16 @@ bin_size=1
 sample=ZZ-4L
 hist_label=ZZ \rightarrow 4l
 hist_name=weighted_count
+
+Name=weighted_count_TTBar2l
+plot_name=weighted_count_TTBar2l
+title=Weighted Count for (TTBar2l)
+xmin=0
+xmax=8
+relabel_x_axis=true
+overflow=false
+ylabel=Count
+bin_size=1
+sample=TTBar2l
+hist_label=T\bar{T} \rightarrow 2l
+hist_name=weighted_count
