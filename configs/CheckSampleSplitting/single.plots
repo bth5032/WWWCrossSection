@@ -53,19 +53,6 @@ sample=WWW
 hist_label=WWW
 hist_name=weighted_count
 
-Name=weighted_count_
-plot_name=weighted_count_
-title=Weighted Count for ()
-xmin=0
-xmax=8
-relabel_x_axis=true
-overflow=false
-ylabel=Count
-bin_size=1
-sample=
-hist_label=
-hist_name=weighted_count
-
 Name=weighted_count_TTGamma
 plot_name=weighted_count_TTGamma
 title=Weighted Count for (TTGamma)
