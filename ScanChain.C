@@ -3953,6 +3953,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
         //When Debug mode is off, you can turn this on:
         #ifdef EVENT_LIST
           cout<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
+          files_log<<"evt: "<<phys.evt()<<" run: "<<phys.run()<<" lumi: "<<phys.lumi()<<" scale1fb: "<<phys.evt_scale1fb()<<" weight: "<<weight<<" extra_weight: "<< weight/phys.evt_scale1fb() <<endl;
         #endif
 //===========================================
 // Analysis Code
