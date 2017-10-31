@@ -3915,24 +3915,36 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       //cout<<"(1/g_neventsinfile->GetBinContent(1)): "<<(1/g_neventsinfile->GetBinContent(1))<<endl;
 
       MC_variations->Fill("All Events",  weight);  //All events
-      //                                   weight        divide by baseline            apply new factor                      sum of new factors         divide by total num events for avg of new factors
-      MC_variations->Fill("R1F2",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_n2()       *   g_neventsinfile->GetBinContent(2)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 1   Fac Scale 2
-      #ifdef DEBUG 
-        cout<<__LINE__<<endl; 
-      #endif
-      MC_variations->Fill("R1F0.5",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r1_np05()     *   g_neventsinfile->GetBinContent(3)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 1   Fac Scale 0.5
-      MC_variations->Fill("R2F1",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n1()       *   g_neventsinfile->GetBinContent(4)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 2   Fac Scale 1
-      MC_variations->Fill("R2F2",         weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n2()       *   g_neventsinfile->GetBinContent(5)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 2   Fac Scale 2
-      MC_variations->Fill("R2F0.5",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r2_n0p5()     *   g_neventsinfile->GetBinContent(6)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 2   Fac Scale 0.5
-      MC_variations->Fill("R0.5F1",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n1()     *   g_neventsinfile->GetBinContent(7)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 0.5 Fac Scale 1
-      MC_variations->Fill("R0.5F2",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n2()     *   g_neventsinfile->GetBinContent(8)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 0.5 Fac Scale 2
-      MC_variations->Fill("R0.5F0.5",     weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_rn_r0p5_n0p5()   *   g_neventsinfile->GetBinContent(9)  *  (1/g_neventsinfile->GetBinContent(1))   );  //Renorm Scale 0.5 Fac Scale 0.5
       
-      MC_variations->Fill("alpha_s up",   weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_alphas_down()    *   g_neventsinfile->GetBinContent(12) *  (1/g_neventsinfile->GetBinContent(1))   ); //alpha_s down
-      MC_variations->Fill("alpha_s down", weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_alphas_up()      *   g_neventsinfile->GetBinContent(13) *  (1/g_neventsinfile->GetBinContent(1))   ); //alpha_s up
+      //---------------------------------------------
+      // The weight of an event (if using the MC method properly) is Scale1fb * (baseline/avg. baseline)
+      // since the baseline weight doesn't vary much over the events, we don't normally bother (i.e. we assume baseline/avg. baseline is 1).
+      // Then to find the proper variation of the weights, we want to do:
+      //
+      // Weight ==> Weight * (w1/avg. w1) / (w0/ avg. w0)
+      //
+      // where w0 is the baseline and w1 is the new weight.
+      // This reduces to:
+      //
+      // Weight ==> Weight * w1 * s0 / (s1 * w0)
+      //
+      // where s0 and s1 are the sum of the baseline and new weights for all events in the sample. I.E. the total number of events drops out.
+      // This is the formula used below.
+      //                                  weight              w1                          sum of baseline weights                    sum of new weights                  baseline weight
+      MC_variations->Fill("R1F2",         weight  *   phys.weight_rn_r1_n2()      *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(2)    *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 1   Fac Scale 2
+      MC_variations->Fill("R1F0.5",       weight  *   phys.weight_rn_r1_np05()    *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(3)    *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 1   Fac Scale 0.5
+      MC_variations->Fill("R2F1",         weight  *   phys.weight_rn_r2_n1()      *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(4)    *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 2   Fac Scale 1
+      MC_variations->Fill("R2F2",         weight  *   phys.weight_rn_r2_n2()      *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(5)    *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 2   Fac Scale 2
+      MC_variations->Fill("R2F0.5",       weight  *   phys.weight_rn_r2_n0p5()    *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(6)    *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 2   Fac Scale 0.5
+      MC_variations->Fill("R0.5F1",       weight  *   phys.weight_rn_r0p5_n1()    *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(7)    *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 0.5 Fac Scale 1
+      MC_variations->Fill("R0.5F2",       weight  *   phys.weight_rn_r0p5_n2()    *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(8)    *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 0.5 Fac Scale 2
+      MC_variations->Fill("R0.5F0.5",     weight  *   phys.weight_rn_r0p5_n0p5()  *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(9)    *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 0.5 Fac Scale 0.5
+      
+      MC_variations->Fill("alpha_s up",   weight  *   phys.weight_alphas_down()   *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(12)   *   phys.weight_rn_r1_n1() )   ); //alpha_s down
+      MC_variations->Fill("alpha_s down", weight  *   phys.weight_alphas_up()     *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(13)   *   phys.weight_rn_r1_n1() )   ); //alpha_s up
 
-      MC_variations->Fill("pdf up",       weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_pdf_up()         *   g_neventsinfile->GetBinContent(10) *  (1/g_neventsinfile->GetBinContent(1))   ); //pdf up
-      MC_variations->Fill("pdf down",     weight  *  (1/phys.weight_rn_r1_n1())  *  phys.weight_pdf_down()       *   g_neventsinfile->GetBinContent(11) *  (1/g_neventsinfile->GetBinContent(1))   ); //pdf down
+      MC_variations->Fill("pdf up",       weight  *   phys.weight_pdf_up()        *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(10)   *   phys.weight_rn_r1_n1() )   ); //pdf up
+      MC_variations->Fill("pdf down",     weight  *   phys.weight_pdf_down()      *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(11)   *   phys.weight_rn_r1_n1() )   ); //pdf down
 
       #ifdef DEBUG 
         cout<<__LINE__<<endl; 
