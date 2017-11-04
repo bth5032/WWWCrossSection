@@ -33,40 +33,40 @@ def fillYields(filename, sr):
   hist = f.Get("MC_variations").Clone("h_%s" % sr)
 
   variations[sr] = {
-    "tot" : hist->GetBinContnent(1),
-    "high_FR" : hist->GetBinContnent(2),
-    "low_FR" : hist->GetBinContnent(2),
-    "f0p5r0p5" : hist->GetBinContnent(9),
-    "f2r2" : hist->GetBinContnent(5),
-    "alpha_up" : hist->GetBinContnent(10),
-    "alpha_dn" : hist->GetBinContnent(11),
-    "pdf_up" : hist->GetBinContnent(12),
-    "pdf_dn" : hist->GetBinContnent(13)
+    "tot" : hist.GetBinContent(1),
+    "high_FR" : hist.GetBinContent(2),
+    "low_FR" : hist.GetBinContent(2),
+    "f0p5r0p5" : hist.GetBinContent(9),
+    "f2r2" : hist.GetBinContent(5),
+    "alpha_up" : hist.GetBinContent(10),
+    "alpha_dn" : hist.GetBinContent(11),
+    "pdf_up" : hist.GetBinContent(12),
+    "pdf_dn" : hist.GetBinContent(13)
   }
 
   for i in xrange(3,11):
-    count = hist->GetBinContnent(i)
+    count = hist.GetBinContent(i)
     if count > variations[sr]["high_FR"]:
       print("high for %s came from %d" % (sr, i) )
       variations[sr]["high_FR"] = count
-    else if count < variations[sr]["low_FR"]:
+    elif count < variations[sr]["low_FR"]:
       variations[sr]["low_FR"] = count
       print("low for %s came from %d" % (sr, i) )
 
 def printLatexTable(SRs):
   outfile = open("outputs/MC_Variation.tex", "w+")
 
-  pretty_SR_names = ["2lepSSEE": "$ee$","2lepSSEMu": "$e \mu$","2lepSSMuMu":  "$\mu \mu$","3lep_0SFOS": "0SFOS","3lep_1SFOS": "1SFOS","3lep_2SFOS": "2SFOS"]
-
+  pretty_SR_names = {"2lepSSEE": "$ee$","2lepSSEMu": "$e \mu$","2lepSSMuMu":  "$\mu \mu$","3lep_0SFOS": "0SFOS","3lep_1SFOS": "1SFOS","3lep_2SFOS": "2SFOS"}
+  var_names = ["tot", "high_FR", "low_FR", "alpha_up", "alpha_dn", "pdf_up", "pdf_dn"]
+  pretty_var_names = {"tot": "Yield", "high_FR": "F\\&R High", "low_FR": "F\\&R Low", "f2r2": "F2R2", "f0p5r0p5": "F$0.5$R$0.5$", "alpha_up": "$\\alpha_s$ Low", "alpha_dn": "$\\alpha_s$ High", "pdf_up": "PDF Low", "pdf_dn": "PDF High"}
+  
   outfile.write("\\begin{table}[ht!]\n")
   outfile.write("\\begin{center}\n")
-  outfile.write("\\begin{tabular}{l"+"|c"*len(line1.keys())+"}\n")
-  
-  var_names = ["tot", "high_FR", "low_FR", "f0p5r0p5", "f2r2", "alpha_up", "alpha_dn", "pdf_up", "pdf_dn"]
+  outfile.write("\\begin{tabular}{l"+"|c"*len(var_names)+"}\n")
 
   header="Variation "
   for v in var_names:
-    header+="& %s " % v
+    header+="& %s " % pretty_var_names[v]
   header+="\\\\ \\hline\n"
 
   outfile.write(header)
@@ -77,10 +77,10 @@ def printLatexTable(SRs):
   for sr in SRs:
     line = "%s" % pretty_SR_names[sr]
     for v in var_names:
-      line+=" & $%0.2f (%0.2f)$" % (variations[sr][v], variations[sr][v]/variations[sr][0])
+      line+=" & $%0.2f (%0.2f)$" % (variations[sr][v], variations[sr][v]/variations[sr]["tot"])
     line+= "\\\\ \n"
     outfile.write(line)
-    
+
   outfile.write("\\end{tabular} \n")
   outfile.write("\\end{center} \n")
   outfile.write("\\end{table} \n")
@@ -91,7 +91,7 @@ def main():
   
 
   for signal_region in SRs:
-    fillYields("%s/%s/WWW.root" % (base_hists_path, signal_region), signal_region)
+    fillYields("%s/%s/Signal.root" % (base_hists_path, signal_region), signal_region)
 
   printLatexTable(SRs)
 

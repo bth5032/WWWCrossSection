@@ -3940,7 +3940,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       MC_variations->Fill("R0.5F2",       weight  *   phys.weight_rn_r0p5_n2()    *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(9)   *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 0.5 Fac Scale 2
       MC_variations->Fill("R0.5F0.5",     weight  *   phys.weight_rn_r0p5_n0p5()  *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(10)  *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 0.5 Fac Scale 0.5
     
-      MC_variations->Fill("alpha_s up",   weight  *   phys.weight_alphas_down()     *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(14)  *   phys.weight_rn_r1_n1() )  ); //alpha_s down
+      MC_variations->Fill("alpha_s up",   weight  *   phys.weight_alphas_down()   *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(14)  *   phys.weight_rn_r1_n1() )  ); //alpha_s down
       MC_variations->Fill("alpha_s down", weight  *   phys.weight_alphas_up()     *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(13)  *   phys.weight_rn_r1_n1() )  ); //alpha_s up
 
       MC_variations->Fill("pdf up",       weight  *   phys.weight_pdf_up()        *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(11)  *   phys.weight_rn_r1_n1() )  ); //pdf up
