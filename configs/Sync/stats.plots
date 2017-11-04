@@ -414,6 +414,20 @@ ylabel=Count
 bin_size=1
 hist_name=MC_variations
 
+Name=MC_variations_WH
+plot_name=MC_variations_WH
+PLOT_TYPE=single
+sample=WH
+title=MC Variations
+logy=false
+xmin=0
+xmax=13
+relabel_x_axis=true
+overflow=false
+ylabel=Count
+bin_size=1
+hist_name=MC_variations
+
 Name=MC_variations_Signal
 plot_name=MC_variations_Signal
 PLOT_TYPE=single
