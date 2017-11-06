@@ -13,6 +13,7 @@ r.gROOT.SetBatch(True)
 parser = argparse.ArgumentParser(add_help=False)
 
 parser.add_argument("-u", "--usage", help="Print help message and quit", action="store_true")
+parser.add_argument("-s", "--sample", help="Sample to run over (WWW, Wh, Signal)", type=str, default="Signal")
 
 args=parser.parse_args()
 
@@ -53,8 +54,8 @@ def fillYields(filename, sr):
       variations[sr]["low_FR"] = count
       print("low for %s came from %d" % (sr, i) )
 
-def printLatexTable(SRs):
-  outfile = open("outputs/MC_Variation.tex", "w+")
+def printLatexTable(SRs, sample):
+  outfile = open("outputs/MC_Variation_%s.tex" % sample, "w+")
 
   pretty_SR_names = {"2lepSSEE": "$ee$","2lepSSEMu": "$e \mu$","2lepSSMuMu":  "$\mu \mu$","3lep_0SFOS": "0SFOS","3lep_1SFOS": "1SFOS","3lep_2SFOS": "2SFOS"}
   var_names = ["tot", "high_FR", "low_FR", "alpha_up", "alpha_dn", "pdf_up", "pdf_dn"]
@@ -88,12 +89,12 @@ def printLatexTable(SRs):
 def main():
   SRs = ["2lepSSEE","2lepSSEMu","2lepSSMuMu","3lep_0SFOS","3lep_1SFOS","3lep_2SFOS"]
   base_hists_path = "/nfs-7/userdata/bobak/WWWCrossSection_Hists/Sync/SRs/"
-  
+  sample = args.sample
 
   for signal_region in SRs:
-    fillYields("%s/%s/Signal.root" % (base_hists_path, signal_region), signal_region)
+    fillYields("%s/%s/%s.root" % (base_hists_path, signal_region, sample), signal_region)
 
-  printLatexTable(SRs)
+  printLatexTable(SRs, sample)
 
 if __name__ == "__main__":
   main()
