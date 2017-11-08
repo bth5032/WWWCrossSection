@@ -3457,6 +3457,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
   MC_variations->Fill("alpha_s down",0);
   MC_variations->Fill("pdf up",0);
   MC_variations->Fill("pdf down",0);
+  MC_variations->Fill("R1F1",0);
 
   TH1D *photon_lep_momma_geniso, *photon_lep_momma_SSID_geniso, *photon_lep_momma_genreliso, *photon_lep_momma_SSID_genreliso, *SSID_genmatch, *fakeBreakdown;
   if (conf->get("check_leps_from_photon_iso") == "true"){
@@ -3930,7 +3931,7 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       //
       // where s0 and s1 are the sum of the baseline and new weights for all events in the sample. I.E. the total number of events drops out.
       // This is the formula used below.
-      //                                  weight              w1                          sum of baseline weights                    sum of new weights              don't divide by baseline weight
+      //                                  weight              w1                          sum of baseline weights                    sum of new weights              divide by baseline weight
       MC_variations->Fill("R1F2",         weight  *   phys.weight_rn_r1_n2()      *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(3)   *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 1   Fac Scale 2
       MC_variations->Fill("R1F0.5",       weight  *   phys.weight_rn_r1_np05()    *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(4)   *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 1   Fac Scale 0.5
       MC_variations->Fill("R2F1",         weight  *   phys.weight_rn_r2_n1()      *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(5)   *   phys.weight_rn_r1_n1() )  );  //Renorm Scale 2   Fac Scale 1
@@ -3946,6 +3947,8 @@ int ScanChain( TChain* chain, ConfigParser *configuration, bool fast/* = true*/,
       MC_variations->Fill("pdf up",       weight  *   phys.weight_pdf_up()        *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(11)  *   phys.weight_rn_r1_n1() )  ); //pdf up
       MC_variations->Fill("pdf down",     weight  *   phys.weight_pdf_down()      *  g_neventsinfile->GetBinContent(2)   /   (g_neventsinfile->GetBinContent(12)  *   phys.weight_rn_r1_n1() )  ); //pdf down
 
+      //Check the "correct baseline" weight here just for understanding
+      MC_variations->Fill("R1F1",         weight  *   phys.weight_rn_r1_n1()      *  g_neventsinfile->GetBinContent(1)   /   (g_neventsinfile->GetBinContent(2)                              )  );  //Renorm Scale 1   Fac Scale 1
       #ifdef DEBUG 
         cout<<__LINE__<<endl; 
       #endif
