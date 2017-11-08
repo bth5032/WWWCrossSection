@@ -35,6 +35,7 @@ def fillYields(filename, sr):
 
   variations[sr] = {
     "tot" : hist.GetBinContent(1),
+    "tot_unc" : hist.GetBinError(1),
     "high_FR" : hist.GetBinContent(2),
     "low_FR" : hist.GetBinContent(2),
     "f0p5r0p5" : hist.GetBinContent(9),
@@ -78,7 +79,10 @@ def printLatexTable(SRs, sample):
   for sr in SRs:
     line = "%s" % pretty_SR_names[sr]
     for v in var_names:
-      line+=" & $%0.2f (%0.2f)$" % (variations[sr][v], variations[sr][v]/variations[sr]["tot"])
+      if v == "tot":
+        line+=" & $%0.2f \pm %0.2f$" % (variations[sr][tot], variations[sr]["tot_unc"])
+      else:  
+        line+=" & $%0.2f (%0.2f)$" % (variations[sr][v], variations[sr][v]/variations[sr]["tot"])
     line+= "\\\\ \n"
     outfile.write(line)
 
