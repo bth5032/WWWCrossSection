@@ -80,7 +80,7 @@ def printLatexTable(SRs, sample):
     line = "%s" % pretty_SR_names[sr]
     for v in var_names:
       if v == "tot":
-        line+=" & $%0.2f \pm %0.2f$" % (variations[sr][tot], variations[sr]["tot_unc"])
+        line+=" & $%0.2f \pm %0.2f$" % (variations[sr]["tot"], variations[sr]["tot_unc"])
       else:  
         line+=" & $%0.2f (%0.2f)$" % (variations[sr][v], variations[sr][v]/variations[sr]["tot"])
     line+= "\\\\ \n"
